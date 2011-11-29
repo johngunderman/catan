@@ -1,4 +1,4 @@
-DROP DATABASE Catan;
+DROP DATABASE IF EXISTS Catan;
 
 SET storage_engine=InnoDB;
 CREATE DATABASE Catan;
