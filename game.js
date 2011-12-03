@@ -2,6 +2,11 @@
 IMAGE_SOURCE = 'images/tiles.png';
 TILE_HEIGHT = 304;
 TILE_WIDTH  = 354;
+TILE_OFFSET = 86;                  // the horizontal offset of the hexagon
+
+SCALE_HEIGHT = 85;
+SCALE_WIDTH  = 98;
+SCALE_OFFSET = 24;
 
 WOOD      = 0;
 SHEEP     = 1;
@@ -32,13 +37,70 @@ function initBoard() {
     // Init the drawing board
     var example = document.getElementById('board');
     var context = example.getContext('2d');
-    context.fillStyle = "rgb(255,0,0)";
+    context.fillStyle = "rgb(255,255,255)";
     context.fillRect(0, 0, 600, 600);
 
     var img = new Image();
     img.src = IMAGE_SOURCE;
 
-    context.drawImage(img, TILE_WIDTH * 5,0,TILE_WIDTH,TILE_HEIGHT, 0,0,TILE_WIDTH/2,TILE_HEIGHT/2);
+    dispWaterFrame(img, context);
+
+}
+
+function dispWaterFrame(img, context) {
+    // first vertical column
+    for (x = 1; x < 5; x++) {
+        context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                          TILE_WIDTH, TILE_HEIGHT,
+                          0, SCALE_HEIGHT * (x + .5),
+                          SCALE_WIDTH, SCALE_HEIGHT);
+    }
+
+    // second vertical column (only 2)
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      SCALE_WIDTH - SCALE_OFFSET, SCALE_HEIGHT,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      SCALE_WIDTH - SCALE_OFFSET, SCALE_HEIGHT * 5,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    // third vertical column
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2 + SCALE_HEIGHT * 5,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    // Center column
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      3 * (SCALE_WIDTH - SCALE_OFFSET), 0,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      3 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT * 6,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    // fourth vertical column
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+                      TILE_WIDTH, TILE_HEIGHT,
+                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2 + SCALE_HEIGHT * 5,
+                      SCALE_WIDTH, SCALE_HEIGHT);
+
+
 }
 
 function initTicker() {
