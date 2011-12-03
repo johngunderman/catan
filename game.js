@@ -1,4 +1,16 @@
 
+IMAGE_SOURCE = 'images/tiles.png';
+TILE_HEIGHT = 304;
+TILE_WIDTH  = 354;
+
+WOOD      = 0;
+SHEEP     = 1;
+MOUNTAIN  = 2;
+DESERT    = 3;
+OCEAN     = 4;
+WASTELAND = 5;
+
+
 window.onload = function() {
     initTitle();
     initBoard();
@@ -6,6 +18,7 @@ window.onload = function() {
     initWhitespace();
     initPlayerDisplay();
 }
+
 
 function initTitle() {
     var example = document.getElementById('title');
@@ -21,6 +34,11 @@ function initBoard() {
     var context = example.getContext('2d');
     context.fillStyle = "rgb(255,0,0)";
     context.fillRect(0, 0, 600, 600);
+
+    var img = new Image();
+    img.src = IMAGE_SOURCE;
+
+    context.drawImage(img, TILE_WIDTH * 5,0,TILE_WIDTH,TILE_HEIGHT, 0,0,TILE_WIDTH/2,TILE_HEIGHT/2);
 }
 
 function initTicker() {
