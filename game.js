@@ -37,7 +37,7 @@ function initBoard() {
     // Init the drawing board
     var example = document.getElementById('board');
     var context = example.getContext('2d');
-    context.fillStyle = "rgb(255,255,255)";
+    context.fillStyle = "rgb(200,200, 200)";
     context.fillRect(0, 0, 600, 600);
 
     var img = new Image();
@@ -47,60 +47,56 @@ function initBoard() {
 
 }
 
+
 function dispWaterFrame(img, context) {
-    // first vertical column
-    for (x = 1; x < 5; x++) {
-        context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                          TILE_WIDTH, TILE_HEIGHT,
-                          0, SCALE_HEIGHT * (x + .5),
-                          SCALE_WIDTH, SCALE_HEIGHT);
+    drawHexAt(img, context, OCEAN, 0,0);
+    drawHexAt(img, context, OCEAN, 0,1);
+    drawHexAt(img, context, OCEAN, 0,2);
+    drawHexAt(img, context, OCEAN, 0,3);
+
+    drawHexAt(img, context, OCEAN, 1,0);
+    drawHexAt(img, context, OCEAN, 1,4);
+
+    drawHexAt(img, context, OCEAN, 2,0);
+    drawHexAt(img, context, OCEAN, 2,5);
+
+    drawHexAt(img, context, OCEAN, 3,0);
+    drawHexAt(img, context, OCEAN, 3,6);
+
+    drawHexAt(img, context, OCEAN, 4,0);
+    drawHexAt(img, context, OCEAN, 4,5);
+
+    drawHexAt(img, context, OCEAN, 5,0);
+    drawHexAt(img, context, OCEAN, 5,4);
+
+    drawHexAt(img, context, OCEAN, 6,0);
+    drawHexAt(img, context, OCEAN, 6,1);
+    drawHexAt(img, context, OCEAN, 6,2);
+    drawHexAt(img, context, OCEAN, 6,3);
+
+}
+
+
+// (0,0) is measured as the north-west most piece on the board.
+// TODO: Make this not draw things in the lower right hand corner
+function drawHexAt(img, context, hexNum, x, y) {
+    var xcoord = 0;
+    var ycoord = 0;
+
+    if (x < 0 || y < 0 || x > 6 || y > 6) {
+        // invalid coords!
+        console.debug("Invalid drawing coords in drawHexAt!");
+        return -1;
     }
 
-    // second vertical column (only 2)
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
+    ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+
+    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    context.drawImage(img, TILE_WIDTH * hexNum, 0,
                       TILE_WIDTH, TILE_HEIGHT,
-                      SCALE_WIDTH - SCALE_OFFSET, SCALE_HEIGHT,
+                      xcoord, ycoord,
                       SCALE_WIDTH, SCALE_HEIGHT);
-
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      SCALE_WIDTH - SCALE_OFFSET, SCALE_HEIGHT * 5,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    // third vertical column
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2 + SCALE_HEIGHT * 5,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    // Center column
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      3 * (SCALE_WIDTH - SCALE_OFFSET), 0,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      3 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT * 6,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    // fourth vertical column
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-    context.drawImage(img, TILE_WIDTH * OCEAN, 0,
-                      TILE_WIDTH, TILE_HEIGHT,
-                      2 * (SCALE_WIDTH - SCALE_OFFSET), SCALE_HEIGHT / 2 + SCALE_HEIGHT * 5,
-                      SCALE_WIDTH, SCALE_HEIGHT);
-
-
 }
 
 function initTicker() {
