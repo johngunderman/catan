@@ -41,11 +41,15 @@ function initBoard() {
     context.fillRect(0, 0, 600, 600);
 
     var img = new Image();
+    img.onload = function() {
+        dispWaterFrame(img, context);
+        dispDemoBoard(img, context);
+    }
+
+    //onload, then src.  Not the other way around
     img.src = IMAGE_SOURCE;
 
-    dispWaterFrame(img, context);
 
-    dispDemoBoard(img, context);
 
 }
 
