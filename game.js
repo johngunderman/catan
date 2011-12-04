@@ -8,12 +8,12 @@ SCALE_HEIGHT = 85;
 SCALE_WIDTH  = 98;
 SCALE_OFFSET = 24;
 
-WOOD      = 0;
-SHEEP     = 1;
-MOUNTAIN  = 2;
-DESERT    = 3;
-OCEAN     = 4;
-WASTELAND = 5;
+WOOD     = 0;
+SHEEP    = 1;
+MOUNTAIN = 2;
+DESERT   = 3;
+OCEAN    = 4;
+BRICK    = 5;
 
 
 window.onload = function() {
@@ -37,7 +37,7 @@ function initBoard() {
     // Init the drawing board
     var example = document.getElementById('board');
     var context = example.getContext('2d');
-    context.fillStyle = "rgb(200,200, 200)";
+    context.fillStyle = "rgb(255,255,255)";
     context.fillRect(0, 0, 600, 600);
 
     var img = new Image();
@@ -45,8 +45,32 @@ function initBoard() {
 
     dispWaterFrame(img, context);
 
+    dispDemoBoard(img, context);
+
 }
 
+
+function dispDemoBoard(img, context) {
+    drawHexAt(img, context, WOOD, 1,1);
+    drawHexAt(img, context, DESERT, 1,2);
+    drawHexAt(img, context, SHEEP, 1,3);
+    drawHexAt(img, context, MOUNTAIN, 2,1);
+    drawHexAt(img, context, BRICK, 2,2);
+    drawHexAt(img, context, WOOD, 2,3);
+    drawHexAt(img, context, MOUNTAIN, 2,4);
+    drawHexAt(img, context, SHEEP, 3,1);
+    drawHexAt(img, context, WOOD, 3,2);
+    drawHexAt(img, context, SHEEP, 3,3);
+    drawHexAt(img, context, BRICK, 3,4);
+    drawHexAt(img, context, DESERT, 3,5);
+    drawHexAt(img, context, BRICK, 4,1);
+    drawHexAt(img, context, MOUNTAIN, 4,2);
+    drawHexAt(img, context, DESERT, 4,3);
+    drawHexAt(img, context, WOOD, 4,4);
+    drawHexAt(img, context, DESERT, 5,1);
+    drawHexAt(img, context, BRICK, 5,2);
+    drawHexAt(img, context, SHEEP, 5,3);
+}
 
 function dispWaterFrame(img, context) {
     drawHexAt(img, context, OCEAN, 0,0);
