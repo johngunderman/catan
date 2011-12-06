@@ -15,6 +15,9 @@ DESERT   = 3;
 OCEAN    = 4;
 BRICK    = 5;
 
+WEST      = 0;
+NORTHWEST = 1;
+
 
 window.onload = function() {
     initTitle();
@@ -74,9 +77,56 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, DESERT, 5,1);
     drawHexAt(img, context, BRICK, 5,2);
     drawHexAt(img, context, SHEEP, 5,3);
+
+
+    // draw us some coordinates:
+    for (x = 0; x < 7; x++) {
+        for (y = 0; y < 7; y++) {
+            //console.log("displaying vertices for " + x +"," + y);
+            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            dispAtVertex(x + "," + y + ",1", context, x, y, 1);
+        }
+    }
+
 }
 
+
+// x,y determines a hex, d determines the vertex of the hex
+// Two values for d: WEST or NORTHWEST
+function dispAtVertex(text, context, x, y, d) {
+    var xcoord = 0;
+    var ycoord = 0;
+
+    if (x < 0 || y < 0 || x > 11 || y > 11) {
+        // invalid coords!
+        console.debug("Invalid drawing coords in dispAtVertex!");
+        return -1;
+    }
+
+    ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+
+    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    ycoord += .5 * SCALE_HEIGHT;
+    xcoord += SCALE_WIDTH - SCALE_OFFSET;
+
+    if (d == WEST) {
+        ycoord += .5 * SCALE_HEIGHT;
+    }
+    else if (d == NORTHWEST) {
+        xcoord += SCALE_OFFSET;
+    }
+
+    //console.log("displaying vertex at " + xcoord +"," + ycoord);
+
+    context.fillStyle    = 'rgb(0,0,0)';
+    context.font         = '12px sans-serif';
+    context.fillText(text, xcoord, ycoord);
+}
+
+
 function dispWaterFrame(img, context) {
+
     drawHexAt(img, context, OCEAN, 0,0);
     drawHexAt(img, context, OCEAN, 0,1);
     drawHexAt(img, context, OCEAN, 0,2);
@@ -111,15 +161,13 @@ function drawHexAt(img, context, hexNum, x, y) {
     var xcoord = 0;
     var ycoord = 0;
 
-    if (x < 0 || y < 0 || x > 6 || y > 6) {
-        // invalid coords!
-        console.debug("Invalid drawing coords in drawHexAt!");
-        return -1;
-    }
-
     ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
     xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    // shift origin to make (0,0) a game tile instead of an ocean tile
+    ycoord += .5 * SCALE_HEIGHT;
+    xcoord += SCALE_WIDTH - SCALE_OFFSET;
 
     context.drawImage(img, TILE_WIDTH * hexNum, 0,
                       TILE_WIDTH, TILE_HEIGHT,
