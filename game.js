@@ -107,6 +107,9 @@ function dispAtVertex(text, context, x, y, d) {
 
     xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
 
+    ycoord += .5 * SCALE_HEIGHT;
+    xcoord += SCALE_WIDTH - SCALE_OFFSET;
+
     if (d == WEST) {
         ycoord += .5 * SCALE_HEIGHT;
     }
@@ -123,6 +126,7 @@ function dispAtVertex(text, context, x, y, d) {
 
 
 function dispWaterFrame(img, context) {
+
     drawHexAt(img, context, OCEAN, 0,0);
     drawHexAt(img, context, OCEAN, 0,1);
     drawHexAt(img, context, OCEAN, 0,2);
@@ -157,15 +161,13 @@ function drawHexAt(img, context, hexNum, x, y) {
     var xcoord = 0;
     var ycoord = 0;
 
-    if (x < 0 || y < 0 || x > 6 || y > 6) {
-        // invalid coords!
-        console.debug("Invalid drawing coords in drawHexAt!");
-        return -1;
-    }
-
     ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
     xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    // shift origin to make (0,0) a game tile instead of an ocean tile
+    ycoord += .5 * SCALE_HEIGHT;
+    xcoord += SCALE_WIDTH - SCALE_OFFSET;
 
     context.drawImage(img, TILE_WIDTH * hexNum, 0,
                       TILE_WIDTH, TILE_HEIGHT,
