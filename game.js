@@ -58,30 +58,30 @@ function initBoard() {
 
 
 function dispDemoBoard(img, context) {
-    drawHexAt(img, context, WOOD, 1,1);
-    drawHexAt(img, context, DESERT, 1,2);
-    drawHexAt(img, context, SHEEP, 1,3);
-    drawHexAt(img, context, MOUNTAIN, 2,1);
-    drawHexAt(img, context, BRICK, 2,2);
-    drawHexAt(img, context, WOOD, 2,3);
-    drawHexAt(img, context, MOUNTAIN, 2,4);
-    drawHexAt(img, context, SHEEP, 3,1);
-    drawHexAt(img, context, WOOD, 3,2);
-    drawHexAt(img, context, SHEEP, 3,3);
-    drawHexAt(img, context, BRICK, 3,4);
-    drawHexAt(img, context, DESERT, 3,5);
-    drawHexAt(img, context, BRICK, 4,1);
-    drawHexAt(img, context, MOUNTAIN, 4,2);
-    drawHexAt(img, context, DESERT, 4,3);
-    drawHexAt(img, context, WOOD, 4,4);
-    drawHexAt(img, context, DESERT, 5,1);
-    drawHexAt(img, context, BRICK, 5,2);
-    drawHexAt(img, context, SHEEP, 5,3);
+    drawHexAt(img, context, WOOD, 0,0);
+    drawHexAt(img, context, DESERT, 0,1);
+    drawHexAt(img, context, SHEEP, 0,2);
+    drawHexAt(img, context, MOUNTAIN, 1,0);
+    drawHexAt(img, context, BRICK, 1,1);
+    drawHexAt(img, context, WOOD, 1,2);
+    drawHexAt(img, context, MOUNTAIN, 1,3);
+    drawHexAt(img, context, SHEEP, 2,0);
+    drawHexAt(img, context, WOOD, 2,1);
+    drawHexAt(img, context, SHEEP, 2,2);
+    drawHexAt(img, context, BRICK, 2,3);
+    drawHexAt(img, context, DESERT, 2,4);
+    drawHexAt(img, context, BRICK, 3,1);
+    drawHexAt(img, context, MOUNTAIN, 3,2);
+    drawHexAt(img, context, DESERT, 3,3);
+    drawHexAt(img, context, WOOD, 3,4);
+    drawHexAt(img, context, DESERT, 4,1);
+    drawHexAt(img, context, BRICK, 4,2);
+    drawHexAt(img, context, SHEEP, 4,3);
 
 
     // draw us some coordinates:
-    for (x = 0; x < 7; x++) {
-        for (y = 0; y < 7; y++) {
+    for (x = -1; x < 7; x++) {
+        for (y = -1; y < 7; y++) {
             //console.log("displaying vertices for " + x +"," + y);
             dispAtVertex(x + "," + y + ",0", context, x, y, 0);
             dispAtVertex(x + "," + y + ",1", context, x, y, 1);
@@ -97,11 +97,13 @@ function dispAtVertex(text, context, x, y, d) {
     var xcoord = 0;
     var ycoord = 0;
 
-    if (x < 0 || y < 0 || x > 11 || y > 11) {
+    //FIXME: Retool this, it doesn't actually ensure correctness.
+    //or remove
+    /*if (x < 0 || y < 0 || x > 11 || y > 11) {
         // invalid coords!
-        console.debug("Invalid drawing coords in dispAtVertex!");
+        console.warn("Invalid drawing coords in dispAtVertex!");
         return -1;
-    }
+    }*/
 
     ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
@@ -127,30 +129,30 @@ function dispAtVertex(text, context, x, y, d) {
 
 function dispWaterFrame(img, context) {
 
-    drawHexAt(img, context, OCEAN, 0,0);
-    drawHexAt(img, context, OCEAN, 0,1);
-    drawHexAt(img, context, OCEAN, 0,2);
+    drawHexAt(img, context, OCEAN, -1,-1);
+    drawHexAt(img, context, OCEAN, -1,0);
+    drawHexAt(img, context, OCEAN, -1,1);
+    drawHexAt(img, context, OCEAN, -1,2);
+
+    drawHexAt(img, context, OCEAN, 0,-1);
     drawHexAt(img, context, OCEAN, 0,3);
 
-    drawHexAt(img, context, OCEAN, 1,0);
+    drawHexAt(img, context, OCEAN, 1,-1);
     drawHexAt(img, context, OCEAN, 1,4);
 
-    drawHexAt(img, context, OCEAN, 2,0);
+    drawHexAt(img, context, OCEAN, 2,-1);
     drawHexAt(img, context, OCEAN, 2,5);
 
     drawHexAt(img, context, OCEAN, 3,0);
-    drawHexAt(img, context, OCEAN, 3,6);
+    drawHexAt(img, context, OCEAN, 3,5);
 
     drawHexAt(img, context, OCEAN, 4,0);
-    drawHexAt(img, context, OCEAN, 4,5);
+    drawHexAt(img, context, OCEAN, 4,4);
 
     drawHexAt(img, context, OCEAN, 5,0);
-    drawHexAt(img, context, OCEAN, 5,4);
-
-    drawHexAt(img, context, OCEAN, 6,0);
-    drawHexAt(img, context, OCEAN, 6,1);
-    drawHexAt(img, context, OCEAN, 6,2);
-    drawHexAt(img, context, OCEAN, 6,3);
+    drawHexAt(img, context, OCEAN, 5,1);
+    drawHexAt(img, context, OCEAN, 5,2);
+    drawHexAt(img, context, OCEAN, 5,3);
 
 }
 
