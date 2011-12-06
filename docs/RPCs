@@ -35,7 +35,9 @@ wait(userid, gameid, seqno):
     RETURNS:
     {
         sequence: 45
-        log: { name: "joined", args: ["John", 205] }
+        log: [
+            { name: "joined", args: ["John", 205] }
+        ]
     }
 
 join_game()
@@ -48,9 +50,10 @@ join_game()
     {
         status: success
         sequence: 50
-        log: {
-            { name: "joined", args: ["John", 201"]
+        log: [
+            { name: "joined", args: ["John", 201"],
             { name: "joined", args: ["John", 205"]
+        ]
     }
 
     RETURNS (fail):
@@ -68,7 +71,26 @@ start_game(userid, gameid, seqno)
     {
         status: success
         sequence: 221
-        log: {
+        log: [
             { name: "puthexes", args: [[1, 1], [2, 5], ...]}
-        }
+        ]
     }
+
+Events:
+
+Client requests:
+    place_settlement
+    move_robber
+    conduct_turn
+    discard_card
+
+Server events:
+    joined [(name, id)]
+    hexes_placed [(position, type)]
+    robber_placed
+    road_built
+    settlement_built
+    city_built
+    robber_moved
+    trade_offered
+
