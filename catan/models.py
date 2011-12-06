@@ -8,10 +8,13 @@ class User(Base):
 
 class Game(Base):
     __tablename__ = "Game"
+
     GameID = Column(Integer, primary_key=True)
     DateStarted = Column(DateTime) #or timestamp, maybe?
     GameName = Column(String)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
+
+    players = relationship("GamePlayer")
     cards = relationship("GameCards", uselist=False)
 
 class GameCards(Base):
@@ -29,15 +32,14 @@ class GameCards(Base):
 
 class GamePlayer(Base):
     __tablename__ = "GamePlayer"
-    ID = Column(Integer, primary_key=True)
-    GameID = Column(Integer)
-    UserID = Column(Integer)
-    Color = Column(String(6))
+    PlayerID = Column(Integer, primary_key=True)
+    GameID = Column(Integer, ForeignKey("Game.GameID"))
+    UserID = Column(Integer, ForeignKey("User.UserID"))
     cards = relationship("PlayerCards", uselist=False)
 
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
-    PlayerID = Column(Integer, ForeignKey("GamePlayer.ID"), primary_key=True)
+    PlayerID = Column(Integer, ForeignKey("GamePlayer.PlayerID"), primary_key=True)
     Brick = Column(SmallInteger)
     Wood = Column(SmallInteger)
     Wheat = Column(SmallInteger)
