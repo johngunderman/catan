@@ -105,12 +105,10 @@ function dispAtVertex(text, context, x, y, d) {
         return -1;
     }*/
 
-    ycoord = 0.5 * (3 - x) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
-    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
-
-    ycoord += .5 * SCALE_HEIGHT;
-    xcoord += SCALE_WIDTH - SCALE_OFFSET;
+    var coords = getPixelCoords(x,y);
+    xcoord = coords[0];
+    ycoord = coords[1];
 
     if (d == WEST) {
         ycoord += .5 * SCALE_HEIGHT;
@@ -124,6 +122,24 @@ function dispAtVertex(text, context, x, y, d) {
     context.fillStyle    = 'rgb(0,0,0)';
     context.font         = '12px sans-serif';
     context.fillText(text, xcoord, ycoord);
+}
+
+
+// gives the pixel coordinates of the upper left hand corner
+// of the square containing the hexagon to be drawn. Note that this pixel
+// location is not actually inside the hexagon.
+function getPixelCoords(x,y) {
+    var xcoord = 0;
+    var ycoord = 0;
+
+    ycoord = 0.5 * (3 - x) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+
+    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    ycoord += .5 * SCALE_HEIGHT;
+    xcoord += SCALE_WIDTH - SCALE_OFFSET;
+
+    return [xcoord, ycoord];
 }
 
 
@@ -163,13 +179,9 @@ function drawHexAt(img, context, hexNum, x, y) {
     var xcoord = 0;
     var ycoord = 0;
 
-    ycoord = 0.5 * (3 - x) * SCALE_HEIGHT + y * SCALE_HEIGHT;
-
-    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
-
-    // shift origin to make (0,0) a game tile instead of an ocean tile
-    ycoord += .5 * SCALE_HEIGHT;
-    xcoord += SCALE_WIDTH - SCALE_OFFSET;
+    var coords = getPixelCoords(x,y);
+    xcoord = coords[0];
+    ycoord = coords[1];
 
     context.drawImage(img, TILE_WIDTH * hexNum, 0,
                       TILE_WIDTH, TILE_HEIGHT,
