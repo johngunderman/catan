@@ -74,9 +74,9 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, MOUNTAIN, 3,2);
     drawHexAt(img, context, DESERT, 3,3);
     drawHexAt(img, context, WOOD, 3,4);
-    drawHexAt(img, context, DESERT, 4,1);
-    drawHexAt(img, context, BRICK, 4,2);
-    drawHexAt(img, context, SHEEP, 4,3);
+    drawHexAt(img, context, DESERT, 4,2);
+    drawHexAt(img, context, BRICK, 4,3);
+    drawHexAt(img, context, SHEEP, 4,4);
 
 
     // draw us some coordinates:
@@ -105,7 +105,7 @@ function dispAtVertex(text, context, x, y, d) {
         return -1;
     }*/
 
-    ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+    ycoord = 0.5 * (3 - x) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
     xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
 
@@ -146,13 +146,13 @@ function dispWaterFrame(img, context) {
     drawHexAt(img, context, OCEAN, 3,0);
     drawHexAt(img, context, OCEAN, 3,5);
 
-    drawHexAt(img, context, OCEAN, 4,0);
-    drawHexAt(img, context, OCEAN, 4,4);
+    drawHexAt(img, context, OCEAN, 4,1);
+    drawHexAt(img, context, OCEAN, 4,5);
 
-    drawHexAt(img, context, OCEAN, 5,0);
-    drawHexAt(img, context, OCEAN, 5,1);
     drawHexAt(img, context, OCEAN, 5,2);
     drawHexAt(img, context, OCEAN, 5,3);
+    drawHexAt(img, context, OCEAN, 5,4);
+    drawHexAt(img, context, OCEAN, 5,5);
 
 }
 
@@ -163,7 +163,7 @@ function drawHexAt(img, context, hexNum, x, y) {
     var xcoord = 0;
     var ycoord = 0;
 
-    ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+    ycoord = 0.5 * (3 - x) * SCALE_HEIGHT + y * SCALE_HEIGHT;
 
     xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
 
