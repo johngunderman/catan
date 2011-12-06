@@ -15,6 +15,9 @@ DESERT   = 3;
 OCEAN    = 4;
 BRICK    = 5;
 
+WEST      = 0;
+NORTHWEST = 1;
+
 
 window.onload = function() {
     initTitle();
@@ -74,7 +77,50 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, DESERT, 5,1);
     drawHexAt(img, context, BRICK, 5,2);
     drawHexAt(img, context, SHEEP, 5,3);
+
+
+    // draw us some coordinates:
+    for (x = 0; x < 7; x++) {
+        for (y = 0; y < 7; y++) {
+            //console.log("displaying vertices for " + x +"," + y);
+            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            dispAtVertex(x + "," + y + ",1", context, x, y, 1);
+        }
+    }
+
 }
+
+
+// x,y determines a hex, d determines the vertex of the hex
+// Two values for d: WEST or NORTHWEST
+function dispAtVertex(text, context, x, y, d) {
+    var xcoord = 0;
+    var ycoord = 0;
+
+    if (x < 0 || y < 0 || x > 11 || y > 11) {
+        // invalid coords!
+        console.debug("Invalid drawing coords in dispAtVertex!");
+        return -1;
+    }
+
+    ycoord = 0.5 * Math.abs(x - 3) * SCALE_HEIGHT + y * SCALE_HEIGHT;
+
+    xcoord = (SCALE_WIDTH - SCALE_OFFSET) * x;
+
+    if (d == WEST) {
+        ycoord += .5 * SCALE_HEIGHT;
+    }
+    else if (d == NORTHWEST) {
+        xcoord += SCALE_OFFSET;
+    }
+
+    //console.log("displaying vertex at " + xcoord +"," + ycoord);
+
+    context.fillStyle    = 'rgb(0,0,0)';
+    context.font         = '12px sans-serif';
+    context.fillText(text, xcoord, ycoord);
+}
+
 
 function dispWaterFrame(img, context) {
     drawHexAt(img, context, OCEAN, 0,0);
