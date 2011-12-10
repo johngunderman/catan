@@ -1,0 +1,5 @@
+Dependencies:
+
+python
+python-flask
+python-sqlalchemy

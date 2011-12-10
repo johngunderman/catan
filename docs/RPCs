@@ -1,0 +1,96 @@
+Result format:
+
+status = "success" | "fail"
+    on bad, the client should refresh the page
+result = any data that the operation generated
+sequence = the next value to call wait(n) with.  The next sequence the client should expect to see.
+log = 
+
+RPCs:
+
+create_game(userid)
+    - Advertises a game to people
+        - RETURNS: success or failure, conditionally the game id + log(gameid,0)
+    - Remain in lobby on client side, maybe?
+
+    RETURNS (success):
+    {
+        status: "success",
+        result: 201
+        sequence: 1
+        log: [
+            { name: "joined", args: ["Josh", 201] }
+        ]
+    }
+
+    RETURNS (fail):
+    {
+        status: "fail"
+    }
+
+wait(userid, gameid, seqno):
+    - Long poll
+    - Gets the logs of actions that have occured on the server that are >= sequence number n
+
+    RETURNS:
+    {
+        sequence: 45
+        log: [
+            { name: "joined", args: ["John", 205] }
+        ]
+    }
+
+join_game()
+    - Joins in on an advertised game
+        - LOG EVENT: joined (name, color)
+    - Remain in lobby until start_game
+    - RETURNS: log from 0
+
+    RETURNS (success):
+    {
+        status: success
+        sequence: 50
+        log: [
+            { name: "joined", args: ["John", 201"],
+            { name: "joined", args: ["John", 205"]
+        ]
+    }
+
+    RETURNS (fail):
+    {
+        status: fail
+    }
+
+start_game(userid, gameid, seqno)
+    - Starts the game
+    - Allocates terrain hexes
+        - LOG EVENT: puthexes [(1, 1) ..... ]
+        - RETURNS: the log from seqno
+    - Redirect to game page
+    
+    {
+        status: success
+        sequence: 221
+        log: [
+            { name: "puthexes", args: [[1, 1], [2, 5], ...]}
+        ]
+    }
+
+Events:
+
+Client requests:
+    place_settlement
+    move_robber
+    conduct_turn
+    discard_card
+
+Server events:
+    joined [(name, id)]
+    hexes_placed [(position, type)]
+    robber_placed
+    road_built
+    settlement_built
+    city_built
+    robber_moved
+    trade_offered
+

@@ -39,6 +39,3 @@ application = Application([
 http_server = HTTPServer(application)
 http_server.listen(5000)
 IOLoop.instance().start()
-
-
-
