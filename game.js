@@ -52,7 +52,6 @@ function initBoard() {
         dispWaterFrame(img, stage.getContext());
         dispDemoBoard(img, stage.getContext());
         drawCoords(stage.getContext());
-        //drawRoadDetector(stage, 3,3,NORTHWEST,4,3,WEST);
         drawAllRoadDetectors(stage);
 
     }
@@ -130,10 +129,8 @@ function drawRoadDetector(stage, v1, v2) {
         var context = this.getContext();
         context.beginPath();
         context.lineWidth = 1;
-        context.strokeStyle = "red"
-        //context.strokeStyle = "rgba(0,0,0,0)";
-        //context.fillStyle = "rgba(0,0,0,0)";
-        context.fillStyle = "red";
+        context.strokeStyle = "rgba(0,0,0,0)";
+        context.fillStyle = "rgba(0,0,0,0)";
 	var width = 2
 
         context.moveTo(coords1[0] - width, coords1[1] - width);
