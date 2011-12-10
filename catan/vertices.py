@@ -1,9 +1,15 @@
 """
-We model a 6x6 grid of hexagons.  Obviously some hexagons are not valid in the context of a catan board, thus some of the vertices on them are also not valid positions on a catan board.
+We model a 6x6 grid of hexagons.  Obviously some hexagons are not
+valid in the context of a catan board, thus some of the vertices on
+them are also not valid positions on a catan board.
 
-We consider two vertices on each hexagon, the west vertex, and the northwest vertex.  Together with the location of a hexagon, the WEST or NORTHWEST information can model the position of any vertex on the board.
+We consider two vertices on each hexagon, the west vertex, and the
+northwest vertex.  Together with the location of a hexagon, the WEST
+or NORTHWEST information can model the position of any vertex on the
+board.
 
-Each vertex is thus a 3-tuple (x,y,d).  x and y are zero-indexed.  d is {WEST = 0, NORTHWEST = 1}.
+Each vertex is thus a 3-tuple (x,y,d).  x and y are zero-indexed.  d
+is {WEST = 0, NORTHWEST = 1}.
 """
 
 rows = [(0,6), (0,8), (0,10), (1,11), (3,11), (5,11)] #a[x] is the indices of (first good vertex, last good vertex)
@@ -18,8 +24,9 @@ def isvalid((x,y,d)):
     return pos >= low and pos <= high and (d == 0 or d == 1)
 
 """
-adjacent(p) returns a list of at most three vertices which are directly adjacent to p.
-""" 
+adjacent(p) returns a list of at most three vertices which are
+directly adjacent to p.
+"""
 def adjacent((x,y,d)):
     if d == 0:
         return filter(isvalid,[(x-1, y, 1), (x, y, 1), (x, y+1, 1)])
@@ -27,7 +34,8 @@ def adjacent((x,y,d)):
         return filter(isvalid,[(x, y-1, 0), (x, y, 0), (x+1, y, 0)])
 
 """
-Takes a 3-tuple p and represents it as a single integer for easy storage and transmission
+Takes a 3-tuple p and represents it as a single integer for easy
+storage and transmission
 """
 def compress((x,y,d)):
     return indices[y] + 2*x + d - rows[y][0]
@@ -41,7 +49,8 @@ def decompress(p):
     return (p/2, y, p % 2)
 
 """
-Tests whether decompress(compress(g)) == g.  Should probably be factored elsewhere
+Tests whether decompress(compress(g)) == g.  Should probably be
+factored elsewhere
 """
 def test_sanity():
     from random import randint
