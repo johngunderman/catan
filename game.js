@@ -23,11 +23,10 @@ NORTHWEST = 1;
 
 window.onload = function() {
     initTitle();
-    initBoard();
     initTicker();
     initWhitespace();
     initPlayerDisplay();
-    dispRoad(0,0,0,4,4,1);
+    initBoard();
 }
 
 
@@ -42,23 +41,19 @@ function initTitle() {
 function initBoard() {
     // Init the drawing board
 
-    var example = document.getElementById('board');
-    var context = example.getContext('2d');
-    context.fillStyle = "rgb(255,255,255)";
-    context.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE);
+    var stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
+
 
     var img = new Image();
     img.onload = function() {
-        dispWaterFrame(img, context);
-        dispDemoBoard(img, context);
+        dispWaterFrame(img, stage.context);
+        dispDemoBoard(img, stage.context);
     }
 
     //onload, then src.  Not the other way around
     img.src = IMAGE_SOURCE;
-
-
-
 }
+
 
 
 function dispDemoBoard(img, context) {
