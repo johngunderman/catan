@@ -20,6 +20,10 @@ BRICK    = 5;
 WEST      = 0;
 NORTHWEST = 1;
 
+// a[x] is the indices of (first good vertex, last good vertex)
+rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
+//a[y] is the number of vertices that occur before row y
+indices = [0, 7, 16, 27, 38, 47];
 
 window.onload = function() {
     initTitle();
@@ -43,12 +47,14 @@ function initBoard() {
 
     var stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
 
-
     var img = new Image();
     img.onload = function() {
         dispWaterFrame(img, stage.getContext());
         dispDemoBoard(img, stage.getContext());
-        drawRoad(stage);
+        drawCoords(stage.getContext());
+        //drawRoadDetector(stage, 3,3,NORTHWEST,4,3,WEST);
+        drawAllRoadDetectors(stage);
+
     }
 
     //onload, then src.  Not the other way around
@@ -56,6 +62,16 @@ function initBoard() {
 
 }
 
+
+function drawCoords(context) {
+    // draw us some coordinates:
+    for (var x = -1; x < 7; x++) {
+        for (var y = -1; y < 7; y++) {
+            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            dispAtVertex(x + "," + y + ",1", context, x, y, 1);
+        }
+    }
+}
 
 
 function dispDemoBoard(img, context) {
@@ -79,37 +95,53 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, BRICK, 4,3);
     drawHexAt(img, context, SHEEP, 4,4);
 
-
-    // draw us some coordinates:
-    for (x = -1; x < 7; x++) {
-        for (y = -1; y < 7; y++) {
-            //console.log("displaying vertices for " + x +"," + y);
-            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
-            dispAtVertex(x + "," + y + ",1", context, x, y, 1);
-        }
-    }
-
 }
 
 
-function drawRoad(stage) {
+// called when initializing the board
+// here we draw all the valid road detectors
+// see drawRoadDetector() for more info
+function drawAllRoadDetectors(stage) {
+    for (var x = 0; x < 6; x++) {
+        for (var y = 0; y < 6; y++) {
+	    var v1 = [x,y,WEST];
+            if(isvalid(v1)) {
+                var adj = adjacent(v1);
+                for (var z = 0; z < adj.length; z++) {
+                    var v2 = adj[z];
+                    drawRoadDetector(stage, v1, v2);
+                }
+            }
+        }
+    }
+}
 
-    var coords1 = getVertexCoords(4,3,WEST);
-    var coords2 = getVertexCoords(3,3,NORTHWEST);
+// On the given stage, draw a road detector from the vertice
+// described with (x1,y1,d1) to the vertice (x2,y2,d2).
+// Note that these are game piece vertices, not pixel locations.
+// the detector will draw a road at the given line when clicked.
+function drawRoadDetector(stage, v1, v2) {
+
+    var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
+    var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
     var context = stage.getContext();
 
     var line = new Kinetic.Shape(function(){
         var context = this.getContext();
         context.beginPath();
-        context.lineWidth = 3;
-        context.strokeStyle = "rgba(0,0,0,0)";
-        context.fillStyle = "rgba(0,0,0,0)";
-        context.moveTo(coords1[0] - 4, coords1[1] - 4);
-        context.lineTo(coords1[0] + 4, coords1[1] + 4);
-        context.lineTo(coords2[0] + 4, coords2[1] + 4);
-        context.lineTo(coords2[0] - 4, coords2[1] - 4);
+        context.lineWidth = 1;
+        context.strokeStyle = "red"
+        //context.strokeStyle = "rgba(0,0,0,0)";
+        //context.fillStyle = "rgba(0,0,0,0)";
+        context.fillStyle = "red";
+	var width = 2
+
+        context.moveTo(coords1[0] - width, coords1[1] - width);
+        context.lineTo(coords1[0] + width, coords1[1] + width);
+        context.lineTo(coords2[0] + width, coords2[1] + width);
+        context.lineTo(coords2[0] - width, coords2[1] - width);
         context.closePath();
-        context.fill();
+	context.fill();
         context.stroke();
     });
 
@@ -143,20 +175,10 @@ function dispAtVertex(text, context, x, y, d) {
     var xcoord = 0;
     var ycoord = 0;
 
-    //FIXME: Retool this, it doesn't actually ensure correctness.
-    //or remove
-    /*if (x < 0 || y < 0 || x > 11 || y > 11) {
-        // invalid coords!
-        console.warn("Invalid drawing coords in dispAtVertex!");
-        return -1;
-    }*/
-
-
     var coords = getVertexCoords(x,y,d);
     xcoord = coords[0];
     ycoord = coords[1];
 
-    //console.log("displaying vertex at " + xcoord +"," + ycoord);
 
     context.fillStyle    = 'rgb(0,0,0)';
     context.font         = '12px sans-serif';
@@ -319,3 +341,38 @@ function initPlayerDisplay() {
     context.fill();
 }
 
+
+
+// isvalid(p) returns True iff the vertex 3-tuple p is valid in the
+// context of a Catan board.  vertex is an array of three elements:
+// [x,y,d], where [x,y,d] are coordinates for a vertex on the hex
+// board.
+function isvalid(vertex) {
+    var x = vertex[0];
+    var y = vertex[1];
+    var d = vertex[2];
+
+    if(x < 0 || y<0 || x>5 || y>5) return false;
+
+    var lowhigh = rows[y];
+
+    var low = lowhigh[0];
+    var high = lowhigh[1];
+    var pos = 2*x + d;
+    return pos >= low && pos <= high && (d == 0 || d == 1);
+}
+
+// adjacent(p) returns a list of at most three vertices which are
+// directly adjacent to p.
+function adjacent(v) {
+    var x = v[0];
+    var y = v[1];
+    var d = v[2];
+
+    if (d == 0) {
+        return [[x-1, y, 1], [x, y, 1], [x, y+1, 1]].filter(isvalid);
+    }
+    if (d == 1) {
+        return [[x, y-1, 0],[x, y, 0], [x+1, y, 0]].filter(isvalid);
+    }
+}
