@@ -8,6 +8,8 @@ SCALE_HEIGHT = 85;
 SCALE_WIDTH  = 98;
 SCALE_OFFSET = 24;
 
+BOARD_SIZE = 600;
+
 WOOD     = 0;
 SHEEP    = 1;
 MOUNTAIN = 2;
@@ -25,6 +27,7 @@ window.onload = function() {
     initTicker();
     initWhitespace();
     initPlayerDisplay();
+    dispRoad(0,0,0,4,4,1);
 }
 
 
@@ -38,10 +41,11 @@ function initTitle() {
 
 function initBoard() {
     // Init the drawing board
+
     var example = document.getElementById('board');
     var context = example.getContext('2d');
     context.fillStyle = "rgb(255,255,255)";
-    context.fillRect(0, 0, 600, 600);
+    context.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE);
 
     var img = new Image();
     img.onload = function() {
@@ -106,16 +110,9 @@ function dispAtVertex(text, context, x, y, d) {
     }*/
 
 
-    var coords = getPixelCoords(x,y);
+    var coords = getVertexCoords(x,y,d);
     xcoord = coords[0];
     ycoord = coords[1];
-
-    if (d == WEST) {
-        ycoord += .5 * SCALE_HEIGHT;
-    }
-    else if (d == NORTHWEST) {
-        xcoord += SCALE_OFFSET;
-    }
 
     //console.log("displaying vertex at " + xcoord +"," + ycoord);
 
@@ -138,6 +135,24 @@ function getPixelCoords(x,y) {
 
     ycoord += .5 * SCALE_HEIGHT;
     xcoord += SCALE_WIDTH - SCALE_OFFSET;
+
+    return [xcoord, ycoord];
+}
+
+function getVertexCoords(x,y,d) {
+    var xcoord;
+    var ycoord;
+
+    var coords = getPixelCoords(x,y);
+    xcoord = coords[0];
+    ycoord = coords[1];
+
+    if (d == WEST) {
+        ycoord += .5 * SCALE_HEIGHT;
+    }
+    else if (d == NORTHWEST) {
+        xcoord += SCALE_OFFSET;
+    }
 
     return [xcoord, ycoord];
 }
