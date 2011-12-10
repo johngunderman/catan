@@ -42,8 +42,9 @@ wait(userid, gameid, seqno):
 
 join_game()
     - Joins in on an advertised game
-        - LOG EVENT: joined (name, color)
     - Remain in lobby until start_game
+    - PREREQ: logged in
+    - LOG EVENT: joined (name, userid)
     - RETURNS: log from 0
 
     RETURNS (success):
@@ -62,9 +63,9 @@ join_game()
     }
 
 start_game(userid, gameid, seqno)
-    - Starts the game
     - Allocates terrain hexes
-        - LOG EVENT: puthexes [(1, 1) ..... ]
+        - LOG EVENT: hexes_placed [(1, 1) ..... ]
+        - LOG EVENT: setup_started (userid)
         - RETURNS: the log from seqno
     - Redirect to game page
     
@@ -72,25 +73,75 @@ start_game(userid, gameid, seqno)
         status: success
         sequence: 221
         log: [
-            { name: "puthexes", args: [[1, 1], [2, 5], ...]}
+            { name: "game_started", args: [[1, 1], [2, 5], ...]}
         ]
     }
 
-Events:
+BUYING/BUILDING:
 
-Client requests:
-    place_settlement
-    move_robber
-    conduct_turn
-    discard_card
+build_settlement(position)
+    - Places a settlment on the game board
+    - RETURNS: boolean, the log
+    - LOG EVENT: settlement_built
+    
+upgrade_settlement(position):
+ * - Changes an existing settlement into a city
+ * - RETURNS: boolean, the log
+ * - LOG EVENT settlement_upgraded
+ * 
+development_card(userid)
+ * - //TODO: RAFAEL
+ * - Check if largest army
+ * - Gives a development card to userid
+ * - RETURNS: boolean, the log
+ * - LOG EVENT: devcard_bought
 
-Server events:
-    joined [(name, id)]
-    hexes_placed [(position, type)]
-    robber_placed
-    road_built
-    settlement_built
-    city_built
-    robber_moved
-    trade_offered
+build_road(position)
+    - Places a road on the game board
+    - Check if longest road
+    - PREREQS: in game
+    - RETURNS: boolean, the log
+    - LOG EVENT: road_built
+
+move_robber(position)
+    - Moves the robber on the game board
+    - PREREQS : in game
+    - RETURNS: boolean, the log
+    - LOG EVENT: robber_moved
+    
+discard_cards([(cardtype, quantity)])
+    - discards cards specified
+    - RETURNS: boolean, the log
+    - LOG EVENT: cards_discarded
+
+offer_trade...
+    - LOG EVENT: trade_offered
+
+
+Private data:
+    - Development cards
+
+Log Events:
+
+RPC: (These log events have a 1:1 coorespondence with RPCs)
+    - joined
+    - development_card_bought
+    - development_card_played
+    - settlement_built
+    - settlement_upgraded
+    - road_built
+    - robber_moved
+    - trade_offered
+    - cards_discarded
+
+    
+Non-RPC:
+    - got_achievement
+        - Longest Road
+        - Largest Army
+    - hexes_placed
+    - setup_started
+    - setup_finished
+    - your_turn
+        Notifies the user that it is their turn to act.  The user must play according to the contextually correct game rules.
 

@@ -1,0 +1,14 @@
+Components:
+Rules, Almanac, Quick Start Rules
+60 roads (15ea white, red, orange, blue)
+20 Settlements (5ea white, red, orange, blue)
+16 Cities (4ea white, red, orange, blue)
+4 Building Costs Cards
+1 Robber
+18 Sea Hex Tiles (9 port, 9 empty)
+19 Land Hex Tiles (3 Hills, 3 Mountains, 4 Fields, 4 Woods, 4 Pasture, 1 Desert)
+95 Resource Cards (19ea Bricks, Wool, Lumber, Grain, Ore)
+25 Development Cards (14 Soldiers, 6 Progress, 5 Victory Point)
+2 Special Cards (Longest Road, Largest Army)
+18 Number Tokens
+2 Dice
