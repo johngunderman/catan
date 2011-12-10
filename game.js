@@ -51,7 +51,7 @@ function initBoard() {
     img.onload = function() {
         dispWaterFrame(img, stage.getContext());
         dispDemoBoard(img, stage.getContext());
-        drawCoords(stage.getContext());
+        //drawCoords(stage.getContext());
         drawAllRoadDetectors(stage);
         drawAllCityDetectors(stage);
 
