@@ -15,3 +15,21 @@ def start_game(id, sequence):
     db_session.commit();
 
     return {"result": "success", "log": [i.Action for i in Log.query.filter(Log.Sequence >= sequence).all()]}
+
+def build_settlement(userid, position):
+    g = Game();
+
+    g.Settlement.UserID = userid
+    g.Settlement.GameID = this.gameid # ??
+    g.Settlement.Type = 1
+    g.Settlement.Vertex = position
+
+    sequence = Log.query.count();
+    g.log.append(
+        Log(sequence, json.dumps({ "action" : "settlement_built", "args": [userid, position]}))
+    )
+
+    db_session.add(g);
+    db_session.commit();
+
+    
