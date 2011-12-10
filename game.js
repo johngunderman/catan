@@ -51,8 +51,9 @@ function initBoard() {
     img.onload = function() {
         dispWaterFrame(img, stage.getContext());
         dispDemoBoard(img, stage.getContext());
-        drawCoords(stage.getContext());
+        //drawCoords(stage.getContext());
         drawAllRoadDetectors(stage);
+        drawAllCityDetectors(stage);
 
     }
 
@@ -66,7 +67,7 @@ function drawCoords(context) {
     // draw us some coordinates:
     for (var x = -1; x < 7; x++) {
         for (var y = -1; y < 7; y++) {
-            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            //dispAtVertex(x + "," + y + ",0", context, x, y, 0);
             dispAtVertex(x + "," + y + ",1", context, x, y, 1);
         }
     }
@@ -94,6 +95,7 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, BRICK, 4,3);
     drawHexAt(img, context, SHEEP, 4,4);
 
+    drawCoords(context);
 }
 
 
@@ -163,6 +165,78 @@ function drawRoadDetector(stage, v1, v2) {
     });
 
     stage.add(line);
+}
+
+
+// called when initializing the board
+// here we draw all the valid city detectors
+// see drawCityDetector() for more info
+function drawAllCityDetectors(stage) {
+    for (var x = 0; x < 6; x++) {
+        for (var y = 0; y < 6; y++) {
+            var v1 = [x,y,WEST];
+            var v2 = [x,y,NORTHWEST];
+            if(isvalid(v1)) {
+                drawCityDetector(stage,v1);
+            }
+            if(isvalid(v2)) {
+                drawCityDetector(stage,v2);
+            }
+        }
+    }
+}
+
+// On the given stage, draw a city detector on the vertice
+// described with (x1,y1,d1).
+// Note that these are game piece vertices, not pixel locations.
+// the detector will draw a city at the given vertex when clicked.
+function drawCityDetector(stage, vertex) {
+
+    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+    var context = stage.getContext();
+
+    var city = new Kinetic.Shape(function(){
+        var context = this.getContext();
+        context.beginPath();
+        context.lineWidth = 1;
+        context.strokeStyle = "red"
+        context.fillStyle = "rgba(0,0,0,0)";
+	var width = 5
+
+        context.moveTo(coords[0] - width, coords[1] - width);
+        context.lineTo(coords[0] - width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] - width);
+        context.closePath();
+	context.fill();
+        context.stroke();
+    });
+
+    city.addEventListener("mouseover", function(){
+        document.body.style.cursor = "pointer";
+    });
+    city.addEventListener("mouseout", function(){
+        document.body.style.cursor = "default";
+    });
+
+    city.addEventListener("mousedown", function(){
+        var width = 6;
+        document.body.style.cursor = "default";
+        context.beginPath();
+        context.lineWidth = 6;
+        context.strokeStyle = "red";
+        context.fillStyle = "red";
+        context.moveTo(coords[0] - width, coords[1] - width);
+        context.lineTo(coords[0] - width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] - width);
+
+        context.closePath();
+        context.fill();
+        context.stroke();
+    });
+
+    stage.add(city);
 }
 
 
@@ -349,7 +423,7 @@ function isvalid(vertex) {
     var y = vertex[1];
     var d = vertex[2];
 
-    if(x < 0 || y<0 || x>5 || y>5) return false;
+    if(y<0 || y>5) return false;
 
     var lowhigh = rows[y];
 
