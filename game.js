@@ -23,11 +23,10 @@ NORTHWEST = 1;
 
 window.onload = function() {
     initTitle();
-    initBoard();
     initTicker();
     initWhitespace();
     initPlayerDisplay();
-    dispRoad(0,0,0,4,4,1);
+    initBoard();
 }
 
 
@@ -42,23 +41,21 @@ function initTitle() {
 function initBoard() {
     // Init the drawing board
 
-    var example = document.getElementById('board');
-    var context = example.getContext('2d');
-    context.fillStyle = "rgb(255,255,255)";
-    context.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE);
+    var stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
+
 
     var img = new Image();
     img.onload = function() {
-        dispWaterFrame(img, context);
-        dispDemoBoard(img, context);
+        dispWaterFrame(img, stage.getContext());
+        dispDemoBoard(img, stage.getContext());
+        drawRoad(stage);
     }
 
     //onload, then src.  Not the other way around
     img.src = IMAGE_SOURCE;
 
-
-
 }
+
 
 
 function dispDemoBoard(img, context) {
@@ -92,6 +89,51 @@ function dispDemoBoard(img, context) {
         }
     }
 
+}
+
+
+function drawRoad(stage) {
+
+    var coords1 = getVertexCoords(4,3,WEST);
+    var coords2 = getVertexCoords(3,3,NORTHWEST);
+    var context = stage.getContext();
+
+    var line = new Kinetic.Shape(function(){
+        var context = this.getContext();
+        context.beginPath();
+        context.lineWidth = 3;
+        context.strokeStyle = "rgba(0,0,0,0)";
+        context.fillStyle = "rgba(0,0,0,0)";
+        context.moveTo(coords1[0] - 4, coords1[1] - 4);
+        context.lineTo(coords1[0] + 4, coords1[1] + 4);
+        context.lineTo(coords2[0] + 4, coords2[1] + 4);
+        context.lineTo(coords2[0] - 4, coords2[1] - 4);
+        context.closePath();
+        context.fill();
+        context.stroke();
+    });
+
+    line.addEventListener("mouseover", function(){
+        document.body.style.cursor = "pointer";
+    });
+    line.addEventListener("mouseout", function(){
+        document.body.style.cursor = "default";
+    });
+
+    line.addEventListener("mousedown", function(){
+        document.body.style.cursor = "default";
+        context.beginPath();
+        context.lineWidth = 6;
+        context.strokeStyle = "red";
+        context.fillStyle = "rgba(0,0,0,0)";
+        context.moveTo(coords1[0], coords1[1]);
+        context.lineTo(coords2[0], coords2[1]);
+        context.closePath();
+        context.fill();
+        context.stroke();
+    });
+
+    stage.add(line);
 }
 
 
