@@ -81,6 +81,7 @@ BUYING/BUILDING:
 
 build_settlement(position)
     - Places a settlment on the game board
+    - Recounts road length if building in between roads
     - RETURNS: boolean, the log
     - LOG EVENT: settlement_built
     
