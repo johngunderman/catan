@@ -46,12 +46,14 @@ function initBoard() {
 
     var img = new Image();
     img.onload = function() {
-        dispWaterFrame(img, stage.context);
-        dispDemoBoard(img, stage.context);
+        dispWaterFrame(img, stage.getContext());
+        dispDemoBoard(img, stage.getContext());
+        drawRoad(stage);
     }
 
     //onload, then src.  Not the other way around
     img.src = IMAGE_SOURCE;
+
 }
 
 
@@ -87,6 +89,51 @@ function dispDemoBoard(img, context) {
         }
     }
 
+}
+
+
+function drawRoad(stage) {
+
+    var coords1 = getVertexCoords(4,3,WEST);
+    var coords2 = getVertexCoords(3,3,NORTHWEST);
+    var context = stage.getContext();
+
+    var line = new Kinetic.Shape(function(){
+        var context = this.getContext();
+        context.beginPath();
+        context.lineWidth = 3;
+        context.strokeStyle = "rgba(0,0,0,0)";
+        context.fillStyle = "rgba(0,0,0,0)";
+        context.moveTo(coords1[0] - 4, coords1[1] - 4);
+        context.lineTo(coords1[0] + 4, coords1[1] + 4);
+        context.lineTo(coords2[0] + 4, coords2[1] + 4);
+        context.lineTo(coords2[0] - 4, coords2[1] - 4);
+        context.closePath();
+        context.fill();
+        context.stroke();
+    });
+
+    line.addEventListener("mouseover", function(){
+        document.body.style.cursor = "pointer";
+    });
+    line.addEventListener("mouseout", function(){
+        document.body.style.cursor = "default";
+    });
+
+    line.addEventListener("mousedown", function(){
+        document.body.style.cursor = "default";
+        context.beginPath();
+        context.lineWidth = 6;
+        context.strokeStyle = "red";
+        context.fillStyle = "rgba(0,0,0,0)";
+        context.moveTo(coords1[0], coords1[1]);
+        context.lineTo(coords2[0], coords2[1]);
+        context.closePath();
+        context.fill();
+        context.stroke();
+    });
+
+    stage.add(line);
 }
 
 
