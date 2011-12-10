@@ -19,6 +19,9 @@ indices = [0, 7, 16, 27, 38, 47] #a[y] is the number of vertices that occur befo
 isvalid(p) returns True iff the vertex 3-tuple p is valid in the context of a Catan board
 """
 def isvalid((x,y,d)):
+    if  y<0 or y>5:
+        return false;
+
     (low, high) = rows[y]
     pos = 2*x + d
     return pos >= low and pos <= high and (d == 0 or d == 1)

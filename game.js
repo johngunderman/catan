@@ -67,7 +67,7 @@ function drawCoords(context) {
     // draw us some coordinates:
     for (var x = -1; x < 7; x++) {
         for (var y = -1; y < 7; y++) {
-            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            //dispAtVertex(x + "," + y + ",0", context, x, y, 0);
             dispAtVertex(x + "," + y + ",1", context, x, y, 1);
         }
     }
@@ -95,6 +95,7 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, BRICK, 4,3);
     drawHexAt(img, context, SHEEP, 4,4);
 
+    drawCoords(context);
 }
 
 
@@ -422,7 +423,7 @@ function isvalid(vertex) {
     var y = vertex[1];
     var d = vertex[2];
 
-    if(x < 0 || y<0 || x>5 || y>5) return false;
+    if(y<0 || y>5) return false;
 
     var lowhigh = rows[y];
 
