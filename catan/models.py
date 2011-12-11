@@ -24,13 +24,16 @@ class Game(Base):
     DateStarted = Column(DateTime) #or timestamp, maybe?
     GameName = Column(String)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
+    NextSequence = Column(Integer)
 
     players = relationship("GamePlayer")
     cards = relationship("GameCards", uselist=False)
     hexes = relationship("Hex")
-    log = relationship("Log")
+    settlements = relationship("Settlement")
+    __log = relationship("Log")
 
     def __init__(self):
+        self.NextSequence = 0;
         return
 
     def start(self):
@@ -72,6 +75,11 @@ class Game(Base):
 
         self.hexes = create_hexes();
 
+    def log(self, action):
+        import json #Does this follow convention?
+        l = Log(self.NextSequence, json.dumps(action))
+        self.__log.append(l)
+        self.NextSequence += 1
 
 class GameCards(Base):
     __tablename__ = "GameCards"
@@ -136,7 +144,7 @@ class Hex(Base):
         self.Chit = chit
         self.Type = type
 
-    def json(self):
+    def json(self): #TODO: come up better name?
         return [self.Vertex, self.Chit, self.Type]
 
     GameID = Column(Integer, ForeignKey("Game.GameID"), primary_key=True)
@@ -153,10 +161,19 @@ class Road(Base):
 
 class Settlement(Base):
     __tablename__ = "Settlement"
-    GameID = Column(Integer, primary_key=True)
-    UserID = Column(Integer)
-    Type = Column(SmallInteger)
+
+    TOWN = 0
+    CITY = 1
+
+    GameID = Column(Integer, ForeignKey("Game.GameID"), primary_key=True)
     Vertex = Column(SmallInteger, primary_key=True)
+    UserID = Column(Integer, ForeignKey("User.UserID"))
+    Type = Column(SmallInteger)
+
+    def __init__(self, vertex, userid, type):
+        self.Vertex = vertex
+        self.UserID = userid
+        self.Type = type
 
 class Port(Base):
     __tablename__ = "Port"
