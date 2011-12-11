@@ -1,0 +1,17 @@
+h1 {
+    text-align: center;
+    font: bold 40px sans-serif;
+}
+
+#right-side {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#page {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 850px;
+}

@@ -26,20 +26,10 @@ rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
 indices = [0, 7, 16, 27, 38, 47];
 
 window.onload = function() {
-    initTitle();
     initTicker();
     initWhitespace();
     initPlayerDisplay();
     initBoard();
-}
-
-
-function initTitle() {
-    var example = document.getElementById('title');
-    var context = example.getContext('2d');
-    context.fillStyle    = 'rgb(0,0,0)';
-    context.font         = 'bold 40px sans-serif';
-    context.fillText  ('SETTLERS OF CATAN (TITLE)', 12, 65);
 }
 
 function initBoard() {

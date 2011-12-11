@@ -5,73 +5,34 @@
 <html>
 
   <script src="lib/kinetic-v2.3.2.js"></script>
+  <link rel="stylesheet" type="text/css" href="style/style.css" />
 
 
-  <center>
-    <table border="0">
-      <tr>
-        <td>
-          <table border="0">
-            <tr>
-              <td width="600">
-                <canvas id="title" width="600" height="110">
-                  This text is displayed if your browser does not support HTML5 Canvas.
-                </canvas>
-              </td>
-            </tr>
-            <tr>
-              <td width="600">
-                <div id="board" width="600" height="600">
-                </div>
 
-              </td>
-            </tr>
-          </table>
-        </td>
-        <td>
-          <table border="0">
-            <tr>
-              <td width="30">
-
-              </td>
-            </tr>
-          </table>
-        </td>
-        <td width="250">
-          <table border="0">
-            <tr>
-              <td width="250">
-                <canvas id="players" width="250" height="200">
-                  This text is displayed if your browser does not support HTML5 Canvas.
-                </canvas>
-
-                <script>
+  <h1>Settlers of Catan</h1>
 
 
-                </script>
-              </td>
-            </tr>
-            <tr>
-              <td width="250">
-                <canvas id="whitespace" width="250" height="130">
-                  This text is displayed if your browser does not support HTML5 Canvas.
-                </canvas>
+  <div id="page">
+    <div id="board" width="600" height="600"></div>
 
-              </td>
-            </tr>
-            <tr>
-              <td width="250">
-                <canvas id="ticker" width="250" height="380">
-                  This text is displayed if your browser does not support HTML5 Canvas.
-                </canvas>
+    <div id="right-side">
+      <div>
+        <canvas id="players" width="250" height="200">
+          This text is displayed if your browser does not support HTML5 Canvas.
+        </canvas>
+      </div>
+      <div>
+        <canvas id="whitespace" width="250" height="130">
+          This text is displayed if your browser does not support HTML5 Canvas.
+        </canvas>
+      </div>
+      <div>
+        <canvas id="ticker" width="250" height="380">
+          This text is displayed if your browser does not support HTML5 Canvas.
+        </canvas>
+      </div>
+    </div>
+  </div>
 
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </center>
-  <script type="text/javascript" src="game.js">
-  </script>
+  <script type="text/javascript" src="game.js"></script>
 </html>
