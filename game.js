@@ -35,16 +35,13 @@ window.onload = function() {
 function initBoard() {
     // Init the drawing board
 
-    var stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
+    //global
+    stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
 
     var img = new Image();
     img.onload = function() {
         dispWaterFrame(img, stage.getContext());
         dispDemoBoard(img, stage.getContext());
-        //drawCoords(stage.getContext());
-        drawAllRoadDetectors(stage);
-        drawAllCityDetectors(stage);
-
     }
 
     //onload, then src.  Not the other way around
@@ -84,8 +81,6 @@ function dispDemoBoard(img, context) {
     drawHexAt(img, context, DESERT, 4,2);
     drawHexAt(img, context, BRICK, 4,3);
     drawHexAt(img, context, SHEEP, 4,4);
-
-    drawCoords(context);
 }
 
 
@@ -152,6 +147,8 @@ function drawRoadDetector(stage, v1, v2) {
         context.closePath();
         context.fill();
         context.stroke();
+
+        stage.removeAll();
     });
 
     stage.add(line);
@@ -224,6 +221,8 @@ function drawCityDetector(stage, vertex) {
         context.closePath();
         context.fill();
         context.stroke();
+
+        stage.removeAll();
     });
 
     stage.add(city);
@@ -436,4 +435,15 @@ function adjacent(v) {
     if (d == 1) {
         return [[x, y-1, 0],[x, y, 0], [x+1, y, 0]].filter(isvalid);
     }
+}
+
+
+function placeRoadClicked() {
+    stage.removeAll();
+    drawAllRoadDetectors(stage);
+}
+
+function placeCityClicked() {
+    stage.removeAll();
+    drawAllCityDetectors(stage);
 }
