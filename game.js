@@ -447,3 +447,8 @@ function placeCityClicked() {
     stage.removeAll();
     drawAllCityDetectors(stage);
 }
+
+function doneButtonClicked() {
+    // here we should tell the server that we're done.
+    alert("Your turn is now over!");
+}
