@@ -116,7 +116,7 @@ function drawRoadDetector(stage, v1, v2) {
         var context = this.getContext();
         context.beginPath();
         context.lineWidth = 1;
-        context.strokeStyle = "rgba(0,0,0,0)";
+        context.strokeStyle = "red";
         context.fillStyle = "rgba(0,0,0,0)";
 	var width = 2
 
