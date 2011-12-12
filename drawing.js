@@ -344,3 +344,26 @@ function initPlayerDisplay() {
     context.closePath();
     context.fill();
 }
+
+function dispChit(context,x,y) {
+    var xcoord = 0;
+    var ycoord = 0;
+    var xy = getPixeCoords(x,y);
+
+    xcoord = xy[0];
+    ycoord = xy[1];
+
+    xcoord += SCALE_HEIGHT / 2;
+    ycoord += SCALE_WIDTH / 2;
+
+    var radius = 70;
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = "#8ED6FF";
+    context.fill();
+    context.lineWidth = 5;
+    context.strokeStyle = "black";
+    context.stroke();
+}
+
