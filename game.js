@@ -10,44 +10,36 @@ SCALE_OFFSET = 24;
 
 BOARD_SIZE = 600;
 
-WOOD     = 0;
-SHEEP    = 1;
-MOUNTAIN = 2;
-DESERT   = 3;
-OCEAN    = 4;
-BRICK    = 5;
+OCEAN     = 0;
+FOREST    = 1;
+PASTURE   = 2;
+FIELDS    = 3;
+HILLS     = 4;
+MOUNTAINS = 5;
+DESERT    = 6;
 
 WEST      = 0;
 NORTHWEST = 1;
+
+HOSTNAME = 'http://localhost:5000';
 
 // a[x] is the indices of (first good vertex, last good vertex)
 rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
 //a[y] is the number of vertices that occur before row y
 indices = [0, 7, 16, 27, 38, 47];
 
-function decompress(p) {
-    var y = 0;
-    for(; y < indices.length; i++)
-    {
-        if(indices[i] > p)
-        {
-            break;
-        }
-    }
+gameID = -1;
 
-    y--; //We actually scan past the one we want, go back one
-    p += rows[y][0] - indices[y];
-    return [p / 2, y, p % 2]
-}
 
 window.onload = function() {
+    startGameRequest();
+
     initTicker();
     initWhitespace();
     initPlayerDisplay();
-    initBoard();
 }
 
-function initBoard() {
+function initBoard(hexes) {
     // Init the drawing board
 
     //global
@@ -56,12 +48,26 @@ function initBoard() {
     var img = new Image();
     img.onload = function() {
         dispWaterFrame(img, stage.getContext());
-        dispDemoBoard(img, stage.getContext());
+        dispBoard(img, stage.getContext(), hexes);
     }
 
     //onload, then src.  Not the other way around
     img.src = IMAGE_SOURCE;
 
+}
+
+// hexes are encoded as [vertex, chit, type]
+function dispBoard(img, context, hexes) {
+    console.log("about to display board");
+    console.log(hexes);
+
+    for (var x = 0; x < hexes.length; x++) {
+        var xyd = decompress(hexes[x][0]);
+        console.log("drawing hex at " + hexes[x][0]);
+        console.log("drawing hex at " + xyd);
+
+        drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
+    }
 }
 
 
@@ -77,25 +83,25 @@ function drawCoords(context) {
 
 
 function dispDemoBoard(img, context) {
-    drawHexAt(img, context, WOOD, 0,0);
+    drawHexAt(img, context, FOREST, 0,0);
     drawHexAt(img, context, DESERT, 0,1);
-    drawHexAt(img, context, SHEEP, 0,2);
-    drawHexAt(img, context, MOUNTAIN, 1,0);
+    drawHexAt(img, context, PASTURE, 0,2);
+    drawHexAt(img, context, ORE, 1,0);
     drawHexAt(img, context, BRICK, 1,1);
-    drawHexAt(img, context, WOOD, 1,2);
-    drawHexAt(img, context, MOUNTAIN, 1,3);
-    drawHexAt(img, context, SHEEP, 2,0);
-    drawHexAt(img, context, WOOD, 2,1);
-    drawHexAt(img, context, SHEEP, 2,2);
+    drawHexAt(img, context, FOREST, 1,2);
+    drawHexAt(img, context, ORE, 1,3);
+    drawHexAt(img, context, PASTURE, 2,0);
+    drawHexAt(img, context, FOREST, 2,1);
+    drawHexAt(img, context, PASTURE, 2,2);
     drawHexAt(img, context, BRICK, 2,3);
     drawHexAt(img, context, DESERT, 2,4);
     drawHexAt(img, context, BRICK, 3,1);
-    drawHexAt(img, context, MOUNTAIN, 3,2);
+    drawHexAt(img, context, ORE, 3,2);
     drawHexAt(img, context, DESERT, 3,3);
-    drawHexAt(img, context, WOOD, 3,4);
+    drawHexAt(img, context, FOREST, 3,4);
     drawHexAt(img, context, DESERT, 4,2);
     drawHexAt(img, context, BRICK, 4,3);
-    drawHexAt(img, context, SHEEP, 4,4);
+    drawHexAt(img, context, PASTURE, 4,4);
 }
 
 
@@ -452,6 +458,22 @@ function adjacent(v) {
     }
 }
 
+function decompress(p) {
+    var y = 0;
+
+    for(; y < indices.length; y++) {
+        console.log(p);
+        console.log(indices[y] > p);
+        if(indices[y] > p) {
+            break;
+        }
+    }
+
+    y--; //We actually scan past the one we want, go back one
+    p += rows[y][0] - indices[y];
+    return [Math.floor(p / 2), y, p % 2]
+}
+
 
 function placeRoadClicked() {
     stage.removeAll();
@@ -466,4 +488,65 @@ function placeCityClicked() {
 function doneButtonClicked() {
     // here we should tell the server that we're done.
     alert("Your turn is now over!");
+}
+
+// The result of the ajax request will json which is then passed to
+// the given callback func.
+function makeAjaxRequest(url, params, callbackFunc) {
+    var xmlhttp;
+    xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+            callbackFunc(xmlhttp.responseText);
+        }
+    }
+
+    xmlhttp.open("GET", url + params, true);
+    xmlhttp.send();
+}
+
+
+// currently a huge hack, just so we can get the starting board layout.
+function startGameRequest() {
+
+    var callback = function(json) {
+        console.log(json);
+        var myJson = JSON.parse(json);
+        console.log(myJson);
+
+        if (myJson.log[0].action != "hexes_placed") {
+            // TODO throw some crazy error
+        }
+
+        var hexes = myJson.log[0].args;
+
+        initBoard(hexes);
+
+    }
+
+    makeAjaxRequest(HOSTNAME + "/start_game", "?user=5&game=1&sequence=0", callback);
+}
+
+
+function dispChit(context,x,y) {
+    var xcoord = 0;
+    var ycoord = 0;
+    var xy = getPixeCoords(x,y);
+
+    xcoord = xy[0];
+    ycoord = xy[1];
+
+    xcoord += SCALE_HEIGHT / 2;
+    ycoord += SCALE_WIDTH / 2;
+
+    var radius = 70;
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, radius, 0, 2 * Math.PI, false);
+    context.fillStyle = "#8ED6FF";
+    context.fill();
+    context.lineWidth = 5;
+    context.strokeStyle = "black";
+    context.stroke();
 }

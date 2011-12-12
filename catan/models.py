@@ -5,12 +5,12 @@ from sqlalchemy.orm import relationship
 import random
 
 class Terrain:
-    FOREST = 1
-    PASTURE = 2
-    GRAIN = 3
-    BRICK = 4
-    ORE = 5
-    DESERT = 6
+    FOREST    = 1
+    PASTURE   = 2
+    FIELDS    = 3
+    HILLS     = 4
+    MOUNTAINS = 5
+    DESERT    = 6
 
 
 class User(Base):
