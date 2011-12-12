@@ -5,10 +5,10 @@ from string import replace
 import vertices
 import json
 
-#get_log returns the log, in JSON form
 def get_log(gameid, sequence):
+    g= Game.query.get(gameid)
     log = [i.Action for i in Log.query.filter(Log.GameID == gameid).filter(Log.Sequence >= sequence).all()]
-    return "[" + ",".join(log) + "]"
+    return (g.NextSequence, "[" + ",".join(log) + "]")
 
 """
 add_log takes an object, adds the log beside it, and returns the whole thing as JSON
@@ -27,9 +27,7 @@ def create_game(userid):
 
     db_session.add(g);
     db_session.commit()
-
-    print(g.GameID)
-    return add_log("success", g.GameID, 0)
+    return g.GameID
 
 def start_game(gameid, sequence):
     g = Game.query.get(gameid);
@@ -39,7 +37,7 @@ def start_game(gameid, sequence):
 
     db_session.commit()
 
-    return add_log("success", gameid, sequence)
+    return "success"
 
 def build_settlement(gameid, userid, vertex, sequence):
     p = decompress(vertex)
@@ -52,9 +50,9 @@ def build_settlement(gameid, userid, vertex, sequence):
 
         db_session.commit()
 
-        return add_log("success", id, sequence)
+        return "success"
     else:
-        return add_log("failure", id, sequence)
+        return "failure"
 
 """
 def upgrade_settlement():
