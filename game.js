@@ -355,7 +355,7 @@ function drawHexAt(img, context, hexNum, x, y) {
     xcoord = coords[0];
     ycoord = coords[1];
 
-    context.drawImage(img, TILE_WIDTH * hexNum, 0,
+    context.drawImage(img, 0, TILE_HEIGHT * hexNum,
                       TILE_WIDTH, TILE_HEIGHT,
                       xcoord, ycoord,
                       SCALE_WIDTH, SCALE_HEIGHT);
