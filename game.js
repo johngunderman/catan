@@ -29,6 +29,14 @@ rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
 indices = [0, 7, 16, 27, 38, 47];
 
 gameID = -1;
+// at some point this needs to be gotten from the server
+userID = 1;
+
+// shows where we are in the sequence of actions for this game.
+sequenceNum = 0;
+
+// actions to commit at the end of the user's turn
+actionsMade = [];
 
 
 window.onload = function() {
@@ -244,6 +252,10 @@ function drawCityDetector(stage, vertex) {
         context.stroke();
 
         stage.removeAll();
+
+        actionsMade.push(coords);
+
+        // add to our commitable items.
     });
 
     stage.add(city);
@@ -510,22 +522,36 @@ function makeAjaxRequest(url, params, callbackFunc) {
 // currently a huge hack, just so we can get the starting board layout.
 function startGameRequest() {
 
-    var callback = function(json) {
+
+    var start_game_callback = function(json) {
         console.log(json);
         var myJson = JSON.parse(json);
         console.log(myJson);
 
         if (myJson.log[0].action != "hexes_placed") {
-            // TODO throw some crazy error
+            console.log("ERROR: data returned from /start_game is unexpected");
         }
+        else {
+            var hexes = myJson.log[0].args;
 
-        var hexes = myJson.log[0].args;
-
-        initBoard(hexes);
+            initBoard(hexes);
+        }
 
     }
 
-    makeAjaxRequest(HOSTNAME + "/start_game", "?user=5&game=1&sequence=0", callback);
+    var create_game_callback = function(json) {
+        gameID = parseInt(json);
+        console.log("created new game with gameID: " + gameID);
+
+        makeAjaxRequest(HOSTNAME + "/start_game",
+                        "?user=" + userID
+                        + "&game=" + gameID
+                        + "&sequence=" + sequenceNum,
+                        start_game_callback);
+    }
+
+    makeAjaxRequest(HOSTNAME + "/create_game", "?user=" + userID,
+                   create_game_callback);
 }
 
 
