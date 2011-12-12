@@ -22,6 +22,12 @@ class DevCard:
     ROADBUILDING = 7
     YEAROFPLENTY = 8
 
+"""
+class Requirements:
+    Road = [WOOD, BRICK]
+    Settlement = [WOOD, BRICK, WHEAT, SHEEP]
+"""
+
 class User(Base):
     __tablename__ = "User"
     UserID = Column(Integer, primary_key=True)
@@ -131,28 +137,29 @@ class GameCards(Base):
     YearOfPlenty = Column(SmallInteger)
     Monopoly = Column(SmallInteger)
 	
-	def drawDevCard():
+    def drawDevCard():
         deck = [DevCards.KNIGHT]*self.Knight + [DevCards.LIBRARY]*self.LIBRARY + [DevCards.PALACE]*self.Palace + [DevCards.CHAPEL]*self.Chapel + [DevCards.UNIVERSITY]*self.University + [DevCards.MARKET]*self.Market + [DevCards.ROADBUILDING]*self.RoadBuilding + [DevCards.YEAROFPLENTY]*self.YearOfPlenty
         card = random.choice(deck)
 
-        if(card == DevCards.KNIGHT)
+        """if card == DevCards.KNIGHT:
             self.Knight--
-        elif (card == DevCards.LIBRARY)
+        elif card == DevCards.LIBRARY:
             self.Library--
-        elif (card == DevCards.PALACE)
+        elif card == DevCards.PALACE:
             self.Palace--
-        elif (card == DevCards.CHAPEL)
+        elif card == DevCards.CHAPEL:
             self.Chapel--
-        elif (card == DevCards.UNIVERSITY)
+        elif card == DevCards.UNIVERSITY:
             self.University--
-        elif (card == DevCards.MARKET)
+        elif card == DevCards.MARKET:
             self.Market--
-        elif (card == DevCards.ROADBUILDING)
+        elif card == DevCards.ROADBUILDING:
             self.RoadBuilding--
-        elif (card == DevCards.YEAROFPLENTY)
+        elif card == DevCards.YEAROFPLENTY:
             self.YearOfPlenty--
         else
             raise someException
+        """
        
         return card
 
@@ -163,8 +170,8 @@ class GamePlayer(Base):
     UserID = Column(Integer, ForeignKey("User.UserID"))
     cards = relationship("PlayerCards", uselist=False)
 	
-	def getCard(card):
-        if(card == DevCards.KNIGHT)
+    def getCard(card):
+        """if(card == DevCards.KNIGHT)
             cards.Knight++
         elif (card == DevCards.LIBRARY)
             cards.Library++
@@ -182,6 +189,7 @@ class GamePlayer(Base):
             cards.YearOfPlenty++
         else
             return false
+        """
        
         return true
 
@@ -211,7 +219,7 @@ class Hex(Base):
         self.Chit = chit
         self.Type = type
 
-    def json(self): #TODO: come up better name?
+    def log_format(self): #TODO: come up better name?
         return [self.Vertex, self.Chit, self.Type]
 
     GameID = Column(Integer, ForeignKey("Game.GameID"), primary_key=True)

@@ -23,7 +23,7 @@ def start_game(userid, game):
     if not game.start():
         return "failure"
 
-    game.log({ "action" : "hexes_placed", "args": [i.json() for i in game.hexes]})
+    game.log({ "action" : "hexes_placed", "args": [i.log_format() for i in game.hexes]})
 
     db_session.commit()
 
@@ -57,15 +57,13 @@ def upgrade_settlement(gameid, userid, vertex, sequence):
     else:
         return add_log("failure", id, sequence)
 
-def build_road(gameid, userid, vertex1, vertex2, sequence):
+def build_road(game, userid, vertex1, vertex2, sequence):
     p1 = decompress(vertex1)
     p2 = decompress(vertex2)
-    if (isvalid(p1) && isvalid(p2)): #game logic for allowing a road is different from allowing a settlement though
-        g = Game.query.get(id)
-
-        s = Road(vertex1, vertex2, userid)
-        g.roads.append(s)
-        g.log({ "action" : "road_build", "args" : [userid, vertex1, vertex2]})
+    if isvalid(p1) and isvalid(p2): #game logic for allowing a road is different from allowing a settlement though
+        r = Road(vertex1, vertex2, userid)
+        g.roads.append(r)
+        g.log({ "action" : "road_built", "args" : [userid, vertex1, vertex2]})
 
         db_session.commit() # TODO: check if we now have longest road. 
                             # Also, I think you can place a road and cut across someone elses road ?
@@ -74,18 +72,18 @@ def build_road(gameid, userid, vertex1, vertex2, sequence):
     else:
         return add_log("failure", id, sequence)
 
-def development_card(gameid, userid):
+def development_card(game, userid):
     #check if user has 1 sheep 1 ore 1 wheat
-    if(hasResources(userid, DEVCARD)
+    if hasResources(userid, DEVCARD):
         g = Game.query.get(id)
 
-        player = GamePlayer.query.filter(GamePlayer.GameID == gameid).filter(GamePlayer.UserID == userid).first()
-        
-		card = GameCards.draw()
+        player = GamePlayer.query.filter(GamePlayer.GameID == game.GameID).filter(GamePlayer.UserID == userid).first()
+
+        card = GameCards.draw()
         player.getCard(card)
 		
         g.log({ "action" : "devcard_bought", "args" : [userid]}) #public
-        g.log({ "action" : "devcard_bought", "args" : [userid, card]}) #private
+        #g.log({ "action" : "devcard_bought", "args" : [userid, card]}) #private
 
 """
 def move_robber():
