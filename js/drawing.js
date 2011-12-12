@@ -360,13 +360,20 @@ function dispChit(context, number, x,y) {
     xcoord += SCALE_HEIGHT / 2 + TEXT_XOFFSET;
     ycoord += SCALE_WIDTH / 2 + TEXT_YOFFSET;
 
-    context.font = "30pt sans-serif";
-    context.lineWidth = 1;
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
+    context.fillStyle = "brown";
+    context.fill();
+    context.lineWidth = 3;
+    context.strokeStyle = "black";
+    context.stroke();
+
+
+    context.font = "12pt sans-serif";
     context.textAlign = "center";
-    context.strokeStyle = "black"; // stroke color
     context.textBaseline = "middle";
     context.fillStyle = "white";
     context.fillText("" + number, xcoord, ycoord);
-    context.strokeText("" + number, xcoord, ycoord);
 }
 
