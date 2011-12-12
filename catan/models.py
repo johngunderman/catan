@@ -75,7 +75,7 @@ class Game(Base):
                 (42, 10),
                 (44, 9)
             ]
-            types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.GRAIN]*4 + [Terrain.BRICK]*3 + [Terrain.ORE]*3
+            types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.FIELDS]*4 + [Terrain.HILLS]*3 + [Terrain.MOUNTAINS]*3
             random.shuffle(types) #Shuffle the hexes
 
             hexes = [Hex(vertex, chit, type) for ((vertex, chit), type) in zip(preboard, types)]
