@@ -25,6 +25,21 @@ rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
 //a[y] is the number of vertices that occur before row y
 indices = [0, 7, 16, 27, 38, 47];
 
+function decompress(p) {
+    var y = 0;
+    for(; y < indices.length; i++)
+    {
+        if(indices[i] > p)
+        {
+            break;
+        }
+    }
+
+    y--; //We actually scan past the one we want, go back one
+    p += rows[y][0] - indices[y];
+    return [p / 2, y, p % 2]
+}
+
 window.onload = function() {
     initTicker();
     initWhitespace();
