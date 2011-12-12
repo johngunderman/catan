@@ -41,11 +41,53 @@ def build_settlement(userid, game, vertex):
         return "success"
     else:
         return "failure"
+		
+def upgrade_settlement(gameid, userid, vertex, sequence):
+    p = decompress(vertex)
+    if isvalid(p): # game logic for allowing an upgrade is different from initially placing a settlement though
+        g = Game.query.get(id)
+
+        s = Settlement(vertex, userid, Settlement.CITY)
+        g.settlements.append(s)
+        g.log({ "action" : "settlement_upgraded", "args" : [userid, vertex]})
+
+        db_session.commit()
+
+        return add_log("success", id, sequence)
+    else:
+        return add_log("failure", id, sequence)
+
+def build_road(gameid, userid, vertex1, vertex2, sequence):
+    p1 = decompress(vertex1)
+    p2 = decompress(vertex2)
+    if (isvalid(p1) && isvalid(p2)): #game logic for allowing a road is different from allowing a settlement though
+        g = Game.query.get(id)
+
+        s = Road(vertex1, vertex2, userid)
+        g.roads.append(s)
+        g.log({ "action" : "road_build", "args" : [userid, vertex1, vertex2]})
+
+        db_session.commit() # TODO: check if we now have longest road. 
+                            # Also, I think you can place a road and cut across someone elses road ?
+
+        return add_log("success", id, sequence)
+    else:
+        return add_log("failure", id, sequence)
+
+def development_card(gameid, userid):
+    #check if user has 1 sheep 1 ore 1 wheat
+    if(hasResources(userid, DEVCARD)
+        g = Game.query.get(id)
+
+        player = GamePlayer.query.filter(GamePlayer.GameID == gameid).filter(GamePlayer.UserID == userid).first()
+        
+		card = GameCards.draw()
+        player.getCard(card)
+		
+        g.log({ "action" : "devcard_bought", "args" : [userid]}) #public
+        g.log({ "action" : "devcard_bought", "args" : [userid, card]}) #private
 
 """
-def upgrade_settlement():
-def development_card():
-def build_road():
 def move_robber():
 def discard_cards():
 """

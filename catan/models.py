@@ -12,6 +12,15 @@ class Terrain:
     MOUNTAINS = 5
     DESERT    = 6
 
+class DevCard:
+    KNIGHT       = 1
+    LIBRARY      = 2
+    PALACE       = 3
+    CHAPEL       = 4
+    UNIVERSITY   = 5
+    MARKET       = 6
+    ROADBUILDING = 7
+    YEAROFPLENTY = 8
 
 class User(Base):
     __tablename__ = "User"
@@ -121,6 +130,31 @@ class GameCards(Base):
     RoadBuilding = Column(SmallInteger)
     YearOfPlenty = Column(SmallInteger)
     Monopoly = Column(SmallInteger)
+	
+	def drawDevCard():
+        deck = [DevCards.KNIGHT]*self.Knight + [DevCards.LIBRARY]*self.LIBRARY + [DevCards.PALACE]*self.Palace + [DevCards.CHAPEL]*self.Chapel + [DevCards.UNIVERSITY]*self.University + [DevCards.MARKET]*self.Market + [DevCards.ROADBUILDING]*self.RoadBuilding + [DevCards.YEAROFPLENTY]*self.YearOfPlenty
+        card = random.choice(deck)
+
+        if(card == DevCards.KNIGHT)
+            self.Knight--
+        elif (card == DevCards.LIBRARY)
+            self.Library--
+        elif (card == DevCards.PALACE)
+            self.Palace--
+        elif (card == DevCards.CHAPEL)
+            self.Chapel--
+        elif (card == DevCards.UNIVERSITY)
+            self.University--
+        elif (card == DevCards.MARKET)
+            self.Market--
+        elif (card == DevCards.ROADBUILDING)
+            self.RoadBuilding--
+        elif (card == DevCards.YEAROFPLENTY)
+            self.YearOfPlenty--
+        else
+            raise someException
+       
+        return card
 
 class GamePlayer(Base):
     __tablename__ = "GamePlayer"
@@ -128,6 +162,28 @@ class GamePlayer(Base):
     GameID = Column(Integer, ForeignKey("Game.GameID"))
     UserID = Column(Integer, ForeignKey("User.UserID"))
     cards = relationship("PlayerCards", uselist=False)
+	
+	def getCard(card):
+        if(card == DevCards.KNIGHT)
+            cards.Knight++
+        elif (card == DevCards.LIBRARY)
+            cards.Library++
+        elif (card == DevCards.PALACE)
+            cards.Palace++
+        elif (card == DevCards.CHAPEL)
+            cards.Chapel++
+        elif (card == DevCards.UNIVERSITY)
+            cards.University++
+        elif (card == DevCards.MARKET)
+            cards.Market++
+        elif (card == DevCards.ROADBUILDING)
+            cards.RoadBuilding++
+        elif (card == DevCards.YEAROFPLENTY)
+            cards.YearOfPlenty++
+        else
+            return false
+       
+        return true
 
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
