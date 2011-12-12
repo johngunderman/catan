@@ -18,13 +18,18 @@ class User(Base):
     UserID = Column(Integer, primary_key=True)
 
 class Game(Base):
+    class States:
+        NOTSTARTED = 0
+        STARTED = 1
+
     __tablename__ = "Game"
 
     GameID = Column(Integer, primary_key=True)
-    DateStarted = Column(DateTime) #or timestamp, maybe?
+    DateStarted = Column(DateTime)
+    State = Column(Integer, nullable=False)
     GameName = Column(String)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
-    NextSequence = Column(Integer)
+    NextSequence = Column(Integer, nullable=False)
 
     players = relationship("GamePlayer")
     cards = relationship("GameCards", uselist=False)
@@ -33,10 +38,15 @@ class Game(Base):
     __log = relationship("Log")
 
     def __init__(self):
+        self.State = Game.States.NOTSTARTED
         self.NextSequence = 0;
         return
 
     def start(self):
+        if(self.State != Game.States.NOTSTARTED):
+            return False
+
+        self.State = Game.States.STARTED
         self.cards = GameCards()
 
         """Test ideas:
@@ -74,6 +84,7 @@ class Game(Base):
             return hexes
 
         self.hexes = create_hexes();
+        return True
 
     def log(self, action):
         import json #Does this follow convention?

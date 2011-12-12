@@ -5,48 +5,36 @@ from string import replace
 import vertices
 import json
 
-def get_log(gameid, sequence):
-    g= Game.query.get(gameid)
-    log = [i.Action for i in Log.query.filter(Log.GameID == gameid).filter(Log.Sequence >= sequence).all()]
-    return (g.NextSequence, "[" + ",".join(log) + "]")
+def get_game(gameid):
+    return Game.query.get(gameid)
 
-"""
-add_log takes an object, adds the log beside it, and returns the whole thing as JSON
-
-It uses a DIRTY DIRTY HACK.
-"""
-def add_log(obj, gameid, sequence):
-    log = get_log(gameid, sequence)
-
-    #A dirty dirty hack that prevents us from having to parse and serialize the JSON all over again
-    flagged = json.dumps({ "response": obj, "sequence": Game.query.get(gameid).NextSequence, "log": "REPLACE_TOKEN"});
-    return flagged.replace('"REPLACE_TOKEN"', log, 1)
+def get_log(game, sequence):
+    log = [i.Action for i in Log.query.filter(Log.GameID == game.GameID).filter(Log.Sequence >= sequence).all()]
+    return (game.NextSequence, "[" + ",".join(log) + "]")
 
 def create_game(userid):
-    g = Game()
+    game = Game()
 
-    db_session.add(g);
+    db_session.add(game);
     db_session.commit()
-    return g.GameID
+    return game
 
-def start_game(gameid, sequence):
-    g = Game.query.get(gameid);
+def start_game(userid, game):
+    if not game.start():
+        return "failure"
 
-    g.start();
-    g.log({ "action" : "hexes_placed", "args": [i.json() for i in g.hexes]})
+    game.log({ "action" : "hexes_placed", "args": [i.json() for i in game.hexes]})
 
     db_session.commit()
 
     return "success"
 
-def build_settlement(gameid, userid, vertex, sequence):
+def build_settlement(userid, game, vertex):
     p = decompress(vertex)
     if isvalid(p): #TODO: we also need to figure out whether the game logic allows it
-        g = Game.query.get(id)
-
         s = Settlement(vertex, userid, Settlement.TOWN)
-        g.settlements.append(s)
-        g.log({ "action" : "settlement_built", "args" : [userid, vertex]})
+        game.settlements.append(s)
+        game.log({ "action" : "settlement_built", "args" : [userid, vertex]})
 
         db_session.commit()
 
