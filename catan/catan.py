@@ -1,4 +1,4 @@
-from flask import Flask, Response, make_response, request
+from flask import Flask, Response, make_response, request, send_from_directory
 app = Flask(__name__)
 app.debug = True
 #app.config.from_envvar("CATAN_SETTINGS")
@@ -46,6 +46,11 @@ def build_settlement():
     (userid, game, sequence) = get_game_prereqs()
     result = build_settlement(userid, game, request.args["vertex"])
     return LogResponse(game, sequence, result)
+
+@app.route("/<path:filename>")
+def build_settlement(filename):
+    return send_from_directory('../', filename)
+
 
 if __name__ == "__main__":
     app.run()
