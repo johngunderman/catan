@@ -1,6 +1,6 @@
 
 IMAGE_SOURCE = 'images/tiles.png';
-TILE_HEIGHT = 304;
+TILE_HEIGHT = 306;
 TILE_WIDTH  = 354;
 TILE_OFFSET = 86;                  // the horizontal offset of the hexagon
 
