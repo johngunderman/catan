@@ -9,7 +9,11 @@ function dispBoard(img, context, hexes) {
         console.log("drawing hex at " + xyd);
 
         drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
+        dispChit(context, hexes[x][1], xyd[0],xyd[1]);
+
     }
+
+    // temp location for drawing chits
 }
 
 
@@ -345,25 +349,24 @@ function initPlayerDisplay() {
     context.fill();
 }
 
-function dispChit(context,x,y) {
+function dispChit(context, number, x,y) {
     var xcoord = 0;
     var ycoord = 0;
-    var xy = getPixeCoords(x,y);
+    var xy = getPixelCoords(x,y);
 
     xcoord = xy[0];
     ycoord = xy[1];
 
-    xcoord += SCALE_HEIGHT / 2;
-    ycoord += SCALE_WIDTH / 2;
+    xcoord += SCALE_HEIGHT / 2 + TEXT_XOFFSET;
+    ycoord += SCALE_WIDTH / 2 + TEXT_YOFFSET;
 
-    var radius = 70;
-
-    context.beginPath();
-    context.arc(xcoord, ycoord, radius, 0, 2 * Math.PI, false);
-    context.fillStyle = "#8ED6FF";
-    context.fill();
-    context.lineWidth = 5;
-    context.strokeStyle = "black";
-    context.stroke();
+    context.font = "30pt sans-serif";
+    context.lineWidth = 1;
+    context.textAlign = "center";
+    context.strokeStyle = "black"; // stroke color
+    context.textBaseline = "middle";
+    context.fillStyle = "white";
+    context.fillText("" + number, xcoord, ycoord);
+    context.strokeText("" + number, xcoord, ycoord);
 }
 

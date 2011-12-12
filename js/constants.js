@@ -8,6 +8,9 @@ SCALE_HEIGHT = 85;
 SCALE_WIDTH  = 98;
 SCALE_OFFSET = 24;
 
+TEXT_XOFFSET = 10;
+TEXT_YOFFSET = 0;
+
 BOARD_SIZE = 600;
 
 OCEAN     = 0;
@@ -30,6 +33,8 @@ indices = [0, 7, 16, 27, 38, 47];
 
 
 // GLOBALS BELOW, CONSTANTS ABOVE
+// we shall code in the shade
+// 'til we run out of rum.
 
 gameID = -1;
 // at some point this needs to be gotten from the server
