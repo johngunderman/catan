@@ -48,8 +48,12 @@ def build_settlement():
     return LogResponse(game, sequence, result)
 
 @app.route("/<path:filename>")
-def build_settlement(filename):
+def get_file(filename):
     return send_from_directory('../', filename)
+
+@app.route("/")
+def get_main():
+    return send_from_directory('../', 'html/main.html')
 
 
 if __name__ == "__main__":
