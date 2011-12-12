@@ -1,44 +1,4 @@
 
-IMAGE_SOURCE = 'images/tiles.png';
-TILE_HEIGHT = 304;
-TILE_WIDTH  = 354;
-TILE_OFFSET = 86;                  // the horizontal offset of the hexagon
-
-SCALE_HEIGHT = 85;
-SCALE_WIDTH  = 98;
-SCALE_OFFSET = 24;
-
-BOARD_SIZE = 600;
-
-OCEAN     = 0;
-FOREST    = 1;
-PASTURE   = 2;
-FIELDS    = 3;
-HILLS     = 4;
-MOUNTAINS = 5;
-DESERT    = 6;
-
-WEST      = 0;
-NORTHWEST = 1;
-
-HOSTNAME = 'http://localhost:5000';
-
-// a[x] is the indices of (first good vertex, last good vertex)
-rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
-//a[y] is the number of vertices that occur before row y
-indices = [0, 7, 16, 27, 38, 47];
-
-gameID = -1;
-// at some point this needs to be gotten from the server
-userID = 1;
-
-// shows where we are in the sequence of actions for this game.
-sequenceNum = 0;
-
-// actions to commit at the end of the user's turn
-actionsMade = [];
-
-
 window.onload = function() {
     startGameRequest();
 
@@ -87,29 +47,6 @@ function drawCoords(context) {
             dispAtVertex(x + "," + y + ",1", context, x, y, 1);
         }
     }
-}
-
-
-function dispDemoBoard(img, context) {
-    drawHexAt(img, context, FOREST, 0,0);
-    drawHexAt(img, context, DESERT, 0,1);
-    drawHexAt(img, context, PASTURE, 0,2);
-    drawHexAt(img, context, ORE, 1,0);
-    drawHexAt(img, context, BRICK, 1,1);
-    drawHexAt(img, context, FOREST, 1,2);
-    drawHexAt(img, context, ORE, 1,3);
-    drawHexAt(img, context, PASTURE, 2,0);
-    drawHexAt(img, context, FOREST, 2,1);
-    drawHexAt(img, context, PASTURE, 2,2);
-    drawHexAt(img, context, BRICK, 2,3);
-    drawHexAt(img, context, DESERT, 2,4);
-    drawHexAt(img, context, BRICK, 3,1);
-    drawHexAt(img, context, ORE, 3,2);
-    drawHexAt(img, context, DESERT, 3,3);
-    drawHexAt(img, context, FOREST, 3,4);
-    drawHexAt(img, context, DESERT, 4,2);
-    drawHexAt(img, context, BRICK, 4,3);
-    drawHexAt(img, context, PASTURE, 4,4);
 }
 
 
