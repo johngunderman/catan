@@ -22,7 +22,6 @@ function startGameRequest() {
     var start_game_callback = function(json) {
         console.log(json);
         var myJson = JSON.parse(json);
-        console.log(myJson);
 
         if (myJson.log[0].action != "hexes_placed") {
             console.log("ERROR: data returned from /start_game is unexpected");

@@ -1,12 +1,8 @@
 // hexes are encoded as [vertex, chit, type]
 function dispBoard(img, context, hexes) {
-    console.log("about to display board");
-    console.log(hexes);
 
     for (var x = 0; x < hexes.length; x++) {
         var xyd = decompress(hexes[x][0]);
-        console.log("drawing hex at " + hexes[x][0]);
-        console.log("drawing hex at " + xyd);
 
         drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
         dispChit(context, hexes[x][1], xyd[0],xyd[1]);

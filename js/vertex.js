@@ -37,8 +37,6 @@ function decompress(p) {
     var y = 0;
 
     for(; y < indices.length; y++) {
-        console.log(p);
-        console.log(indices[y] > p);
         if(indices[y] > p) {
             break;
         }
