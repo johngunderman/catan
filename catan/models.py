@@ -35,13 +35,18 @@ class User(Base):
 class Game(Base):
     class States:
         NOTSTARTED = 0
-        STARTED = 1
+        SETUP_FORWARD = 1
+        SETUP_BACKWARD = 2
+        NORMAL_PLAY = 3
+        DISCARD_CARDS = 4
+        MOVE_ROBBER = 5
+        STEAL_CARDS = 6
 
     __tablename__ = "Game"
 
     GameID = Column(Integer, primary_key=True)
     DateStarted = Column(DateTime)
-    State = Column(Integer, nullable=False)
+    State = Column(SmallInteger, nullable=False)
     GameName = Column(String)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
     NextSequence = Column(Integer, nullable=False)
