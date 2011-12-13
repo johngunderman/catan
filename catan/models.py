@@ -21,12 +21,12 @@ class DevCard:
     MARKET       = 6
     ROADBUILDING = 7
     YEAROFPLENTY = 8
-    
+
 class BuildTypes:
     ROAD        = 1
     SETTLEMENT  = 2
     CITY        = 3
-    DEVCARD     = 4  
+    DEVCARD     = 4
 
 class Resource:
     WOOD    = 1
@@ -34,7 +34,7 @@ class Resource:
     WHEAT   = 3
     BRICK   = 4
     ORE     = 5
-    
+
 """
 class Requirements:
     Road = [WOOD, BRICK]
@@ -149,7 +149,7 @@ class GameCards(Base):
     RoadBuilding = Column(SmallInteger)
     YearOfPlenty = Column(SmallInteger)
     Monopoly = Column(SmallInteger)
-	
+
     def drawDevCard():
         deck = [DevCards.KNIGHT]*self.Knight + [DevCards.LIBRARY]*self.LIBRARY + [DevCards.PALACE]*self.Palace
         deck += [DevCards.CHAPEL]*self.Chapel + [DevCards.UNIVERSITY]*self.University + [DevCards.MARKET]*self.Market
@@ -174,8 +174,8 @@ class GameCards(Base):
             self.YearOfPlenty -= 1
         else:
             return False
-        
-       
+
+
         return card
 
 class GamePlayer(Base):
@@ -186,20 +186,20 @@ class GamePlayer(Base):
     cards = relationship("PlayerCards", uselist=False)
 
     def hasResources(self, buildType):
-    
+
         reqs = {
                 BuildTypes.ROAD:[(1,Resource.WOOD), (1,Resource.BRICK)],
                 BuildTypes.SETTLEMENT:[(1,Resource.WOOD), (1,Resource.BRICK), (1,Resource.SHEEP), (1,Resource.WHEAT)],
                 BuildTypes.CITY:[(3,Resource.ORE), (2,Resource.WHEAT)],
                 BuildTypes.DEVCARD:[(1,Resource.SHEEP),(1,Resource.ORE), (1,Resource.WHEAT)]
                 }
-        
+
         if len(filter(lambda (amnt, type) : self.cards[type] < amnt, reqs[buildType])) == 0:
             return True
         else:
             return False
-	
-	
+
+
     def getCard(card):
         if card == DevCards.KNIGHT:
             cards.Knight += 1
@@ -219,7 +219,7 @@ class GamePlayer(Base):
             cards.YearOfPlenty += 1
         else:
             return False
-       
+
         return True
 
 class PlayerCards(Base):
@@ -296,4 +296,3 @@ class Log(Base):
     def __init__(self, sequence, action):
         self.Sequence = sequence
         self.Action = action
-

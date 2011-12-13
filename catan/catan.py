@@ -33,7 +33,7 @@ def create_game():
     userid = request.args["user"]
     game = controller.create_game(userid)
 
-    return Response(response=str(game.GameID), mimetype="application/json") 
+    return Response(response=str(game.GameID), mimetype="application/json")
 
 @app.route("/start_game")
 def start_game():

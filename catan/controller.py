@@ -3,7 +3,7 @@ from models import *
 from string import replace
 
 import vertices
-import json      
+import json
 
 def get_game(gameid):
     return Game.query.get(gameid)
@@ -45,7 +45,7 @@ def build_settlement(userid, game, vertex):
             return add_log("failure", id, sequence)
     else:
         return add_log("failure", id, sequence)
-		
+
 def upgrade_settlement(gameid, userid, vertex, sequence):
     p = vertices.decompress(vertex)
     if vertices.isvalid(p): # game logic for allowing an upgrade is different from initially placing a settlement though
@@ -75,7 +75,7 @@ def build_road(game, userid, vertex1, vertex2, sequence):
             g.roads.append(r)
             g.log({ "action" : "road_built", "args" : [userid, vertex1, vertex2]})
 
-            db_session.commit() # TODO: check if we now have longest road. 
+            db_session.commit() # TODO: check if we now have longest road.
                                 # Also, I think you can place a road and cut across someone elses road ?
 
             return add_log("success", id, sequence)
@@ -89,13 +89,13 @@ def development_card(game, userid):
     player = GamePlayer.query.filter(GamePlayer.GameID == game.GameID).filter(GamePlayer.UserID == userid).first()
     if player.hasResources(DEVCARD):
         g = Game.query.get(id)
-        
+
         card = GameCards.draw()
         player.getCard(card)
-		
+
         g.log({ "action" : "devcard_bought", "args" : [userid]}) #public
         #g.log({ "action" : "devcard_bought", "args" : [userid, card]}) #private
-        
+
         return add_log("success", id, sequence)
     else:
         return add_log("failure", id, sequence)
