@@ -49,11 +49,11 @@ def build_settlement():
 
 @app.route("/<path:filename>")
 def get_file(filename):
-    return send_from_directory('../', 'html/' + filename)
+    return send_from_directory('../client', filename)
 
 @app.route("/")
-def get_main():
-    return send_from_directory('../', 'html/main.html')
+def get_index():
+    return send_from_directory('../client', "index.html")
 
 
 if __name__ == "__main__":
