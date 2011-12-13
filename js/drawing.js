@@ -360,13 +360,37 @@ function dispChit(context, number, x,y) {
     xcoord += SCALE_HEIGHT / 2 + TEXT_XOFFSET;
     ycoord += SCALE_WIDTH / 2 + TEXT_YOFFSET;
 
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
+
+    if (number == 7) {
+        context.fillStyle = "black";
+    }
+    else {
+        context.fillStyle = "brown";
+    }
+
+    context.fill();
+    //context.stroke();
 
     context.beginPath();
     context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
-    context.fillStyle = "brown";
-    context.fill();
     context.lineWidth = 3;
     context.strokeStyle = "black";
+    context.stroke();
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS - 3, 0, 2 * Math.PI, false);
+    if (number == 6 || number == 8) {
+        context.strokeStyle = "red";
+    }
+    else if (number == 2 || number == 12) {
+        context.strokeStyle = "grey";
+    }
+    else context.strokeStyle = "brown";
+
+    context.lineWidth = 3;
+
     context.stroke();
 
 
