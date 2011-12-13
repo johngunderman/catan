@@ -6,10 +6,18 @@ function makeAjaxRequest(url, params, callbackFunc) {
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            var myJson = JSON.parse(xmlhttp.responseText);
+            if (myJson.sequence) {
+                sequenceNum = myJson.sequence;
+            }
+            console.log("Server Response: " + xmlhttp.responseText);
+
             callbackFunc(xmlhttp.responseText);
         }
     }
 
+    console.log("Client Request: " + url + params);
     xmlhttp.open("GET", url + params, true);
     xmlhttp.send();
 }
@@ -20,9 +28,7 @@ function startGameRequest() {
 
 
     var start_game_callback = function(json) {
-        console.log(json);
         var myJson = JSON.parse(json);
-        console.log(myJson);
 
         if (myJson.log[0].action != "hexes_placed") {
             console.log("ERROR: data returned from /start_game is unexpected");

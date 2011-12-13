@@ -1,12 +1,8 @@
 // hexes are encoded as [vertex, chit, type]
 function dispBoard(img, context, hexes) {
-    console.log("about to display board");
-    console.log(hexes);
 
     for (var x = 0; x < hexes.length; x++) {
         var xyd = decompress(hexes[x][0]);
-        console.log("drawing hex at " + hexes[x][0]);
-        console.log("drawing hex at " + xyd);
 
         drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
         dispChit(context, hexes[x][1], xyd[0],xyd[1]);
@@ -360,13 +356,46 @@ function dispChit(context, number, x,y) {
     xcoord += SCALE_HEIGHT / 2 + TEXT_XOFFSET;
     ycoord += SCALE_WIDTH / 2 + TEXT_YOFFSET;
 
-    context.font = "30pt sans-serif";
-    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
+
+    if (number == 7) {
+        context.fillStyle = CHIT_ROBBER_COLOR;
+    }
+    else {
+        context.fillStyle = CHIT_DEFAULT_COLOR;
+    }
+
+    context.fill();
+    //context.stroke();
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
+    context.lineWidth = 3;
+    context.strokeStyle = CHIT_DEFAULT_RIM_COLOR;
+    context.stroke();
+
+    context.beginPath();
+    context.arc(xcoord, ycoord, CHIT_RADIUS - 3, 0, 2 * Math.PI, false);
+    if (number == 6 || number == 8) {
+        context.strokeStyle = CHIT_HIGH_PROB_COLOR;
+    }
+    else if (number == 2 || number == 12) {
+        context.strokeStyle = CHIT_LOW_PROB_COLOR;
+    }
+    else context.strokeStyle = CHIT_DEFAULT_PROB_COLOR;
+
+    context.lineWidth = 3;
+
+    context.stroke();
+
+
+    context.font = CHIT_FONT;
     context.textAlign = "center";
-    context.strokeStyle = "black"; // stroke color
     context.textBaseline = "middle";
-    context.fillStyle = "white";
-    context.fillText("" + number, xcoord, ycoord);
-    context.strokeText("" + number, xcoord, ycoord);
+    context.fillStyle = CHIT_FONT_COLOR;
+
+    var offset = TEXT_DD_OFFSET * (number > 9);
+    context.fillText("" + number, xcoord + offset, ycoord);
 }
 

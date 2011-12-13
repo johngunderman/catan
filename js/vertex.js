@@ -37,8 +37,6 @@ function decompress(p) {
     var y = 0;
 
     for(; y < indices.length; y++) {
-        console.log(p);
-        console.log(indices[y] > p);
         if(indices[y] > p) {
             break;
         }
@@ -47,4 +45,14 @@ function decompress(p) {
     y--; //We actually scan past the one we want, go back one
     p += rows[y][0] - indices[y];
     return [Math.floor(p / 2), y, p % 2]
+}
+
+
+// Takes a 3-tuple loc and represents it as a single integer for easy
+// storage and transmission
+function compress(loc) {
+    var x = loc[0];
+    var y = loc[1];
+    var d = loc[2];
+    return indices[y] + 2*x + d - rows[y][0];
 }
