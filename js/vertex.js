@@ -46,3 +46,13 @@ function decompress(p) {
     p += rows[y][0] - indices[y];
     return [Math.floor(p / 2), y, p % 2]
 }
+
+
+// Takes a 3-tuple loc and represents it as a single integer for easy
+// storage and transmission
+function compress(loc) {
+    var x = loc[0];
+    var y = loc[1];
+    var d = loc[2];
+    return indices[y] + 2*x + d - rows[y][0];
+}
