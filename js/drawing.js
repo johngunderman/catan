@@ -398,6 +398,8 @@ function dispChit(context, number, x,y) {
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillStyle = "white";
-    context.fillText("" + number, xcoord, ycoord);
+
+    var offset = TEXT_DD_OFFSET * (number > 9);
+    context.fillText("" + number, xcoord + offset, ycoord);
 }
 

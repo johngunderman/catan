@@ -8,8 +8,10 @@ SCALE_HEIGHT = 85;
 SCALE_WIDTH  = 98;
 SCALE_OFFSET = 24;
 
-TEXT_XOFFSET = 5;
+TEXT_XOFFSET =  5;
 TEXT_YOFFSET = -5;
+// if we have multiple digits we have to shift over to make our text center
+TEXT_DD_OFFSET = -1;
 
 CHIT_RADIUS = 15;
 
