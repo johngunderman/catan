@@ -17,6 +17,7 @@ function makeAjaxRequest(url, params, callbackFunc) {
         }
     }
 
+    console.log("Client Request: " + url + params);
     xmlhttp.open("GET", url + params, true);
     xmlhttp.send();
 }
