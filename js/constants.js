@@ -13,7 +13,18 @@ TEXT_YOFFSET = -5;
 // if we have multiple digits we have to shift over to make our text center
 TEXT_DD_OFFSET = -1;
 
-CHIT_RADIUS = 15;
+// Chit constants
+CHIT_RADIUS             = 15;
+CHIT_FONT               = "12pt sans-serif";
+CHIT_FONT_COLOR         = "white";
+CHIT_ROBBER_COLOR       = "black";
+CHIT_DEFAULT_COLOR      = "brown";
+CHIT_DEFAULT_RIM_COLOR  = "black";
+// inner ring color for high probability chits (8 and 6)
+CHIT_HIGH_PROB_COLOR    = "red";
+// inner ring color for low probability chits (2 and 12)
+CHIT_LOW_PROB_COLOR     = "grey";
+CHIT_DEFAULT_PROB_COLOR = "brown";
 
 BOARD_SIZE = 600;
 

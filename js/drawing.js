@@ -364,10 +364,10 @@ function dispChit(context, number, x,y) {
     context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
 
     if (number == 7) {
-        context.fillStyle = "black";
+        context.fillStyle = CHIT_ROBBER_COLOR;
     }
     else {
-        context.fillStyle = "brown";
+        context.fillStyle = CHIT_DEFAULT_COLOR;
     }
 
     context.fill();
@@ -376,28 +376,28 @@ function dispChit(context, number, x,y) {
     context.beginPath();
     context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);
     context.lineWidth = 3;
-    context.strokeStyle = "black";
+    context.strokeStyle = CHIT_DEFAULT_RIM_COLOR;
     context.stroke();
 
     context.beginPath();
     context.arc(xcoord, ycoord, CHIT_RADIUS - 3, 0, 2 * Math.PI, false);
     if (number == 6 || number == 8) {
-        context.strokeStyle = "red";
+        context.strokeStyle = CHIT_HIGH_PROB_COLOR;
     }
     else if (number == 2 || number == 12) {
-        context.strokeStyle = "grey";
+        context.strokeStyle = CHIT_LOW_PROB_COLOR;
     }
-    else context.strokeStyle = "brown";
+    else context.strokeStyle = CHIT_DEFAULT_PROB_COLOR;
 
     context.lineWidth = 3;
 
     context.stroke();
 
 
-    context.font = "12pt sans-serif";
+    context.font = CHIT_FONT;
     context.textAlign = "center";
     context.textBaseline = "middle";
-    context.fillStyle = "white";
+    context.fillStyle = CHIT_FONT_COLOR;
 
     var offset = TEXT_DD_OFFSET * (number > 9);
     context.fillText("" + number, xcoord + offset, ycoord);
