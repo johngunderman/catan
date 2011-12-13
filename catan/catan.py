@@ -49,7 +49,7 @@ def build_settlement():
 
 @app.route("/<path:filename>")
 def get_file(filename):
-    return send_from_directory('../', filename)
+    return send_from_directory('../', 'html/' + filename)
 
 @app.route("/")
 def get_main():
