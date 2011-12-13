@@ -6,6 +6,13 @@ function makeAjaxRequest(url, params, callbackFunc) {
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+
+            var myJson = JSON.parse(xmlhttp.responseText);
+            if (myJson.sequence) {
+                sequenceNum = myJson.sequence;
+            }
+            console.log("Server Response: " + xmlhttp.responseText);
+
             callbackFunc(xmlhttp.responseText);
         }
     }
@@ -20,7 +27,6 @@ function startGameRequest() {
 
 
     var start_game_callback = function(json) {
-        console.log(json);
         var myJson = JSON.parse(json);
 
         if (myJson.log[0].action != "hexes_placed") {
