@@ -6,10 +6,10 @@ function dispBoard(img, context, hexes) {
 
         drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
         dispChit(context, hexes[x][1], xyd[0],xyd[1]);
-
     }
 
-    // temp location for drawing chits
+    drawResourceCounters(context, 1,2,5,4,3);
+
 }
 
 
@@ -399,3 +399,47 @@ function dispChit(context, number, x,y) {
     context.fillText("" + number, xcoord + offset, ycoord);
 }
 
+
+function drawResourceCounters(context, brick, lumber, wool, grain, ore) {
+    context.font = RESOURCE_FONT;
+    context.fillStyle = RESOURCE_FONT_COLOR;
+
+    // brick
+    context.textAlign = "right";
+    context.fillText("" + brick, RESOURCE_XCOORD, RESOURCE_YCOORD);
+
+    context.textAlign = "left";
+    context.fillText("Brick", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET, RESOURCE_YCOORD);
+
+    // lumber
+    context.textAlign = "right";
+    context.fillText("" + lumber, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING);
+
+    context.textAlign = "left";
+    context.fillText("Lumber", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
+                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING );
+
+    // wool
+    context.textAlign = "right";
+    context.fillText("" + wool, RESOURCE_XCOORD, RESOURCE_YCOORD  + RESOURCE_VERTICAL_SPACING * 2);
+
+    context.textAlign = "left";
+    context.fillText("Wool", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
+                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 2);
+
+    // grain
+    context.textAlign = "right";
+    context.fillText("" + grain, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 3);
+
+    context.textAlign = "left";
+    context.fillText("Grain", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
+                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 3);
+
+    // ore
+    context.textAlign = "right";
+    context.fillText("" + ore, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 4);
+
+    context.textAlign = "left";
+    context.fillText("Ore", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
+                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 4);
+}

@@ -39,6 +39,19 @@ DESERT    = 6;
 WEST      = 0;
 NORTHWEST = 1;
 
+
+// resource counter constants
+RESOURCE_FONT = "12pt sans-serif";
+RESOURCE_FONT_COLOR = "black";
+
+RESOURCE_TEXT_OFFSET = 10;
+RESOURCE_VERTICAL_SPACING = 20;
+
+RESOURCE_XCOORD = 500;
+RESOURCE_YCOORD = 500;
+
+
+
 HOSTNAME = 'http://localhost:5000';
 
 // a[x] is the indices of (first good vertex, last good vertex)

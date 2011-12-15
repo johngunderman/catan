@@ -55,6 +55,5 @@ def get_file(filename):
 def get_index():
     return send_from_directory('../client', "index.html")
 
-
 if __name__ == "__main__":
     app.run()
