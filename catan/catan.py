@@ -51,6 +51,10 @@ def build_settlement():
 def get_file(filename):
     return send_from_directory('../', 'html/' + filename)
 
+@app.route("/js/<path:filename>")
+def get_js_file(filename):
+    return send_from_directory('../', 'js/' + filename)
+
 @app.route("/")
 def get_main():
     return send_from_directory('../', 'html/main.html')
