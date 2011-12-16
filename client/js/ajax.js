@@ -26,7 +26,8 @@ function handle_hexes_placed(log_entry) {
 }
 
 function handle_settlement_built(log_entry) {
-
+    // TODO: register the settlement build in our global gamestate model
+    drawSettlement(log_entry.user, log_entry.vertex);
 }
 
 function handle_settlement_upgraded(log_entry) {
@@ -66,9 +67,8 @@ function handleResponseJson(json) {
     if(myJson.response && myJson.log
        && myJson.sequence && myJson.response == "success") {
 
+        // update our sequence number
         sequenceNum = myJson.sequence;
-
-
 
         // take care of everything else
         var log = myJson.log;

@@ -50,6 +50,8 @@ RESOURCE_VERTICAL_SPACING = 20;
 RESOURCE_XCOORD = 500;
 RESOURCE_YCOORD = 500;
 
+SETTLEMENT = 1;
+CITY = 2;
 
 
 HOSTNAME = 'http://localhost:5000';
@@ -73,3 +75,18 @@ sequenceNum = 0;
 
 // actions to commit at the end of the user's turn
 actionsMade = [];
+
+
+// see gamelogic.js for a complete description of how data is
+// stored in our game board representation
+gameboard = {
+    "settlements" : {},
+    "roads" : {},
+    "cards" : {
+        "brick"  : 0,
+        "lumber" : 0,
+        "wool"   : 0,
+        "grain"  : 0,
+        "ore"    : 0
+    }
+}

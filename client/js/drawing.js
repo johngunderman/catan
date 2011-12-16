@@ -167,24 +167,7 @@ function drawCityDetector(stage, vertex) {
     });
 
     city.addEventListener("mousedown", function(){
-        var width = 6;
-        document.body.style.cursor = "default";
-        context.beginPath();
-        context.lineWidth = 6;
-        context.strokeStyle = "red";
-        context.fillStyle = "red";
-        context.moveTo(coords[0] - width, coords[1] - width);
-        context.lineTo(coords[0] - width, coords[1] + width);
-        context.lineTo(coords[0] + width, coords[1] + width);
-        context.lineTo(coords[0] + width, coords[1] - width);
-
-        context.closePath();
-        context.fill();
-        context.stroke();
-
-        stage.removeAll();
-
-        actionsMade.push(coords);
+        drawSettlement(userID, vertex);
 
         // add to our commitable items.
     });
@@ -192,6 +175,32 @@ function drawCityDetector(stage, vertex) {
     stage.add(city);
 }
 
+
+// user id determines the color
+function drawSettlement(user, vertex) {
+
+    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+    var context = stage.getContext();
+
+    var width = 6;
+    document.body.style.cursor = "default";
+    context.beginPath();
+    context.lineWidth = 6;
+    context.strokeStyle = "red";
+    context.fillStyle = "red";
+    context.moveTo(coords[0] - width, coords[1] - width);
+    context.lineTo(coords[0] - width, coords[1] + width);
+    context.lineTo(coords[0] + width, coords[1] + width);
+    context.lineTo(coords[0] + width, coords[1] - width);
+
+    context.closePath();
+    context.fill();
+    context.stroke();
+
+    stage.removeAll();
+
+    actionsMade.push(coords);
+}
 
 // x,y determines a hex, d determines the vertex of the hex
 // Two values for d: WEST or NORTHWEST
