@@ -168,6 +168,14 @@ def move_robber(player, tile):
         return "failure"
     
 
+"""
+The setup RPC is called during the setup phase, to set up
+an initial settlement and road.
+
+settlement_vertex: the vertex where the settlement should be put
+road_to: one of the vertices for the new road
+    the other vertex is that of the settlement
+"""
 def setup(player, settlement_vertex, road_to):
     game = player.game
     settlement_v = v.decompress(settlement_vertex)
