@@ -60,10 +60,30 @@ function drawRoadDetector(stage, v1, v2) {
         context.fillStyle = "rgba(0,0,0,0)";
 	var width = 2
 
-        context.moveTo(coords1[0] - width, coords1[1] - width);
-        context.lineTo(coords1[0] + width, coords1[1] + width);
-        context.lineTo(coords2[0] + width, coords2[1] + width);
-        context.lineTo(coords2[0] - width, coords2[1] - width);
+        // hacky-hack to fix the size of the road detectors
+        // I know it's terribad.
+        if (coords1[1] > coords2[1]) {
+            context.moveTo(coords1[0] - width, coords1[1] - width);
+            context.lineTo(coords1[0] + width, coords1[1] + width);
+            context.lineTo(coords2[0] + width, coords2[1] + width);
+            context.lineTo(coords2[0] - width, coords2[1] - width);
+        }
+        else if (coords1[1] < coords2[1]) {
+            context.moveTo(coords1[0] - width, coords1[1] + width);
+            context.lineTo(coords1[0] + width, coords1[1] - width);
+            context.lineTo(coords2[0] + width, coords2[1] - width);
+            context.lineTo(coords2[0] - width, coords2[1] + width);
+        }
+        else {
+            context.moveTo(coords1[0] - width, coords1[1] - width);
+            context.lineTo(coords1[0] + width, coords1[1] + width);
+            context.lineTo(coords2[0] + width, coords2[1] + width);
+            context.lineTo(coords2[0] - width, coords2[1] - width);
+
+        }
+
+
+
         context.closePath();
 	context.fill();
         context.stroke();
@@ -396,7 +416,9 @@ function dispChit(context, number, x,y) {
     context.fillStyle = CHIT_FONT_COLOR;
 
     var offset = TEXT_DD_OFFSET * (number > 9);
-    context.fillText("" + number, xcoord + offset, ycoord);
+
+    if (number != 7)
+        context.fillText("" + number, xcoord + offset, ycoord);
 }
 
 
