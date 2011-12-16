@@ -396,7 +396,9 @@ function dispChit(context, number, x,y) {
     context.fillStyle = CHIT_FONT_COLOR;
 
     var offset = TEXT_DD_OFFSET * (number > 9);
-    context.fillText("" + number, xcoord + offset, ycoord);
+
+    if (number != 7)
+        context.fillText("" + number, xcoord + offset, ycoord);
 }
 
 
