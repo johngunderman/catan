@@ -27,6 +27,7 @@ function handle_hexes_placed(log_entry) {
 
 function handle_settlement_built(log_entry) {
     // TODO: register the settlement build in our global gamestate model
+    insertSettlement(log_entry.user, log_entry.vertex);
     drawSettlement(log_entry.user, log_entry.vertex);
 }
 

@@ -81,6 +81,7 @@ actionsMade = [];
 // stored in our game board representation
 gameboard = {
     "settlements" : {},
+    // roads are owned by a user
     "roads" : {},
     "cards" : {
         "brick"  : 0,

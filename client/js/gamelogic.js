@@ -1,6 +1,7 @@
 
 // entries in `settlements` read as follows:
-// with key of vertex, value is type of settlement: CITY | SETTLEMENT
+// with key of vertex, value is type of
+// { settlement: CITY | SETTLEMENT, user:userID }
 
 // no cost if initial build
 function insertSettlement(user, vertex, isInitialBuild) {
@@ -8,7 +9,12 @@ function insertSettlement(user, vertex, isInitialBuild) {
     // at that vertex yet.
     if (isvalid(vertex) && !gameboard.settlements[vertex]) {
         if (hasSettlementResources() || isInitialBuild) {
-            gameboard.settlements[vertex] = SETTLEMENT;
+            gameboard.settlements[vertex] =
+                {"settlement" : SETTLEMENT,
+                 "user" : userID};
+        }
+        if (!isInitialBuild && user == userID) {
+            removeSettlementResources();
         }
     }
 }
@@ -16,10 +22,17 @@ function insertSettlement(user, vertex, isInitialBuild) {
 function insertCity(user, vertex) {
     // make sure we're valid and a settlement does exist
     // at that vertex yet.
-    if (isvalid(vertex) && gameboard.settlements[vertex] == SETTLEMENT) {
+    if (isvalid(vertex) && gameboard.settlements[vertex]
+        && gameboard.settlements[vertex].settlement == SETTLEMENT
+        && gameboard.settlements[vertex].user == user) {
         if (hasCityResources()) {
-            removeCityResources();
-            gameboard.settlements[vertex] = CITY;
+            gameboard.settlements[vertex] =
+                {"settlement" : CITY,
+                 "user" : userID};
+
+            if (user == userID) {
+                removeCityResources();
+            }
         }
     }
 }
@@ -33,7 +46,7 @@ function insertRoad(user, vertex1, vertex2, isInitialBuild) {
         && !gameboard.settlements[vertex2 + "." + vertex1]) {
 
         if (hasRoadResources() || isInitialBuild) {
-            gameboard.roads[vertex1 + "." + vertex2] = true;
+            gameboard.roads[vertex1 + "." + vertex2] = user;
         }
     }
 }
