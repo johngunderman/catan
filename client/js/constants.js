@@ -40,6 +40,13 @@ WEST      = 0;
 NORTHWEST = 1;
 
 
+MAX_VERTEX = 54;
+VERTICES = []
+
+for(var x = 0;x <= MAX_VERTEX; x++) {
+    VERTICES.push(x);
+}
+
 // resource counter constants
 RESOURCE_FONT = "12pt sans-serif";
 RESOURCE_FONT_COLOR = "black";
@@ -80,6 +87,7 @@ actionsMade = [];
 // see gamelogic.js for a complete description of how data is
 // stored in our game board representation
 gameboard = {
+    // form of {settlement = SETTLEMENT | CITY, user : user}
     "settlements" : {},
     // roads are owned by a user
     "roads" : {},

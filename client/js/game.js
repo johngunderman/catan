@@ -32,7 +32,7 @@ function placeRoadClicked() {
 
 function placeCityClicked() {
     stage.removeAll();
-    drawAllCityDetectors(stage);
+    drawAllSettlementDetectors(stage);
 }
 
 function doneButtonClicked() {

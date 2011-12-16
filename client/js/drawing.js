@@ -115,29 +115,11 @@ function drawRoadDetector(stage, v1, v2) {
 }
 
 
-// called when initializing the board
-// here we draw all the valid city detectors
-// see drawCityDetector() for more info
-function drawAllCityDetectors(stage) {
-    for (var x = 0; x < 6; x++) {
-        for (var y = 0; y < 6; y++) {
-            var v1 = [x,y,WEST];
-            var v2 = [x,y,NORTHWEST];
-            if(isvalid(v1)) {
-                drawCityDetector(stage,v1);
-            }
-            if(isvalid(v2)) {
-                drawCityDetector(stage,v2);
-            }
-        }
-    }
-}
-
 // On the given stage, draw a city detector on the vertice
 // described with (x1,y1,d1).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a city at the given vertex when clicked.
-function drawCityDetector(stage, vertex) {
+function drawSettlementDetector(stage, vertex) {
 
     var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
     var context = stage.getContext();

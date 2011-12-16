@@ -98,3 +98,27 @@ function removeSettlementResources() {
         gameboard.cards.grain--;
     }
 }
+
+function getValidSettlementPlaces() {
+
+    var vertices = [];
+    var res = [];
+
+    for (var vertex in gameboard.settlements) {
+        vertices.push(vertex);
+
+        var av = adjacent(vertex);
+        for(var v in av) {
+            vertices.push(av[v]);
+        }
+
+    }
+
+    res =  VERTICES.filter(function(vertex) {
+        return vertices.indexOf(vertex) <= -1;
+    });
+
+
+    console.log(res);
+    return res;
+}

@@ -13,11 +13,29 @@ req_handlers = {
     "req_setup"           : handle_req_setup
 }
 
+
+function promptSettlement(isInitial) {
+
+    var valid = getValidSettlementPlaces();
+
+    for (var x in valid) {
+        drawSettlementDetector(stage, decompress(valid[x]));
+    }
+}
+
+function promptRoad(isInitial) {
+
+    //return [vertex1, vertex2];
+}
+
 function handle_resources_gained(log_entry) {
 
 }
 
 function handle_req_setup(log_entry) {
+    promptSettlement(true);
+
+//    promptRoad(true);
 
 }
 
