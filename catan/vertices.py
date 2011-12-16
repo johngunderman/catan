@@ -12,15 +12,26 @@ Each vertex is thus a 3-tuple (x,y,d).  x and y are zero-indexed.  d
 is {WEST = 0, NORTHWEST = 1}.
 """
 
+import operator
+import hexes
+
 rows = [(0,6), (0,8), (0,10), (1,11), (3,11), (5,11)] #a[x] is the indices of (first good vertex, last good vertex)
 indices = [0, 7, 16, 27, 38, 47] #a[y] is the number of vertices that occur before row y
+max_value = 54
 
 """
-isvalid(p) returns True iff the vertex 3-tuple p is valid in the context of a Catan board
+in_range(p) returns True iff the compressed vertex is in the correct range for vertices
+"""
+def in_range(p):
+    return p >= 0 and p <= max_value
+
+
+"""
+isvalid(v) returns True iff the vertex 3-tuple p is valid in the context of a Catan board
 """
 def isvalid((x,y,d)):
-    if  y<0 or y>5:
-        return false;
+    if y<0 or y>5:
+        return False
 
     (low, high) = rows[y]
     pos = 2*x + d
@@ -28,13 +39,23 @@ def isvalid((x,y,d)):
 
 """
 adjacent(p) returns a list of at most three vertices which are
-directly adjacent to p.
+directly adjacent to _vertex_ p.
 """
 def adjacent((x,y,d)):
     if d == 0:
         return filter(isvalid,[(x-1, y, 1), (x, y, 1), (x, y+1, 1)])
     if d == 1:
         return filter(isvalid,[(x, y-1, 0), (x, y, 0), (x+1, y, 0)])
+
+"""
+adjacent_hexes(p) returns a list of at most three hexes which are
+directly adjacent to _vertex_ p
+"""
+def adjacent_hexes(p):
+    (x,y,d) = p
+    adjacency = [[(0,0,1), (-1, -1, 1), (-1, 0, 1)], [(0, -1, 0), (-1, -1, 0), (0, 0, 0)]]
+    candidates = [map(operator.add, p, o) for o in adjacency[d]]
+    return filter(hexes.isvalid, candidates)
 
 """
 Takes a 3-tuple p and represents it as a single integer for easy
