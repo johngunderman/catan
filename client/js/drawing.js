@@ -119,7 +119,7 @@ function drawRoadDetector(stage, v1, v2) {
 // described with (x1,y1,d1).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a city at the given vertex when clicked.
-function drawSettlementDetector(stage, vertex) {
+function drawSettlementDetector(stage, vertex, isInitial) {
 
     var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
     var context = stage.getContext();
@@ -149,9 +149,17 @@ function drawSettlementDetector(stage, vertex) {
     });
 
     city.addEventListener("mousedown", function(){
-        drawSettlement(userID, vertex);
 
-        // add to our commitable items.
+        if (isInitial || hasSettlementResources()) {
+            insertSettlement(userID, vertex, isInitial);
+            drawSettlement(userID, vertex);
+        } else {
+            console.log("Not enough resources");
+        }
+
+        if (isInitial) {
+            promptRoad(isInitial);
+        }
     });
 
     stage.add(city);

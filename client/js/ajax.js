@@ -19,13 +19,20 @@ function promptSettlement(isInitial) {
     var valid = getValidSettlementPlaces();
 
     for (var x in valid) {
-        drawSettlementDetector(stage, decompress(valid[x]));
+        drawSettlementDetector(stage, decompress(valid[x]), true);
     }
 }
 
 function promptRoad(isInitial) {
 
-    //return [vertex1, vertex2];
+    var valid = getValidRoadPlaces();
+
+    for (var v in valid) {
+        drawRoadDetector(stage, valid[v][0],
+                         valid[v][1]);
+    }
+
+
 }
 
 function handle_resources_gained(log_entry) {

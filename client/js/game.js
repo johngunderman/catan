@@ -27,12 +27,12 @@ function initBoard(hexes) {
 
 function placeRoadClicked() {
     stage.removeAll();
-    drawAllRoadDetectors(stage);
+    promptRoad();
 }
 
 function placeCityClicked() {
     stage.removeAll();
-    drawAllSettlementDetectors(stage);
+    promptSettlement();
 }
 
 function doneButtonClicked() {

@@ -12,6 +12,8 @@ function insertSettlement(user, vertex, isInitialBuild) {
             gameboard.settlements[vertex] =
                 {"settlement" : SETTLEMENT,
                  "user" : userID};
+            // record our action so we can push it up to the server
+            actionsMade.push({"item" : SETTLEMENT, "vertex" : vertex});
         }
         if (!isInitialBuild && user == userID) {
             removeSettlementResources();
@@ -121,4 +123,50 @@ function getValidSettlementPlaces() {
 
     console.log(res);
     return res;
+}
+
+function getValidSettlementPlaces() {
+
+    var vertices = [];
+    var res = [];
+
+    for (var vertex in gameboard.settlements) {
+        vertices.push(vertex);
+
+        var av = adjacent(vertex);
+        for(var v in av) {
+            vertices.push(av[v]);
+        }
+
+    }
+
+    res =  VERTICES.filter(function(vertex) {
+        return vertices.indexOf(vertex) <= -1;
+    });
+
+
+    console.log(res);
+    return res;
+}
+
+function getValidRoadPlaces() {
+
+    var valid = [];
+    for (var x = 0; x < 6; x++) {
+        for (var y = 0; y < 6; y++) {
+	    var v1 = [x,y,WEST];
+            if(isvalid(v1)) {
+                var adj = adjacent(v1);
+                for (var z = 0; z < adj.length; z++) {
+                    var v2 = adj[z];
+                    if (gameboard.settlements[v1] || gameboard.settlements[v2]) {
+                        valid.push([v1,v2]);
+                    }
+                }
+            }
+        }
+    }
+
+    console.log(valid);
+    return valid;
 }
