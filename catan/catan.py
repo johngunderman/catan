@@ -3,8 +3,13 @@ app = Flask(__name__)
 app.debug = True
 #app.config.from_envvar("CATAN_SETTINGS")
 
-import controller
 import json
+
+import controller
+import database
+import models
+
+database.init_db()
 
 """
 The LogResponse class formats the result of a call together
@@ -13,20 +18,22 @@ with the log.
 It uses a DIRTY DIRTY HACK to do so.
 """
 class LogResponse(Response):
-    def __init__(self, game, sequence, response):
+    def __init__(self, player, sequence, response):
         super(Response, self).__init__()
         self.mimetype = "application/json"
 
-        (nextsequence, log) = controller.get_log(game, sequence)
+        (nextsequence, log) = controller.get_log(player.game, sequence)
 
         flagged = json.dumps({ "response": response, "sequence": nextsequence, "log": "REPLACE_TOKEN"});
         self.data = flagged.replace('"REPLACE_TOKEN"', log, 1)
 
-def get_game_prereqs():
+def get_player_prereqs():
     userid = request.args["user"]
-    game = controller.get_game(request.args["game"])
+    gameid = request.args["game"]
     sequence = request.args["sequence"]
-    return (userid, game, sequence) if game is not None else None
+    
+    player = models.GamePlayer.query.filter_by(GameID=gameid).filter_by(UserID=userid).one()
+    return (player, sequence)
 
 @app.route("/create_game")
 def create_game():
@@ -37,15 +44,24 @@ def create_game():
 
 @app.route("/start_game")
 def start_game():
-    (userid, game, sequence) = get_game_prereqs()
-    result = controller.start_game(userid, game)
-    return LogResponse(game, sequence, result)
+    (player, sequence) = get_player_prereqs()
+
+    result = controller.start_game(player)
+    return LogResponse(player, sequence, result)
+
+@app.route("/setup")
+def setup():
+    (player, sequence) = get_player_prereqs()
+
+    result = controller.setup(player, int(request.args["settlement"]), int(request.args["roadto"]))
+    return LogResponse(player, sequence, result)
 
 @app.route("/build_settlement")
 def build_settlement():
-    (userid, game, sequence) = get_game_prereqs()
-    result = build_settlement(userid, game, request.args["vertex"])
-    return LogResponse(game, sequence, result)
+    (player, sequence) = get_player_prereqs()
+
+    result = build_settlement(player, request.args["vertex"])
+    return LogResponse(player, sequence, result)
 
 @app.route("/<path:filename>")
 def get_file(filename):
