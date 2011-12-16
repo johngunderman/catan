@@ -3,7 +3,7 @@ from models import *
 from string import replace
 
 import vertices as v
-import tiles
+import hexes
 import json
 
 def get_log(game, sequence):
