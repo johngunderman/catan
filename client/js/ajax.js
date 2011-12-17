@@ -40,10 +40,16 @@ function handle_joined(log_entry) {
     user.id = log_entry.user
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
+    if (user.id != userID) {
+        sendToTicker("Player " + user.id  + " joined!");
+    }
+    else {
+        sendToTicker("You joined game #" + gameID);
+    }
 }
 
 function handle_road_built(log_entry) {
-    console.log("log reports road built");
+    sendToTicker("Player " + log_entry.user + " built a road!");
     insertRoad(log_entry.user, decompress(log_entry.vertex1),
                decompress(log_entry.vertex2));
 
@@ -52,21 +58,24 @@ function handle_road_built(log_entry) {
 }
 
 function handle_resources_gained(log_entry) {
+    sendToTicker("You gained resources!");
 
 }
 
 function handle_req_setup(log_entry) {
+    sendToTicker("It's your turn!");
     promptSettlement(true);
     // this calls promptRoad(true) inside.
     // needs to be changed at some point
 }
 
 function handle_hexes_placed(log_entry) {
+    sendToTicker("Initializing the board...");
     initBoard(log_entry.args);
 }
 
 function handle_settlement_built(log_entry) {
-    console.log("log reports settlement built");
+    sendToTicker("Player " + log_entry.user + " built a settlement!");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
     drawSettlement(gameboard.users[log_entry.user].color,
@@ -74,10 +83,12 @@ function handle_settlement_built(log_entry) {
 }
 
 function handle_settlement_upgraded(log_entry) {
+    sendToTicker("Player " + log_entry.user + " upgraded a settlement!");
 
 }
 
 function handle_req_turn(log_entry) {
+    sendToTicker("It's your turn!");
 
 }
 
@@ -171,6 +182,8 @@ function startGameRequest() {
     var create_game_callback = function(json) {
         gameID = parseInt(json);
         console.log("created new game with gameID: " + gameID);
+        sendToTicker("New game created!");
+        sendToTicker("Waiting for players...");
 
         window.location = HOSTNAME + "/#" + gameID;
 

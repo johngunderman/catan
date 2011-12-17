@@ -167,7 +167,7 @@ function drawSettlementDetector(stage, vertex, isInitial) {
 
         if (isInitial || hasSettlementResources()) {
             insertSettlement(userID, vertex, isInitial);
-            
+
             // record this action in our list of overall actions
             actionsMade.push({"item" : "settlement", "vertex" : compress(vertex)});
             drawSettlement(gameboard.users[userID].color, vertex);
@@ -307,29 +307,30 @@ function drawHexAt(img, context, hexNum, x, y) {
 
 function initTicker() {
     // Init ticker
-    var example = document.getElementById('ticker');
-    var context = example.getContext('2d');
-    context.fillStyle = "rgb(49,79,79)";
-    context.font    = 'bold 12px sans-serif';
-    var i = 1;
-    context.fillText  ("Player 1 got 2 wheats and 1 ore", 28, 20*i);i=i+1;
-    context.fillText  ("Player 4 got 1 wheat", 28, 20*i);i=i+1;
-    context.fillText  ("Player 4 put built a settlement", 28, 20*i);i=i+1;
-    context.fillText  ("Player 4 built two roads", 28, 20*i);i=i+1;
-    context.fillText  ("Player 3 rolled a 5", 28, 20*i);i=i+1;
-    context.fillText  ("Player 2 got 1 brick", 28, 20*i);i=i+1;
-    context.fillText  ("Player 3 wants 2 sheep", 28, 20*i);i=i+1;
-    context.fillText  ("Trade finalized:", 28, 20*i);i=i+1;
-    context.fillText  ("Player 3 got 2 sheep", 28, 20*i);i=i+1;
-    context.fillText  ("Player 2 got 1 ore", 28, 20*i);i=i+1;
-    context.fillText  ("Player 3 built a city", 28, 20*i);i=i+1;
-    context.fillText  ("Player 4 rolled a 7", 28, 20*i);i=i+1;
-    context.fillText  ("Player 3 discards 2 wheat, 2 ore", 28, 20*i);i=i+1;
-    context.fillText  ("Player 2 takes wheat from Player 2", 28, 20*i);i=i+1;
-    context.fillText  ("blablabla", 28, 20*i);i=i+1;
-    context.fillText  ("blablabla", 28, 20*i);i=i+1;
-    context.fillText  ("blablabla", 28, 20*i);i=i+1;
-    context.fillText  ("blablabla", 28, 20*i);i=i+1;
+    var canvas = document.getElementById('ticker');
+
+    tickerContext = canvas.getContext('2d');
+    tickerContext.clearRect(0, 0, canvas.width, canvas.height);
+
+    tickerContext.fillStyle = "rgb(49,79,79)";
+    tickerContext.font    = 'bold 12px sans-serif';
+}
+
+function sendToTicker(message) {
+    tickerLog.push(message);
+
+    var canvas = document.getElementById('ticker');
+    tickerContext.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (tickerLog.length > TICKER_LENGTH) {
+        TICKER_BASE =  TICKER_BASE -  TICKER_INC;
+    }
+
+    for(var x = 0; x < tickerLog.length; x++) {
+        tickerContext.fillText(tickerLog[x],
+                               TICKER_XOFFSET, TICKER_BASE + x * TICKER_INC);
+    }
+
 }
 
 function initWhitespace() {
