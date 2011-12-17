@@ -30,7 +30,10 @@ function drawCoords(context) {
 // described with (x1,y1,d1) to the vertice (x2,y2,d2).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a road at the given line when clicked.
-function drawRoadDetector(stage, v1, v2, isInitial) {
+function drawRoadDetector(stage, vertex1, vertex2, isInitial) {
+
+    var v1 = decompress(vertex1);
+    var v2 = decompress(vertex2);
 
     var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
     var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
@@ -84,9 +87,9 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
 
         if (hasRoadResources() || isInitial) {
 
-            drawRoad(gameboard.users[userID].color, v1, v2);
+            console.log(userID);
 
-            insertRoad(userID, v1, v2, isInitial);
+            insertRoad(userID, vertex1, vertex2);
             // log this into our actions to send to the server
             actionsMade.push({"action" : "road",
                               "vertex1" : compress(v1),

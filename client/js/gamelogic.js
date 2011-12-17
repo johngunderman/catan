@@ -127,15 +127,15 @@ function getValidRoadPlacesInitial() {
     function getRoadsFromVertex(start) { //Start is compressed
 
         var start_v = decompress(start);
-        console.log("herrum: " + start);
-        console.log("herrum: " + start_v);
+        console.log(start_v);
         adjacent(start_v).forEach(function(end_v) {
             var end = compress(end_v);
 
             var from = end > start ? start : end;
             var to = end > start ? end: start;
 
-            valid[[from, to]] = true;
+            valid[[from, to]] = { "from" : parseInt(from),
+                                  "to" : parseInt(to) };
         });
     }
 
@@ -146,6 +146,9 @@ function getValidRoadPlacesInitial() {
             getRoadsFromVertex(s);
         }
     }
+
+
+    console.log( valid);
 
     return valid;
 }
@@ -164,7 +167,8 @@ function getValidRoadPlaces() {
                 var from = end > start ? start : end;
                 var to = end > start ? end: start;
 
-                valid[[from, to]] = true;
+                valid[[from, to]] =  { "from" : parseInt(from),
+                                       "to" : parseInt(to) };
             });
         }
 
