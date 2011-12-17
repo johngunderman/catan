@@ -185,7 +185,12 @@ function makeSetupRequest(vertex, roadto) {
     makeAjaxRequest(HOSTNAME + "/setup",
                     "?game=" + gameID
                     + "&settlement=" + vertex
-                    + "&roadto=" + roadto
+                    + "&roadto=" + roadto,
+                    function(json) {
+                        if (json != "success") {
+                            console.log("bad things during /setup");
+                        }
+                    }
                    );
     // clear 'em out!
     actionsMade = [];
