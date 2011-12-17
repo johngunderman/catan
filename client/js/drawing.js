@@ -363,13 +363,18 @@ function updatePlayerDisplay(user) {
 
     for (var v in gameboard.users) {
 
-        context.font = 'bold 18px sans-serif';
-        context.fillStyle = gameboard.users[v].color;
-
 
         if (user.toString() == v) {
-            context.fillText(">>", 50, PLAYER_DISPLAY_OFFSET * i);
+            context.fillStyle = "rgb(34,139,34)";
+            context.beginPath();
+            context.arc(60, PLAYER_DISPLAY_OFFSET * (i - .2), 7, 0, Math.PI*2, true);
+            context.closePath();
+            context.fill();
+            //context.fillText(">>", 50, PLAYER_DISPLAY_OFFSET * i);
         }
+
+        context.font = 'bold 15px sans-serif';
+        context.fillStyle = gameboard.users[v].color;
 
         if (v == userID.toString()) {
             context.fillText("You",
