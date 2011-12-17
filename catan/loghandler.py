@@ -38,11 +38,8 @@ class LogHandler(RequestHandler):
         self.write(flagged.replace('"REPLACE_TOKEN"', log, 1))
         self.set_header("Content-Type", "application/json")
 
-        print("Pre-finish")
         self.finish()
-        print("Post finish")
         log_waiters[self.game.GameID].remove(self.callback)
 
     def on_connection_close(self):
-        print("Finished")
         log_waiters[self.game.GameID].remove(self.callback)

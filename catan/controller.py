@@ -314,5 +314,5 @@ def log_state_change(game):
     if game.State == Game.States.SETUP_FORWARD or game.State == Game.States.SETUP_BACKWARD:
         game.log(Log.req_setup(game.CurrentPlayerID))
     elif game.State == Game.States.NORMAL_PLAY:
-        game.begin_turn(game)
+        game.begin_turn()
         game.log(Log.req_turn(game.CurrentPlayerID))
