@@ -50,9 +50,10 @@ function handle_hexes_placed(log_entry) {
 }
 
 function handle_settlement_built(log_entry) {
+    console.log("we be building settlements, foo");
     // TODO: register the settlement build in our global gamestate model
-    insertSettlement(log_entry.user, log_entry.vertex);
-    drawSettlement(log_entry.user, log_entry.vertex);
+    insertSettlement(log_entry.user, decompress(log_entry.vertex));
+    drawSettlement(log_entry.user, decompress(log_entry.vertex));
 }
 
 function handle_settlement_upgraded(log_entry) {
@@ -89,37 +90,46 @@ function makeAjaxRequest(url, params, callbackFunc) {
 function handleResponseJson(json) {
     var myJson = JSON.parse(json);
 
-    if(myJson.log && myJson.sequence && myJson.log.length > 0) {
 
-        // update our sequence number
-        sequenceNum = myJson.sequence;
+    img = new Image();
+    img.onload = function() {
 
-        // take care of everything else
-        var log = myJson.log;
 
-        for(var x = 0; x < myJson.log.length; x++) {
-            if (handlers[log[x].action]) {
-                handlers[log[x].action](log[x]);
+        if(myJson.log && myJson.sequence && myJson.log.length > 0) {
+
+            // update our sequence number
+            sequenceNum = myJson.sequence;
+
+            // take care of everything else
+            var log = myJson.log;
+
+            for(var x = 0; x < myJson.log.length; x++) {
+                if (handlers[log[x].action]) {
+                    handlers[log[x].action](log[x]);
+                }
             }
+
+            var top = myJson.log[myJson.log.length - 1];
+
+            // handle req_handlers if need be
+            if (req_handlers[top.action] && top.user == userID) {
+                req_handlers[top.action](top);
+            }
+
+            updateClient();
+
+        }
+        else {
+            console.log("Malformed json returned");
+
+            setTimeout("updateClient()",3000);
+            // stuff is really messed up, so go ahead and reload the page
+            //window.location.reload();
         }
 
-        var top = myJson.log[myJson.log.length - 1];
-
-        // handle req_handlers if need be
-        if (req_handlers[top.action] && top.user == userID) {
-            req_handlers[top.action](top);
-        }
-
-        updateClient();
-
     }
-    else {
-        console.log("Malformed json returned");
 
-        setTimeout("updateClient()",3000);
-        // stuff is really messed up, so go ahead and reload the page
-        //window.location.reload();
-    }
+    img.src = IMAGE_SOURCE;
 
 
 }

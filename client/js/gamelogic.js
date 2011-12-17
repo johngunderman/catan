@@ -7,6 +7,7 @@
 function insertSettlement(user, vertex, isInitialBuild) {
     // make sure we're valid and a settlement doesn't exist
     // at that vertex yet.
+    console.log(gameboard.settlements[vertex]);
     if (isvalid(vertex) && !gameboard.settlements[vertex]) {
         if (hasSettlementResources() || isInitialBuild) {
             gameboard.settlements[vertex] =
@@ -19,6 +20,9 @@ function insertSettlement(user, vertex, isInitialBuild) {
         if (!isInitialBuild && user == userID) {
             removeSettlementResources();
         }
+    } else {
+        console.log(gameboard.settlements[vertex]);
+        console.log("something reaaaaally weird happened");
     }
 }
 
