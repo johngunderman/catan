@@ -258,13 +258,9 @@ def setup(player, settlement_vertex, road_to):
         #we don't have to check for existing roads,
         #because there can't be any, by the distance rule
     ):
-        s = Settlement(player.UserID, settlement_vertex)
-        game.settlements.append(s)
-        game.log(Log.settlement_built(player, s))
+        player.add_settlement(settlement_vertex)
 
-        r = Road(player.UserID, settlement_vertex, road_to)
-        game.roads.append(r)
-        game.log(Log.road_built(player, r))
+        player.add_road(settlement_vertex, road_to)
 
         if game.State == Game.States.SETUP_FORWARD:
             if game.CurrentIndex + 1 == len(game.players):
