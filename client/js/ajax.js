@@ -116,7 +116,7 @@ function handleResponseJson(json) {
     }
     else {
         // stuff is really messed up, so go ahead and reload the page
-        window.location.reload();
+        //window.location.reload();
     }
 }
 
@@ -129,12 +129,21 @@ function startGameRequest() {
         console.log("created new game with gameID: " + gameID);
 
         makeAjaxRequest(HOSTNAME + "/start_game",
-                        "?user=" + userID
                         + "&game=" + gameID
                         + "&sequence=" + sequenceNum,
                         handleResponseJson);
     }
 
-    makeAjaxRequest(HOSTNAME + "/create_game", "?user=" + userID,
+    makeAjaxRequest(HOSTNAME + "/create_game", ""
                    create_game_callback);
+}
+
+function makeSetupRequest(sequenceNum, vertex, roadto) {
+    makeAjaxRequest(HOSTNAME + "/setup",
+                    + "&sequence=" + sequenceNum
+                    + "&settlement=" + vertex
+                    + "&roadto=" + roadto
+                   );
+    // clear 'em out!
+    actionsMade = [];
 }

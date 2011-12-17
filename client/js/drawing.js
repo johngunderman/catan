@@ -98,8 +98,6 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
 
         if (isInitial) {
 
-            console.log(actionsMade);
-
             var roadto  = -1;
 
             if (actionsMade[1].vertex1 == actionsMade[0].vertex) {
@@ -109,20 +107,7 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
                 roadto = actionsMade[1].vertex1;
             }
 
-            // console.log(HOSTNAME + "/setup"
-            //             + "?user=" + userID
-            //             + "&sequence=" + sequenceNum
-            //             + "&settlement="+  actionsMade[0].vertex
-            //             + "&roadto=" + roadto);
-
-            makeAjaxRequest(HOSTNAME + "/setup",
-                            "?user=" + userID
-                            + "&sequence=" + sequenceNum
-                            + "&settlement=" + actionsMade[0].vertex
-                            + "&roadto=" + roadto
-                           );
-            // clear 'em out!
-            actionsMade = [];
+            makeSetupRequest(sequenceNum, actionsMade[0].vertex, roadto);
         }
 
 
