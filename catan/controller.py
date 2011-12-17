@@ -260,7 +260,7 @@ def setup(player, settlement_vertex, road_to):
     ):
         s = Settlement(player.UserID, settlement_vertex)
         game.settlements.append(s)
-        game.log(Log.settlement_built(player, s)
+        game.log(Log.settlement_built(player, s))
 
         r = Road(player.UserID, settlement_vertex, road_to)
         game.roads.append(r)
