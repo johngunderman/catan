@@ -82,7 +82,7 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
 
         if (hasRoadResources() || isInitial) {
 
-            drawRoad(userID, v1, v2);
+            drawRoad(gameboard.users[userID].color, v1, v2);
 
             insertRoad(userID, v1, v2, isInitial);
 
@@ -110,21 +110,19 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
 }
 
 
-function drawRoad(user, v1, v2) {
+function drawRoad(color, v1, v2) {
     var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
     var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
     var context = stage.getContext();
 
-            document.body.style.cursor = "default";
-            context.beginPath();
-            context.lineWidth = 6;
-            context.strokeStyle = "red";
-            context.fillStyle = "rgba(0,0,0,0)";
-            context.moveTo(coords1[0], coords1[1]);
-            context.lineTo(coords2[0], coords2[1]);
-            context.closePath();
-            context.fill();
-            context.stroke();
+    document.body.style.cursor = "default";
+    context.beginPath();
+    context.lineWidth = 6;
+    context.strokeStyle = color;
+    context.moveTo(coords1[0], coords1[1]);
+    context.lineTo(coords2[0], coords2[1]);
+    context.closePath();
+    context.stroke();
 }
 
 // On the given stage, draw a city detector on the vertice
@@ -164,7 +162,7 @@ function drawSettlementDetector(stage, vertex, isInitial) {
 
         if (isInitial || hasSettlementResources()) {
             insertSettlement(userID, vertex, isInitial);
-            drawSettlement(userID, vertex);
+            drawSettlement(gameboard.users[userID].color, vertex);
         } else {
             console.log("Not enough resources");
         }
@@ -179,7 +177,7 @@ function drawSettlementDetector(stage, vertex, isInitial) {
 
 
 // user id determines the color
-function drawSettlement(user, vertex) {
+function drawSettlement(color, vertex) {
 
     var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
     var context = stage.getContext();
@@ -187,9 +185,7 @@ function drawSettlement(user, vertex) {
     var width = 6;
     document.body.style.cursor = "default";
     context.beginPath();
-    context.lineWidth = 6;
-    context.strokeStyle = "red";
-    context.fillStyle = "red";
+    context.fillStyle = color;
     context.moveTo(coords[0] - width, coords[1] - width);
     context.lineTo(coords[0] - width, coords[1] + width);
     context.lineTo(coords[0] + width, coords[1] + width);
@@ -197,7 +193,6 @@ function drawSettlement(user, vertex) {
 
     context.closePath();
     context.fill();
-    context.stroke();
 
     stage.removeAll();
 

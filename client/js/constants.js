@@ -73,7 +73,7 @@ indices = [0, 7, 16, 27, 38, 47];
 // we shall code in the shade
 // 'til we run out of rum.
 
-usercolors = ["#008", "#888", "#F00", "#F90" ];
+usercolors = ["#F90", "#F00", "#000", "#008" ];
 
 // shows where we are in the sequence of actions for this game.
 sequenceNum = 0;

@@ -47,7 +47,7 @@ function handle_road_built(log_entry) {
     insertRoad(log_entry.user, decompress(log_entry.vertex1),
                decompress(log_entry.vertex2));
 
-    drawRoad(log_entry.user, decompress(log_entry.vertex1),
+    drawRoad(gameboard.users[log_entry.user].color, decompress(log_entry.vertex1),
                decompress(log_entry.vertex2));
 }
 
@@ -69,7 +69,8 @@ function handle_settlement_built(log_entry) {
     console.log("log reports settlement built");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
-    drawSettlement(log_entry.user, decompress(log_entry.vertex));
+    drawSettlement(gameboard.users[log_entry.user].color,
+            decompress(log_entry.vertex));
 }
 
 function handle_settlement_upgraded(log_entry) {
