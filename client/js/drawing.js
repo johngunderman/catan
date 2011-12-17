@@ -107,7 +107,7 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
                 roadto = actionsMade[1].vertex1;
             }
 
-            makeSetupRequest(sequenceNum, actionsMade[0].vertex, roadto);
+            makeSetupRequest(actionsMade[0].vertex, roadto);
         }
 
 
