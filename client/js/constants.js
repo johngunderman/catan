@@ -61,7 +61,7 @@ SETTLEMENT = 1;
 CITY = 2;
 
 
-HOSTNAME = 'http://localhost:5000';
+HOSTNAME = "";
 
 // a[x] is the indices of (first good vertex, last good vertex)
 rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
