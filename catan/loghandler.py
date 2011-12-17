@@ -8,7 +8,6 @@ import json
 class LogHandler(RequestHandler):
     @asynchronous
     def get(self):
-        print(self)
         #userid = int(self.get_cookie("user"))
         #if we don't mind our game logs being public, we don't even need to look at the userid
         #which brings us to
