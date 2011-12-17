@@ -65,6 +65,11 @@ TICKER_BASE = 20;
 TICKER_INC = 20;
 TICKER_LENGTH = 15;
 
+
+PLAYER_DISPLAY_OFFSET = 35;
+PLAYER_DISPLAY_SCORE_OFFSET = 130;
+PLAYER_DISPLAY_CIRCLE_OFFSET = 15;
+
 HOSTNAME = "";
 
 // a[x] is the indices of (first good vertex, last good vertex)
