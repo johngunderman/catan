@@ -31,6 +31,8 @@ function promptRoad(isInitial) {
 
     var valid = getValidRoadPlaces();
 
+    console.log("valid roads " + valid);
+
     for (var v in valid) {
         drawRoadDetector(stage, valid[v][0],
                          valid[v][1], isInitial);
@@ -165,8 +167,13 @@ function handleResponseJson(json) {
             var top = myJson.log[myJson.log.length - 1];
 
             // handle req_handlers if need be
-            if (req_handlers[top.action] && top.user == userID) {
-                req_handlers[top.action](top);
+            if (req_handlers[top.action]) {
+
+                updatePlayerDisplay(top.user);
+
+                if (top.user == userID) {
+                    req_handlers[top.action](top);
+                }
             }
 
             updateClient();

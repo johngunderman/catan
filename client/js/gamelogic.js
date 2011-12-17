@@ -4,18 +4,19 @@
 // { settlement: CITY | SETTLEMENT, user:userID }
 
 // no cost if initial build
-function insertSettlement(user, vertex, isInitialBuild) {
+function insertSettlement(user, uvertex, isInitialBuild) {
     // make sure we're valid and a settlement doesn't exist
     // at that vertex yet.
+    var vertex = compress(uvertex);
+    console.log("vertex: " + vertex);
     console.log(gameboard.settlements[vertex]);
-    if (isvalid(vertex) && !gameboard.settlements[vertex]) {
-        if (hasSettlementResources() || isInitialBuild) {
+    if (isvalid(uvertex) && !gameboard.settlements[vertex]) {
+        if (hasSettlementResources() || isInitialBuild || user != userID) {
             gameboard.settlements[vertex] =
                 {"settlement" : SETTLEMENT,
-                 "user" : userID};
-            // record our action so we can push it up to the server
+                 "user" : user};
+
             console.log("Action: Settlement created");
-            sendToTicker("Action: Settlement created");
         }
         if (!isInitialBuild && user == userID) {
             removeSettlementResources();
@@ -52,7 +53,7 @@ function insertRoad(user, vertex1, vertex2, isInitialBuild) {
         && !gameboard.roads[vertex1 + "." + vertex2]
         && !gameboard.roads[vertex2 + "." + vertex1]) {
 
-        if (hasRoadResources() || isInitialBuild) {
+        if (hasRoadResources() || isInitialBuild || user != userID) {
             gameboard.roads[vertex1 + "." + vertex2] = user;
 
             console.log("Action: road created");
@@ -168,7 +169,8 @@ function getValidRoadPlaces() {
                 var adj = adjacent(v1);
                 for (var z = 0; z < adj.length; z++) {
                     var v2 = adj[z];
-                    if (gameboard.settlements[v1] || gameboard.settlements[v2]) {
+                    if (gameboard.settlements[compress(v1)]
+                        || gameboard.settlements[compress(v2)]) {
                         valid.push([v1,v2]);
                     }
                 }

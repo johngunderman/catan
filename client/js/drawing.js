@@ -175,6 +175,7 @@ function drawSettlementDetector(stage, vertex, isInitial) {
             console.log("Not enough resources");
         }
 
+
         if (isInitial) {
             promptRoad(isInitial);
         }
@@ -347,36 +348,44 @@ function initWhitespace() {
     context.fillText  ("1:37", 180, 105);
 }
 
+
+function updatePlayerDisplay(user) {
+
+    console.log(gameboard.users);
+
+    var canvas = document.getElementById('players');
+
+    var context = canvas.getContext('2d');
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    var i = 1;
+
+    for (var v in gameboard.users) {
+
+        context.font = 'bold 18px sans-serif';
+        context.fillStyle = gameboard.users[v].color;
+
+
+        if (user.toString() == v) {
+            context.fillText(">>", 50, PLAYER_DISPLAY_OFFSET * i);
+        }
+
+        if (v == userID.toString()) {
+            context.fillText("You",
+                             80, PLAYER_DISPLAY_OFFSET * i);
+        } else {
+            context.fillText("Player " + v,
+                             80, PLAYER_DISPLAY_OFFSET * i);
+        }
+        i++;
+    }
+
+}
+
 function initPlayerDisplay() {
     // init playersDisplay
-    var example = document.getElementById('players');
-    var context = example.getContext('2d');
-    context.fillStyle = "rgb(0,0,128)";
-    context.font    = 'bold 15px sans-serif';
-    context.textBaseline    = 'bottom';
-    //context.fillText  ("Player 0", 0, 30)
-    for(var i=1;i<5;i=i+1) {
-        if(i==1) {
-            context.fillStyle = "rgb(0,0,128)";
-        }
-        if (i==2) {
-            context.fillStyle = "rgb(131,139,131)";
-        }
-        if (i==3) {
-            context.fillStyle = "rgb(255,0,0)";
-        }
-        if (i==4) {
-            context.fillStyle = "rgb(255,140,0)";
-        }
-        context.fillText  ("Player "+ i, 28, 30*i);
-        context.fillStyle = "rgb(0,0,0)";
-        context.fillText  ("(score)", 130, 30*i);
-    }
-    context.fillStyle = "rgb(34,139,34)";
-    context.beginPath();
-    context.arc(15, 50, 5, 0, Math.PI*2, true);
-    context.closePath();
-    context.fill();
+
 }
 
 function dispChit(context, number, x,y) {
