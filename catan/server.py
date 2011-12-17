@@ -11,6 +11,9 @@ from catan import app
 import controller
 from models import Game, log_waiters
 
+from werkzeug.debug import DebuggedApplication
+app = DebuggedApplication(app, evalex=True)
+
 database.init_db()
 
 class BlockHandler(RequestHandler):
@@ -24,14 +27,16 @@ class BlockHandler(RequestHandler):
         self.game = Game.query.get(gameid)
         self.sequence = int(self.get_argument("sequence"))
 
+        if not self.game.GameID in log_waiters:
+            log_waiters[self.game.GameID] = set()
+        log_waiters[self.game.GameID].add(self.callback)
+
         #Don't try to be strict about > relationship of
         #sequence numbers
         if(self.game.NextSequence != self.sequence):
             #we have data to return now
             self.callback()
-        else:
-            log_waiters.add(self.callback)
-
+            
     def callback(self):
         # Client closed connection
         if self.request.connection.stream.closed():
@@ -44,10 +49,10 @@ class BlockHandler(RequestHandler):
         self.set_header("Content-Type", "application/json")
 
         self.finish()
-        log_waiters.remove(self.callback)
+        log_waiters[self.game.GameID].remove(self.callback)
 
     def on_connection_close(self):
-        log_waiters.remove(self.callback)
+        log_waiters[self.game.GameID].remove(self.callback)
 
 wsgi_app = WSGIContainer(app)
 application = Application([
