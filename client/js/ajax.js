@@ -186,11 +186,7 @@ function makeSetupRequest(vertex, roadto) {
                     "?game=" + gameID
                     + "&settlement=" + vertex
                     + "&roadto=" + roadto,
-                    function(json) {
-                        if (json != "success") {
-                            console.log("bad things during /setup");
-                        }
-                    }
+                    function(json) {}
                    );
     // clear 'em out!
     actionsMade = [];
