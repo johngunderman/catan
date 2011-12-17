@@ -85,6 +85,11 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
             drawRoad(userID, v1, v2);
 
             insertRoad(userID, v1, v2, isInitial);
+            // log this into our actions to send to the server
+            actionsMade.push({"action" : "road",
+                              "vertex1" : compress(v1),
+                              "vertex2" : compress(v2)});
+
 
         }
 
@@ -164,6 +169,8 @@ function drawSettlementDetector(stage, vertex, isInitial) {
 
         if (isInitial || hasSettlementResources()) {
             insertSettlement(userID, vertex, isInitial);
+            // record this action in our list of overall actions
+            actionsMade.push({"item" : "settlement", "vertex" : compress(vertex)});
             drawSettlement(userID, vertex);
         } else {
             console.log("Not enough resources");
