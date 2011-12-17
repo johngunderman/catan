@@ -1,7 +1,9 @@
 
 window.onload = function() {
 
-    console.log(document.cookie)
+    userID = $.cookie("user");
+    console.debug(userID);
+
     handleGameJoin();
 
     initTicker();
