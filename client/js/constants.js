@@ -113,5 +113,6 @@ gameboard = {
         "wool"   : 0,
         "grain"  : 0,
         "ore"    : 0
-    }
-}
+    },
+    "scores" : {}
+};

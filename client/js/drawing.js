@@ -393,6 +393,11 @@ function updatePlayerDisplay(user) {
             context.fillText("Player " + v,
                              80, PLAYER_DISPLAY_OFFSET * i);
         }
+
+        context.fillStyle = "black";
+
+        context.fillText("(" + gameboard.scores[v] + ")",
+                         160, PLAYER_DISPLAY_OFFSET * i);
         i++;
     }
 
