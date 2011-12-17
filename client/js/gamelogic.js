@@ -4,25 +4,21 @@
 // with key of vertex, value is type of
 // { settlement: CITY | SETTLEMENT, user:userID }
 
-// no cost if initial build
-function insertSettlement(user, uvertex, isInitialBuild) {
+function insertSettlement(user, uvertex) {
     // make sure we're valid and a settlement doesn't exist
     // at that vertex yet.
     var vertex = compress(uvertex);
     console.log("vertex: " + vertex);
     console.log(gameboard.settlements[vertex]);
     if (isvalid(uvertex) && !gameboard.settlements[vertex]) {
-        if (hasSettlementResources() || isInitialBuild || user != userID) {
-            gameboard.settlements[vertex] =
-                {"settlement" : SETTLEMENT,
-                 "user" : user};
-
-            console.log("Action: Settlement created");
-        }
-        if (!isInitialBuild && user == userID) {
-            removeSettlementResources();
-        }
-    } else {
+        gameboard.settlements[vertex] =
+            {
+                "settlement" : SETTLEMENT,
+                "user" : user
+            };
+    }
+    else
+    {
         console.log(gameboard.settlements[vertex]);
         console.log("something reaaaaally weird happened");
     }
