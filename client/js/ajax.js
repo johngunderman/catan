@@ -129,12 +129,12 @@ function startGameRequest() {
         console.log("created new game with gameID: " + gameID);
 
         makeAjaxRequest(HOSTNAME + "/start_game",
-                        + "&game=" + gameID
+                        "?game=" + gameID
                         + "&sequence=" + sequenceNum,
                         handleResponseJson);
     }
 
-    makeAjaxRequest(HOSTNAME + "/create_game", ""
+    makeAjaxRequest(HOSTNAME + "/create_game", "",
                    create_game_callback);
 }
 
