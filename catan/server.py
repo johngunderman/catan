@@ -1,62 +1,18 @@
 #!/usr/bin/env python
-from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
-from tornado.web import RequestHandler, Application, asynchronous, FallbackHandler
-from time import sleep
-import json
+from tornado.web import Application, asynchronous, FallbackHandler
+from tornado.wsgi import WSGIContainer
 
-import database
-from catan import app
-import controller
-from models import Game, log_waiters
+from frontend import app
+from database import init_db
+from loghandler import LogHandler
 
-from werkzeug.debug import DebuggedApplication
-app = DebuggedApplication(app, evalex=True)
-
-database.init_db()
-
-class BlockHandler(RequestHandler):
-    @asynchronous
-    def get(self):
-        #userid = int(self.get_cookie("user"))
-        #if we don't mind our game logs being public, we don't even need to look at the userid
-        #which brings us to
-        #TODO: Make game logs not public
-        gameid = int(self.get_argument("game"))
-        self.game = Game.query.get(gameid)
-        self.sequence = int(self.get_argument("sequence"))
-
-        if not self.game.GameID in log_waiters:
-            log_waiters[self.game.GameID] = set()
-        log_waiters[self.game.GameID].add(self.callback)
-
-        #Don't try to be strict about > relationship of
-        #sequence numbers
-        if(self.game.NextSequence != self.sequence):
-            #we have data to return now
-            self.callback()
-            
-    def callback(self):
-        # Client closed connection
-        if self.request.connection.stream.closed():
-            return
-
-        (nextsequence, log) = controller.get_log(self.game, self.sequence)
-        flagged = json.dumps({ "log": "REPLACE_TOKEN", "sequence" : nextsequence })
-
-        self.write(flagged.replace('"REPLACE_TOKEN"', log, 1))
-        self.set_header("Content-Type", "application/json")
-
-        self.finish()
-        log_waiters[self.game.GameID].remove(self.callback)
-
-    def on_connection_close(self):
-        log_waiters[self.game.GameID].remove(self.callback)
+init_db()
 
 wsgi_app = WSGIContainer(app)
 application = Application([
-    (r"/get_log", BlockHandler),
+    (r"/get_log", LogHandler),
     (r".*", FallbackHandler, dict(fallback=wsgi_app))
 ])
 

@@ -73,9 +73,7 @@ indices = [0, 7, 16, 27, 38, 47];
 // we shall code in the shade
 // 'til we run out of rum.
 
-gameID = -1;
-// at some point this needs to be gotten from the server
-userID = 1;
+usercolors = ["#008", "#888", "#F00", "#F90" ];
 
 // shows where we are in the sequence of actions for this game.
 sequenceNum = 0;
@@ -88,6 +86,7 @@ actionsMade = [];
 // see gamelogic.js for a complete description of how data is
 // stored in our game board representation
 gameboard = {
+    "users": {},
     // form of {settlement = SETTLEMENT | CITY, user : user}
     "settlements" : {},
     // roads are owned by a user

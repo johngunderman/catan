@@ -2,6 +2,7 @@
 // req events are handled seperately, as we only care about them if they
 // are on the top of the log. See handleResponseJson().
 handlers = {
+    "joined"              : handle_joined,
     "resources_gained"    : handle_resources_gained,
     "hexes_placed"        : handle_hexes_placed,
     "settlement_built"    : handle_settlement_built,
@@ -32,8 +33,13 @@ function promptRoad(isInitial) {
         drawRoadDetector(stage, valid[v][0],
                          valid[v][1], isInitial);
     }
+}
 
-
+function handle_joined(log_entry) {
+    user = {};
+    user.id = log_entry.user
+    user.color = usercolors.pop();
+    gameboard.users[log_entry.user] = user;
 }
 
 function handle_road_built(log_entry) {

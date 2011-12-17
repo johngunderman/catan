@@ -8,8 +8,6 @@ import hexes as h
 
 import random
 
-log_waiters = {}
-
 class Terrain:
     (FOREST, PASTURE, FIELDS, HILLS, MOUNTAINS, DESERT) = range(1,7)
 
@@ -182,10 +180,6 @@ class Game(Base):
         self.__log.append(l)
         self.NextSequence += 1
 
-        if self.GameID in log_waiters:
-            for i in list(log_waiters[self.GameID]):
-                i()
-
 
 class GameCards(Base):
     __tablename__ = "GameCards"
@@ -264,6 +258,16 @@ class GamePlayer(Base):
         return Settlement.query. \
                 filter_by(GameID=self.GameID). \
                 filter_by(UserID=self.UserID)
+
+    def add_settlement(self, vertex):
+        s = Settlement(self.UserID, vertex)
+        self.game.settlements.append(s)
+        self.game.log(Log.settlement_built(self, s))
+
+    def add_road(self, vertex1, vertex2):
+        r = Road(self.UserID, vertex1, vertex2)
+        self.game.roads.append(r)
+        self.game.log(Log.road_built(self, r))
 
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
