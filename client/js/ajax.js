@@ -90,8 +90,7 @@ function makeAjaxRequest(url, params, callbackFunc) {
 function handleResponseJson(json) {
     var myJson = JSON.parse(json);
 
-    if(myJson.response && myJson.log
-       && myJson.sequence && myJson.response == "success") {
+    if(myJson.log && myJson.sequence && myJson.log.length > 0) {
 
         // update our sequence number
         sequenceNum = myJson.sequence;
@@ -112,14 +111,23 @@ function handleResponseJson(json) {
             req_handlers[top.action](top);
         }
 
+        updateClient();
 
     }
     else {
         // stuff is really messed up, so go ahead and reload the page
         //window.location.reload();
     }
+
 }
 
+
+function updateClient() {
+    makeAjaxRequest(HOSTNAME + "/get_log",
+                    "?sequence=" + sequenceNum
+                    + "&game=" + gameID,
+                    handleResponseJson);
+}
 
 // currently a huge hack, just so we can get the starting board layout.
 function startGameRequest() {
@@ -128,19 +136,16 @@ function startGameRequest() {
         gameID = parseInt(json);
         console.log("created new game with gameID: " + gameID);
 
-        makeAjaxRequest(HOSTNAME + "/start_game",
-                        "?game=" + gameID
-                        + "&sequence=" + sequenceNum,
-                        handleResponseJson);
+        updateClient();
     }
 
     makeAjaxRequest(HOSTNAME + "/create_game", "",
                    create_game_callback);
 }
 
-function makeSetupRequest(sequenceNum, vertex, roadto) {
+function makeSetupRequest(vertex, roadto) {
     makeAjaxRequest(HOSTNAME + "/setup",
-                    + "&sequence=" + sequenceNum
+                    "?sequence=" + sequenceNum
                     + "&settlement=" + vertex
                     + "&roadto=" + roadto
                    );
