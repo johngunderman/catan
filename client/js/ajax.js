@@ -41,9 +41,8 @@ function handle_resources_gained(log_entry) {
 
 function handle_req_setup(log_entry) {
     promptSettlement(true);
-
-//    promptRoad(true);
-
+    // this calls promptRoad(true) inside.
+    // needs to be changed at some point
 }
 
 function handle_hexes_placed(log_entry) {
@@ -115,15 +114,19 @@ function handleResponseJson(json) {
 
     }
     else {
+        console.log("Malformed json returned");
+
+        setTimeout("updateClient()",3000);
         // stuff is really messed up, so go ahead and reload the page
         //window.location.reload();
     }
+
 
 }
 
 function joinGame() {
     makeAjaxRequest(HOSTNAME + "/join_game", "?game=" + gameID,
-                    function(json) {startGameLog();});
+                    function(json) {updateClient();});
 
 }
 
@@ -144,7 +147,7 @@ function startGameRequest() {
 
         window.location = HOSTNAME + "/#" + gameID;
 
-        startGameLog();
+        updateClient();
     }
 
     makeAjaxRequest(HOSTNAME + "/create_game", "",
@@ -152,15 +155,9 @@ function startGameRequest() {
 }
 
 
-function startGameLog() {
-    makeAjaxRequest(HOSTNAME + "/get_log", "?game=" + gameID
-                    + "&sequence=" + sequenceNum,
-                    handleResponseJson);
-}
-
 function makeSetupRequest(vertex, roadto) {
     makeAjaxRequest(HOSTNAME + "/setup",
-                    "?sequence=" + sequenceNum
+                    "?game=" + gameID
                     + "&settlement=" + vertex
                     + "&roadto=" + roadto
                    );

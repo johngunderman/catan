@@ -40,7 +40,7 @@ WEST      = 0;
 NORTHWEST = 1;
 
 
-MAX_VERTEX = 54;
+MAX_VERTEX = 53;
 VERTICES = []
 
 for(var x = 0;x <= MAX_VERTEX; x++) {

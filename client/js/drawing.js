@@ -192,7 +192,6 @@ function drawSettlement(user, vertex) {
 
     stage.removeAll();
 
-    console.log("coords: " + compress(vertex));
 }
 
 // x,y determines a hex, d determines the vertex of the hex
