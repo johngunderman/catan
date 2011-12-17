@@ -1,4 +1,4 @@
-import json #TODO: Does this follow convention?
+import json
 from sqlalchemy import Column, DateTime, Integer, SmallInteger, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
@@ -18,17 +18,23 @@ CardTypes = {
     "Knight", "Library", "Palace", "Chapel", "University"
     "Market", "RoadBuilding", "YearOfPlenty"
 }
- 
+
 class BuildTypes:
     ROAD        = 1
     TOWN        = 2
     CITY        = 3
     DEVCARD     = 4
 
-
 class User(Base):
     __tablename__ = "User"
     UserID = Column(Integer, primary_key=True)
+
+    def join_game(self, game):
+        player = GamePlayer(self.UserID)
+        game.players.append(player)
+
+        game.log(Log.joined(self.UserID))
+        return player
 
 class Game(Base):
     class States:
@@ -42,7 +48,7 @@ class Game(Base):
             STEAL_CARDS,
             VICTORY
         ) = range(1,9)
-        
+
     ROBBER_START_HEX = 19
 
     __tablename__ = "Game"
@@ -53,6 +59,7 @@ class Game(Base):
     RobberHex = Column(SmallInteger)
     CurrentIndex = Column(SmallInteger)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
+    #TurnCount = Column(Integer)
     NextSequence = Column(Integer, nullable=False)
 
     players = relationship("GamePlayer", backref="game")
@@ -67,22 +74,108 @@ class Game(Base):
         self.cards = GameCards()
         self.NextSequence = 0;
 
-    """Test ideas:
-    - create_board should be len(19)
-    - it should 2-ples
-    """
-    @staticmethod
-    def create_hexes():
-        chits = (5, 10, 8, 2, 9, 3, 4, 6, 11, 6, 11, 3, 4, 5, 12, 8, 10, 9)
-        preboard = zip(h.valid_hexes, chits)
-        
-        types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.FIELDS]*4 + [Terrain.HILLS]*3 + [Terrain.MOUNTAINS]*3
-        random.shuffle(types) #Shuffle the hexes
+    def start(self):
+        """Test ideas:
+        - create_board should be len(19)
+        - it should 2-ples
+        """
+        def create_hexes():
+            chits = (5, 10, 8, 2, 9, 3, 4, 6, 11, 6, 11, 3, 4, 5, 12, 8, 10, 9)
+            preboard = zip(h.valid_hexes, chits)
 
-        hexes = [Hex(vertex, chit, type) for ((vertex, chit), type) in zip(preboard, types)]
-        hexes.append(Hex(Game.ROBBER_START_HEX, 7, Terrain.DESERT)) #the desert tile is fixed
+            types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.FIELDS]*4 + [Terrain.HILLS]*3 + [Terrain.MOUNTAINS]*3
+            random.shuffle(types) #Shuffle the hexes
 
-        return hexes
+            hexes = [Hex(vertex, chit, type) for ((vertex, chit), type) in zip(preboard, types)]
+            hexes.append(Hex(Game.ROBBER_START_HEX, 7, Terrain.DESERT)) #the desert tile is fixed
+
+            return hexes
+
+        self.hexes = create_hexes()
+        self.RobberHex = Game.ROBBER_START_HEX
+        self.log(Log.hexes_placed(self.hexes))
+
+        self.State = Game.States.SETUP_FORWARD
+        self.CurrentIndex = 0
+        self.CurrentPlayerID = self.players[self.CurrentIndex].UserID
+        self.TurnCount = 0
+
+
+    def begin_turn(self):
+        rolled = random.randint(1,6) + random.randint(1,6)
+        if rolled == 7:
+            Game.State = States.MOVE_ROBBER
+        else:
+            def give_cards(rolled):
+                #gets hexes that have just yielded stuff
+                rolled_hexes = db_session.query(Hex.Vertex, Hex.Type). \
+                    filter_by(GameID=self.GameID). \
+                    filter(Hex.Chit == rolled). \
+                    filter(Hex.Vertex != Game.RobberVertex). \
+                    all()
+
+                """
+                Creates a dict of the form:
+                (type -> (vertex -> count)
+                where:
+                    type is the type of hex
+                    vertex is a vertex number adjacent to the hex
+                    count is the number of times that vertex would
+                        receive cards of type *type*
+                """
+                types = {}
+                for (vertex, type) in rolled_hexes:
+                    if not type in types:
+                        types[type] = {}
+
+                    adjacent = hexes.adjacent(vertex)
+                    for v in adjacent:
+                        if not v in types[type]:
+                            types[type][v] = 0
+                        types[type][v] += 0
+
+                """
+                Creates a dict of the form:
+                (userid -> (type -> count))
+                where:
+                    userid is self explanatory
+                    type if the type of resource
+                        (equivalent to the type of hex)
+                    count is the number of cards of that resource type
+
+                """
+                users = {}
+                for (type, vertices) in types:
+                    #get all settlements that are adjacent to hexes
+                    #of type *type*
+                    settlements = Settlement.query(). \
+                        filter_by(GameID=self.GameID). \
+                        filter(Settlement.Vertex.in_(vertices.keys())). \
+                        all()
+
+                    for s in settlements:
+                        if not s.UserID in users:
+                            users[s.UserID] = {}
+                        if not type in users[s.UserID]:
+                            users[s.UserID][type] = 0
+                        users[s.UserID][type] += \
+                            (2 if s.Type == Settlement.Types.CITY else 1) * \
+                            vertices[s.Vertex]
+
+                for (id, types) in users:
+                    allocated = []
+                    GamePlayer.query. \
+                        filter_by(GameID=self.GameID). \
+                        filter_by(UserID=id).one(). \
+                        cards.giveCards(types)
+
+                    for (type, amount) in types:
+                        allocate.append((amount, type))
+
+                    self.log(Log.got_resources(id, allocated))
+            give_cards(rolled)
+            self.log(Log.req_turn(self.UserID))
+
 
     def log(self, action):
         l = Log(self.NextSequence, json.dumps(action))
@@ -121,7 +214,7 @@ class GameCards(Base):
         #Progress Cards
         self.RoadBuilding = 3 #TODO: Check this
         self.YearOfPlenty = 3 #TODO: Check this
-    
+
     def drawDevCard(self):
         deck = sum([[type] * getattr(self, type) for type in CardTypes])
         card = random.choice(deck)
@@ -136,11 +229,11 @@ class GamePlayer(Base):
 
     def __init__(self,userid):
         self.UserID = userid
-    
+
     #cards = relationship("PlayerCards", uselist=False)
     #roads = relationship("Road",primaryjoin="(Road.UserID == GamePlayer.UserID) & (Road.GameID == GamePlayer.GameID)")
     #settlements = relationship("Settlement")
- 
+
     __reqs = {
         BuildTypes.ROAD : [(1, "Wood"), (1, "Brick")],
         BuildTypes.TOWN: [(1, "Wood"), (1, "Brick"), (1, "Sheep"), (1, "Wheat")],
@@ -148,7 +241,7 @@ class GamePlayer(Base):
         BuildTypes.DEVCARD : [(1, "Sheep"), (1, "Ore"), (1, "Wheat")]
     }
 
-        
+
     def hasCardsFor(self, buildType):
         return all(lambda (amnt, type) : self.cards[type] >= amnt, __reqs[buildType])
 
@@ -184,6 +277,12 @@ class PlayerCards(Base):
     Market = Column(SmallInteger)
     RoadBuilding = Column(SmallInteger)
     YearOfPlenty = Column(SmallInteger)
+
+    def giveCards(self, cards):
+        for (type, amount) in cards:
+            attr = CardTypes[type - 1] #ugly hack
+            x = getattr(self, attr)
+            setattr(self, attr, x + amount)
 
 class Hex(Base):
     __tablename__ = "Hex"
@@ -280,7 +379,7 @@ class Log(Base):
     @staticmethod
     def hexes_placed(hexes):
         #change args to something more meaningful?
-        return { "action": "hexes_placed", "args": 
+        return { "action": "hexes_placed", "args":
             [[i.Vertex, i.Chit, i.Type] for i in hexes ]}
 
     @staticmethod
@@ -294,3 +393,7 @@ class Log(Base):
     @staticmethod
     def req_turn(userid):
         return { "action": "req_turn", "user": userid }
+
+    @staticmethod
+    def joined(userid):
+        return { "action": "joined", "user": userid }
