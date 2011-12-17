@@ -1,11 +1,17 @@
 
 window.onload = function() {
 
+    console.log(document.cookie)
     handleGameJoin();
 
     initTicker();
     initWhitespace();
     initPlayerDisplay();
+}
+
+function user(i) {
+    document.cookie = "user=" + i;
+    window.location.reload();
 }
 
 function initBoard(hexes) {
