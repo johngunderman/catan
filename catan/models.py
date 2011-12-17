@@ -8,8 +8,6 @@ import hexes as h
 
 import random
 
-log_waiters = {}
-
 class Terrain:
     (FOREST, PASTURE, FIELDS, HILLS, MOUNTAINS, DESERT) = range(1,7)
 
@@ -181,10 +179,6 @@ class Game(Base):
         l = Log(self.NextSequence, json.dumps(action))
         self.__log.append(l)
         self.NextSequence += 1
-
-        if self.GameID in log_waiters:
-            for i in list(log_waiters[self.GameID]):
-                i()
 
 
 class GameCards(Base):
