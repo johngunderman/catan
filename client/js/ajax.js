@@ -29,6 +29,8 @@ function promptRoad(isInitial) {
 
     var valid = getValidRoadPlaces();
 
+    console.log("valid roads " + valid);
+
     for (var v in valid) {
         drawRoadDetector(stage, valid[v][0],
                          valid[v][1], isInitial);

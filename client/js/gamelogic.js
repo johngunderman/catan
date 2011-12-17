@@ -169,7 +169,8 @@ function getValidRoadPlaces() {
                 var adj = adjacent(v1);
                 for (var z = 0; z < adj.length; z++) {
                     var v2 = adj[z];
-                    if (gameboard.settlements[v1] || gameboard.settlements[v2]) {
+                    if (gameboard.settlements[compress(v1)]
+                        || gameboard.settlements[compress(v2)]) {
                         valid.push([v1,v2]);
                     }
                 }

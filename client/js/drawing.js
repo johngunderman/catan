@@ -175,6 +175,7 @@ function drawSettlementDetector(stage, vertex, isInitial) {
             console.log("Not enough resources");
         }
 
+
         if (isInitial) {
             promptRoad(isInitial);
         }
@@ -370,8 +371,13 @@ function updatePlayerDisplay(user) {
             context.fillText(">>", 50, PLAYER_DISPLAY_OFFSET * i);
         }
 
-        context.fillText("Player " + v,
-                         80, PLAYER_DISPLAY_OFFSET * i);
+        if (v == userID.toString()) {
+            context.fillText("You",
+                             80, PLAYER_DISPLAY_OFFSET * i);
+        } else {
+            context.fillText("Player " + v,
+                             80, PLAYER_DISPLAY_OFFSET * i);
+        }
         i++;
     }
 
