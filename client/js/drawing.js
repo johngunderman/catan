@@ -336,22 +336,30 @@ function sendToTicker(message) {
 
 }
 
-function initWhitespace() {
-    // init whitespace
+function initWhitespace(user) {
     var example = document.getElementById('whitespace');
     var context = example.getContext('2d');
-    context.fillStyle = "rgb(34,139,34)";
-    context.beginPath();
-    context.arc(40, 43, 10, 0, Math.PI*2, true);
-    context.closePath();
-    context.fill();
-    context.font    = 'bold 20px sans-serif';
-    context.fillText  ("It's your turn!", 70, 50);
-    context.fillText  ("1:37", 180, 105);
+
+    if (user == userID) {
+        // init whitespace
+
+        context.fillStyle = "rgb(34,139,34)";
+        context.beginPath();
+        context.arc(40, 43, 10, 0, Math.PI*2, true);
+        context.closePath();
+        context.fill();
+        context.font    = 'bold 20px sans-serif';
+        context.fillText  ("It's your turn!", 70, 50);
+        //context.fillText  ("1:37", 180, 105);
+    } else {
+        context.clearRect(0,0,250,130);
+    }
 }
 
 
 function updatePlayerDisplay(user) {
+
+    initWhitespace(user);
 
     console.log(gameboard.users);
 
