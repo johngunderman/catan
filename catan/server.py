@@ -3,36 +3,55 @@ from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application, asynchronous, FallbackHandler
-from catan import app
 from time import sleep
+import json
 
-waiters = set()
+import database
+from catan import app
+import controller
+from models import Game, log_waiters
+
+database.init_db()
 
 class BlockHandler(RequestHandler):
     @asynchronous
     def get(self):
-	waiters.add(self.callback)
-        print("Exiting from async.")
+        #userid = int(self.get_cookie("user"))
+        #if we don't mind our game logs being public, we don't even need to look at the userid
+        #which brings us to
+        #TODO: Make game logs not public
+        gameid = int(self.get_argument("game"))
+        self.game = Game.query.get(gameid)
+        self.sequence = int(self.get_argument("sequence"))
 
-    def callback(self, result):
-        # Closed client connection
+        #Don't try to be strict about > relationship of
+        #sequence numbers
+        if(self.game.NextSequence != self.sequence):
+            #we have data to return now
+            self.callback()
+        else:
+            log_waiters.add(self.callback)
+
+    def callback(self):
+        # Client closed connection
         if self.request.connection.stream.closed():
             return
-        self.finish(result)
+
+        (nextsequence, log) = controller.get_log(self.game, self.sequence)
+        flagged = json.dumps({ "log": "REPLACE_TOKEN", "sequence" : nextsequence })
+
+        self.write(flagged.replace('"REPLACE_TOKEN"', log, 1))
+        self.set_header("Content-Type", "application/json")
+
+        self.finish()
+        log_waiters.remove(self.callback)
 
     def on_connection_close(self):
-        waiters.remove(self.callback)
+        log_waiters.remove(self.callback)
 
-class ReleaseHandler(RequestHandler):
-    def get(self):
-        self.write("{0} waiting requests released".format(len(waiters)))
-        for callback in waiters:
-            callback(self.request.remote_ip)
-
-wsgi_app = WSGIContainer(app) 
+wsgi_app = WSGIContainer(app)
 application = Application([
-    (r"/block", BlockHandler),
-    (r"/unblock", ReleaseHandler),
+    (r"/get_log", BlockHandler),
     (r".*", FallbackHandler, dict(fallback=wsgi_app))
 ])
 
