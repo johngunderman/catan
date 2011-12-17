@@ -38,14 +38,9 @@ function initBoard(hexes) {
 }
 
 
-function placeRoadClicked() {
+function upgradeSettlements() {
     stage.removeAll();
-    promptRoad();
-}
-
-function placeCityClicked() {
-    stage.removeAll();
-    promptSettlement();
+    promptUpgradeSettlement();
 }
 
 function doneButtonClicked() {

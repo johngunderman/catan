@@ -47,7 +47,7 @@ function insertRoad(user, vertex1, vertex2) {
         vertex1: vertex1,
         vertex2: vertex2
     }
-    
+
     gameboard.roads[user].push(road);
 
     drawRoad(road);
@@ -119,20 +119,56 @@ function getValidSettlementPlaces() {
     });
 }
 
-function getValidRoadPlaces() {
+
+// called when we are handling req_setup
+function getValidRoadPlacesInitial() {
     var valid = {}
 
+    function getRoadsFromVertex(start) { //Start is compressed
+
+        var start_v = decompress(start);
+        console.log(start_v);
+        adjacent(start_v).forEach(function(end_v) {
+            var end = compress(end_v);
+
+            var from = end > start ? start : end;
+            var to = end > start ? end: start;
+
+            valid[[from, to]] = { "from" : parseInt(from),
+                                  "to" : parseInt(to) };
+        });
+    }
+
+    for (var s in  gameboard.settlements) {
+        console.log("heroo: " + s);
+
+        if (gameboard.settlements[s].user == userID) {
+            getRoadsFromVertex(s);
+        }
+    }
+
+
+    console.log( valid);
+
+    return valid;
+}
+
+
+function getValidRoadPlaces() {
+
+    // called most of the time
     function getAdjacentRoads(road) {
         function getRoadsFromVertex(start) { //Start is compressed
-            
+
             var start_v = decompress(start);
             adjacent(start_v).forEach(function(end_v) {
                 var end = compress(end_v);
-                
+
                 var from = end > start ? start : end;
                 var to = end > start ? end: start;
 
-                valid[[from, to]] = true;
+                valid[[from, to]] =  { "from" : parseInt(from),
+                                       "to" : parseInt(to) };
             });
         }
 
@@ -156,10 +192,10 @@ function getValidRoadPlaces() {
     }
 
     var ret = [];
-    
+
     for(var i in valid) {
         ret.push(i);
     }
-   
+
     return ret;
 }

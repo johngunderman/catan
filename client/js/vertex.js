@@ -35,6 +35,7 @@ function adjacent(v) {
 }
 
 function decompress(p) {
+    p = parseInt(p);
     var y = 0;
 
     for(; y < indices.length; y++) {

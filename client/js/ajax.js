@@ -28,11 +28,33 @@ function promptSettlement(isInitial) {
 }
 
 function promptRoad(isInitial) {
-    var valid = getValidRoadPlaces();
+    var valid;
+
+    if (isInitial) {
+        valid = getValidRoadPlacesInitial();
+    }
+    else {
+        valid = getValidRoadPlaces();
+    }
 
     for (var v in valid) {
-        drawRoadDetector(stage, valid[v][0], valid[v][1], isInitial);
+        drawRoadDetector(stage, valid[v].from, valid[v].to, isInitial);
     }
+}
+
+
+function promptUpgradeSettlement() {
+    if (!hasCityResources()) {
+        sendToTicker("You don't have enough resources!");
+        return;
+    }
+
+    var valid = getValidCityPlaces();
+
+    for (var v in valid) {
+        drawCityDetector(starge, valid[v]);
+    }
+
 }
 
 function name(user) {
