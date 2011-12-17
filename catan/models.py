@@ -182,9 +182,6 @@ class Game(Base):
         self.__log.append(l)
         self.NextSequence += 1
 
-        #This may be a massive hack
-        db_session.commit()
-
         if self.GameID in log_waiters:
             for i in list(log_waiters[self.GameID]):
                 i()
@@ -392,7 +389,7 @@ class Log(Base):
 
     @staticmethod
     def road_built(player, road):
-        return { "action" : "road_built", "user" : player.UserID, "vertex1": road.vertex1, "vertex2": road.vertex2 }
+        return { "action" : "road_built", "user" : player.UserID, "vertex1": road.Vertex1, "vertex2": road.Vertex2 }
 
     @staticmethod
     def settlement_built(player, settlement):
