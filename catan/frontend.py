@@ -8,6 +8,8 @@ import json
 import controller
 from models import User, GamePlayer, Game
 
+log_waiters = {}
+
 """
 The LogResponse class formats the result of a call together
 with the log.
@@ -20,10 +22,16 @@ class JsonResponse(Response):
         self.mimetype = "application/json"
         self.data = json.dumps(response)
 
+
+def flush_log(id):
+    if id in log_waiters:
+        for i in list(log_waiters[id]):
+            i()
+
 def get_player_prereqs():
     userid = int(request.cookies.get("user"))
     gameid = request.args["game"]
-    
+
     return GamePlayer.query.filter_by(GameID=gameid).filter_by(UserID=userid).one()
 
 @app.route("/login")
@@ -50,12 +58,6 @@ def create_game():
 """
 joins an existing game created by create_game.
  - the game will automatically start if the fourt person joined
-
-RETURNS:
-    { "response": "failure" } on failure
-    { "response": "success", "log".... } on success
-
-This function is peculiar because it returns the log conditionally
 """
 @app.route("/join_game")
 def join_game():
@@ -66,6 +68,8 @@ def join_game():
 
     player = controller.join_game(game, user)
 
+    flush_log(game.GameID)
+
     return JsonResponse("success" if player is not None else "failure")
 
 @app.route("/start_game")
@@ -73,6 +77,8 @@ def start_game():
     player = get_player_prereqs()
 
     result = controller.start_game(player)
+
+    flush_log(player.GameID)
     return JsonResponse(result)
 
 @app.route("/setup")
@@ -80,6 +86,8 @@ def setup():
     player = get_player_prereqs()
 
     result = controller.setup(player, int(request.args["settlement"]), int(request.args["roadto"]))
+
+    flush_log(player.GameID)
     return JsonResponse(result)
 
 @app.route("/build_settlement")
@@ -87,6 +95,8 @@ def build_settlement():
     player = get_player_prereqs()
 
     result = controller.build_settlement(player, request.args["vertex"])
+
+    flush_log(player.GameID)
     return JsonResponse(result)
 
 @app.route("/end_turn")
@@ -94,6 +104,8 @@ def end_turn():
     player = get_player_prereqs()
 
     result = controller.end_turn(player)
+
+    flush_log(player.GameID)
     return JsonResponse(result)
 
 @app.route("/<path:filename>")
