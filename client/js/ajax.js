@@ -36,7 +36,7 @@ function promptRoad(isInitial) {
 }
 
 function handle_joined(log_entry) {
-    user = {};
+    var user = {};
     user.id = log_entry.user
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
