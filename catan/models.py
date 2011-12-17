@@ -2,7 +2,7 @@ import json
 from sqlalchemy import Column, DateTime, Integer, SmallInteger, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 
-from database import Base
+from database import Base, db_session
 import vertices as v
 import hexes as h
 
@@ -182,6 +182,9 @@ class Game(Base):
         self.__log.append(l)
         self.NextSequence += 1
 
+        #This may be a massive hack
+        db_session.commit()
+
         if self.GameID in log_waiters:
             for i in log_waiters[self.GameID]:
                 i()
@@ -251,6 +254,9 @@ class GamePlayer(Base):
     def takeCardsFor(self, buildType):
         for (amnt, type) in __reqs[buildType]:
             self.cards[__cardTypes[type]] -= amnt
+
+    def changeScore(self,by):
+        self.Score += by
 
     def roads_q(self):
         return Road.query. \
@@ -385,12 +391,16 @@ class Log(Base):
             [[i.Vertex, i.Chit, i.Type] for i in hexes ]}
 
     @staticmethod
-    def settlement_built(userid, vertex):
-        return { "action" : "settlement_built", "user" : userid, "vertex": vertex}
+    def road_built(player, road):
+        return { "action" : "road_built", "user" : player.UserID, "vertex1": road.vertex1, "vertex2": road.vertex2 }
 
     @staticmethod
-    def settlement_upgraded(userid, vertex):
-        return { "action" : "settlement_upgraded", "user" : userid, "vertex": vertex}
+    def settlement_built(player, settlement):
+        return { "action" : "settlement_built", "user" : player.UserID, "vertex": settlement.Vertex, "score": player.Score }
+
+    @staticmethod
+    def settlement_upgraded(player, vertex):
+        return { "action" : "settlement_upgraded", "user" : player.UserID, "vertex": vertex, "score": player.Score }
 
     @staticmethod
     def req_turn(userid):
