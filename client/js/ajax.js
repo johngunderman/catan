@@ -5,7 +5,8 @@ handlers = {
     "resources_gained"    : handle_resources_gained,
     "hexes_placed"        : handle_hexes_placed,
     "settlement_built"    : handle_settlement_built,
-    "settlement_upgraded" : handle_settlement_upgraded
+    "settlement_upgraded" : handle_settlement_upgraded,
+    "road_built"          : handle_road_built
 }
 
 req_handlers = {
@@ -35,6 +36,15 @@ function promptRoad(isInitial) {
 
 }
 
+function handle_road_built(log_entry) {
+    console.log("log reports road built");
+    insertRoad(log_entry.user, decompress(log_entry.vertex1),
+               decompress(log_entry.vertex2));
+
+    drawRoad(log_entry.user, decompress(log_entry.vertex1),
+               decompress(log_entry.vertex2));
+}
+
 function handle_resources_gained(log_entry) {
 
 }
@@ -50,7 +60,7 @@ function handle_hexes_placed(log_entry) {
 }
 
 function handle_settlement_built(log_entry) {
-    console.log("we be building settlements, foo");
+    console.log("log reports settlement built");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
     drawSettlement(log_entry.user, decompress(log_entry.vertex));

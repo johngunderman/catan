@@ -15,6 +15,9 @@ function insertSettlement(user, vertex, isInitialBuild) {
                  "user" : userID};
             // record our action so we can push it up to the server
             console.log("Action: Settlement created");
+
+            // TODO: this needs to be moved, we don't want to add other folk's
+            // actions to our list
             actionsMade.push({"item" : "settlement", "vertex" : compress(vertex)});
         }
         if (!isInitialBuild && user == userID) {
