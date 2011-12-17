@@ -61,8 +61,10 @@ This function is peculiar because it returns the log conditionally
 def join_game():
     userid = int(request.cookies.get("user"))
     gameid = request.args["game"]
+    game = Game.query.get(gameid)
+    user = User.query.get(userid)
 
-    player = controller.join_game(gameid, userid)
+    player = controller.join_game(game, user)
 
     return JsonResponse("success" if player is not None else "failure")
 
