@@ -1,6 +1,7 @@
 
 window.onload = function() {
-    startGameRequest();
+
+    handleGameJoin();
 
     initTicker();
     initWhitespace();
@@ -40,3 +41,16 @@ function doneButtonClicked() {
     alert("Your turn is now over!");
 }
 
+
+function handleGameJoin() {
+
+    var game = window.location.hash.substr(1);
+
+    if (game) {
+        gameID = game;
+        startGameLog();
+    }
+    else {
+        startGameRequest();
+    }
+}

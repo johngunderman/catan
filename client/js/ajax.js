@@ -136,11 +136,20 @@ function startGameRequest() {
         gameID = parseInt(json);
         console.log("created new game with gameID: " + gameID);
 
-        updateClient();
+        window.location = HOSTNAME + "/#" + gameID;
+
+        startGameLog();
     }
 
     makeAjaxRequest(HOSTNAME + "/create_game", "",
                    create_game_callback);
+}
+
+
+function startGameLog() {
+    makeAjaxRequest(HOSTNAME + "/get_log", "?game=" + gameID
+                    + "&sequence=" + sequenceNum,
+                    handleResponseJson);
 }
 
 function makeSetupRequest(vertex, roadto) {
