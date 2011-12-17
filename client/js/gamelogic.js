@@ -1,3 +1,4 @@
+"use strict";
 
 // entries in `settlements` read as follows:
 // with key of vertex, value is type of

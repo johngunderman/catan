@@ -1,3 +1,4 @@
+"use strict";
 
 // isvalid(p) returns True iff the vertex 3-tuple p is valid in the
 // context of a Catan board.  vertex is an array of three elements:
