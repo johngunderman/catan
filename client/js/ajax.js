@@ -154,6 +154,7 @@ function startGameRequest() {
 function makeSetupRequest(vertex, roadto) {
     makeAjaxRequest(HOSTNAME + "/setup",
                     "?sequence=" + sequenceNum
+                    + "&game=" + gameID
                     + "&settlement=" + vertex
                     + "&roadto=" + roadto
                    );
