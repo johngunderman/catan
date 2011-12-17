@@ -201,7 +201,6 @@ class GameCards(Base):
     Monopoly = Column(SmallInteger)
 
     def __init__(self):
-        #TODO: Check these numbers
         self.Knight = 14
 
         #Victory Point
@@ -212,8 +211,9 @@ class GameCards(Base):
         self.Market = 1
 
         #Progress Cards
-        self.RoadBuilding = 3 #TODO: Check this
-        self.YearOfPlenty = 3 #TODO: Check this
+        self.RoadBuilding = 2
+        self.YearOfPlenty = 2
+        self.Monopoly = 2
 
     def drawDevCard(self):
         deck = sum([[type] * getattr(self, type) for type in CardTypes])
