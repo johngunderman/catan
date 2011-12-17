@@ -54,7 +54,6 @@ class Game(Base):
     __tablename__ = "Game"
 
     GameID = Column(Integer, primary_key=True)
-    GameName = Column(String)
     State = Column(SmallInteger, nullable=False)
     RobberHex = Column(SmallInteger)
     CurrentIndex = Column(SmallInteger)
@@ -264,7 +263,7 @@ class GamePlayer(Base):
         self.game.settlements.append(s)
         self.Score += 1
         self.game.log(Log.settlement_built(self, s))
-        player.checkVictory()
+        self.checkVictory()
 
     def add_road(self, vertex1, vertex2):
         r = Road(self.UserID, vertex1, vertex2)
