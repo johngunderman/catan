@@ -50,7 +50,7 @@ function handle_joined(log_entry) {
     gameboard.scores[user.id] = 0;
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
-    
+
     sendToTicker(name(user.id) + " joined!");
 }
 
@@ -65,7 +65,7 @@ function handle_road_built(log_entry) {
 }
 
 function handle_resources_gained(log_entry) {
-    var message = name(log_entry.user); 
+    var message = name(log_entry.user);
 
     function format_single(card) {
         return card[0] + " " + cardNames[card[1]];
