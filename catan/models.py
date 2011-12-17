@@ -8,7 +8,7 @@ import hexes as h
 
 import random
 
-log_waiters = set()
+log_waiters = {}
 
 class Terrain:
     (FOREST, PASTURE, FIELDS, HILLS, MOUNTAINS, DESERT) = range(1,7)
@@ -182,8 +182,9 @@ class Game(Base):
         self.__log.append(l)
         self.NextSequence += 1
 
-        for i in list(log_waiters):
-            i()
+        if self.GameID in log_waiters:
+            for i in log_waiters[self.GameID]:
+                i()
 
 
 class GameCards(Base):
@@ -226,6 +227,7 @@ class GamePlayer(Base):
     PlayerID = Column(Integer, primary_key=True)
     GameID = Column(Integer, ForeignKey("Game.GameID"))
     UserID = Column(Integer, ForeignKey("User.UserID"))
+    Score = Column(SmallInteger, nullable=False, default=0)
 
     def __init__(self,userid):
         self.UserID = userid
@@ -343,10 +345,10 @@ class Settlement(Base):
     Returns True iff the a settlement can be placed on the given vertex
     """
     @staticmethod
-    def distance_rule(player, vertex):
+    def distance_rule(gameid, vertex):
         checkvertices = map(v.compress, [vertex] + v.adjacent(vertex))
         return Settlement.query. \
-            filter_by(GameID=player.GameID). \
+            filter_by(GameID=gameid). \
             filter(Settlement.Vertex.in_(checkvertices)). \
             count() == 0
 

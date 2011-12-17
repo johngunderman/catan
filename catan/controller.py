@@ -10,17 +10,23 @@ def get_log(game, sequence):
     log = [i.Action for i in Log.query.filter(Log.GameID == game.GameID).filter(Log.Sequence >= sequence).all()]
     return (game.NextSequence, "[" + ",".join(log) + "]")
 
+"""
+Creates a user account.
+
+Since there is currently no authentication, this is somewhat straightforward
+"""
 def create_user():
     u = User()
 
     db_session.add(u)
     db_session.commit()
-    return u.UserID
+    return u
 
-def create_game(userid):
-    #TODO: Move this to catan.py
+"""
+Creates a new game.  The requesting user is automatically part of the game.
+"""
+def create_game(user):
     game = Game()
-    user = User.query.get(userid)
 
     user.join_game(game)
 
@@ -28,11 +34,7 @@ def create_game(userid):
     db_session.commit()
     return game
 
-def join_game(gameid, userid):
-    #TODO: Move this to catan.py
-    game = Game.query.get(gameid)
-    user = User.query.get(userid)
-
+def join_game(game, user):
     if (
         #the game hasn't started yet
         game.State == Game.States.NOTSTARTED and
@@ -76,6 +78,13 @@ def start_game(player):
     else:
         return "failure"
 
+"""
+Checks whether it is this player's turn during normal play
+"""
+def players_turn(player):
+    return \
+        player.game.State == Game.States.NORMAL_PLAY and \
+        player.game.CurrentPlayerID == player.UserID
 
 def build_settlement(player, vertex):
     game = player.game
@@ -83,8 +92,10 @@ def build_settlement(player, vertex):
     p = v.decompress(vertex)
 
     if (
+        players_turn(player) and
+
         #there are no settlements within the distance rule
-        Settlement.distance_rule(player, vertex) and
+        Settlement.distance_rule(player.GameID, vertex) and
 
         #and the player has a road to the vertex
         player.roads_q().count() > 0 and
@@ -106,6 +117,11 @@ def build_settlement(player, vertex):
 def upgrade_settlement(player, vertex):
     existing_settlement = Settlement.query.get((player.GameID, vertex)).filter_by(UserID=player.UserID).first()
     if (
+        #we are in the normal play state
+        game.State == Game.States.NORMAL_PLAY and
+
+        #
+
         #the player already has a settlement here
         existing_settlement is not None and
 
@@ -227,7 +243,6 @@ def setup(player, settlement_vertex, road_to):
     if (
         #we're setting up
         game.State in [Game.States.SETUP_FORWARD, Game.States.SETUP_BACKWARD] and
-
         #it's the player's turn
         player.UserID == game.CurrentPlayerID and
 
@@ -235,7 +250,7 @@ def setup(player, settlement_vertex, road_to):
         v.isvalid(settlement_v) and
 
         #the new settlement conforms to the distance rule
-        Settlement.distance_rule(player, settlement_v) and
+        Settlement.distance_rule(player.GameID, settlement_v) and
 
         #the road vertex is adjacent to the settlement (and valid)
         road_v in v.adjacent(settlement_v)
@@ -282,11 +297,8 @@ def setup(player, settlement_vertex, road_to):
 
 def end_turn(player):
     game = player.game
-    if (
-        game.State == Game.States.NORMAL_PLAY and
-        game.CurrentPlayerID == player.UserID
-    ):
-        game.CurrentIndex += game.CurrentIndex
+    if players_turn(player):
+        game.CurrentIndex += 1
 
         if game.CurrentIndex == len(game.players):
             game.CurrentIndex = 0
