@@ -115,29 +115,6 @@ function removeSettlementResources() {
 }
 
 function getValidSettlementPlaces() {
-
-    var vertices = [];
-    var res = [];
-
-    for (var vertex in gameboard.settlements) {
-        vertices.push(vertex);
-
-        var av = adjacent(vertex);
-        for(var v in av) {
-            vertices.push(av[v]);
-        }
-
-    }
-
-    res =  VERTICES.filter(function(vertex) {
-        return vertices.indexOf(vertex) <= -1;
-    });
-
-
-    return res;
-}
-
-function getValidSettlementPlaces() {
     var excluded = {};
 
     for (var vertex in gameboard.settlements) {
