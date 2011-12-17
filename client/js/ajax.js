@@ -39,6 +39,21 @@ function promptRoad(isInitial) {
     }
 }
 
+
+function promptUpgradeSettlement() {
+    if (!hasCityResources()) {
+        sendToTicker("You don't have enough resources!");
+        return;
+    }
+
+    var valid = getValidCityPlaces();
+
+    for (var v in valid) {
+        drawCityDetector(starge, valid[v]);
+    }
+
+}
+
 function name(user) {
     return user == userID ? "You" : ("Player " + user);
 }

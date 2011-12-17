@@ -132,6 +132,79 @@ function drawRoad(color, v1, v2) {
     context.stroke();
 }
 
+
+// On the given stage, draw a city detector on the vertice
+// described with (x1,y1,d1).
+// Note that these are game piece vertices, not pixel locations.
+// the detector will draw a city at the given vertex when clicked.
+function drawCityDetector(stage, vertex, isInitial) {
+
+    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+    var context = stage.getContext();
+
+    var city = new Kinetic.Shape(function(){
+        var context = this.getContext();
+        context.beginPath();
+        context.lineWidth = 1;
+        context.strokeStyle = "red"
+        context.fillStyle = "rgba(0,0,0,0)";
+	var width = 10
+
+        context.moveTo(coords[0] - width, coords[1] - width);
+        context.lineTo(coords[0] - width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] + width);
+        context.lineTo(coords[0] + width, coords[1] - width);
+        context.closePath();
+	context.fill();
+        context.stroke();
+    });
+
+    city.addEventListener("mouseover", function(){
+        document.body.style.cursor = "pointer";
+    });
+    city.addEventListener("mouseout", function(){
+        document.body.style.cursor = "default";
+    });
+
+    city.addEventListener("mousedown", function(){
+
+        if (hasResources()) {
+            insertCity(userID, vertex);
+
+            // record this action in our list of overall actions
+            actionsMade.push({"item" : "city", "vertex" : compress(vertex)});
+            drawCity(gameboard.users[userID].color, vertex);
+        } else {
+            sendToTicker("Not enough resources!");
+        }
+
+    });
+
+    stage.add(city);
+}
+
+// user id determnies the color
+function drawSettlement(color, vertex) {
+
+    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+    var context = stage.getContext();
+
+    var width = 10;
+    document.body.style.cursor = "default";
+    context.beginPath();
+    context.fillStyle = color;
+    context.moveTo(coords[0] - width, coords[1] - width);
+    context.lineTo(coords[0] - width, coords[1] + width);
+    context.lineTo(coords[0] + width, coords[1] + width);
+    context.lineTo(coords[0] + width, coords[1] - width);
+
+    context.closePath();
+    context.fill();
+
+    stage.removeAll();
+
+}
+
 // On the given stage, draw a city detector on the vertice
 // described with (x1,y1,d1).
 // Note that these are game piece vertices, not pixel locations.
@@ -330,8 +403,15 @@ function sendToTicker(message) {
     }
 
     for(var x = 0; x < tickerLog.length; x++) {
+
+        if (x == tickerLog.length - 1) {
+            tickerContext.fillStyle = "red";
+        }
+
         tickerContext.fillText(tickerLog[x],
                                TICKER_XOFFSET, TICKER_BASE + x * TICKER_INC);
+
+        tickerContext.fillStyle = "rgb(49,79,79)";
     }
 
 }
