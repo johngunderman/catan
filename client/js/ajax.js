@@ -42,6 +42,8 @@ function promptRoad(isInitial) {
 function handle_joined(log_entry) {
     var user = {};
     user.id = log_entry.user
+
+    gameboard.scores[user.id] = 0;
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
     if (user.id != userID) {
@@ -53,6 +55,7 @@ function handle_joined(log_entry) {
 }
 
 function handle_road_built(log_entry) {
+
     sendToTicker("Player " + log_entry.user + " built a road!");
     insertRoad(log_entry.user, decompress(log_entry.vertex1),
                decompress(log_entry.vertex2));
@@ -102,6 +105,10 @@ function handle_hexes_placed(log_entry) {
 }
 
 function handle_settlement_built(log_entry) {
+
+    // update score:
+    gameboard.scores[log_entry.user] = log_entry.score;
+
     sendToTicker("Player " + log_entry.user + " built a settlement!");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
