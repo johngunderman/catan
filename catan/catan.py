@@ -6,7 +6,7 @@ app.debug = True
 import json
 
 import controller
-from models import User, GamePlayer
+from models import User, GamePlayer, Game
 
 """
 The LogResponse class formats the result of a call together
