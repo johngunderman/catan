@@ -39,21 +39,21 @@ function promptRoad(isInitial) {
     }
 }
 
+function name(user) {
+    return user == userID ? "You" : ("Player " + user);
+}
+
 function handle_joined(log_entry) {
     var user = {};
     user.id = log_entry.user
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
-    if (user.id != userID) {
-        sendToTicker("Player " + user.id  + " joined!");
-    }
-    else {
-        sendToTicker("You joined game #" + gameID);
-    }
+    
+    sendToTicker(name(user.id) + " joined!");
 }
 
 function handle_road_built(log_entry) {
-    sendToTicker("Player " + log_entry.user + " built a road!");
+    sendToTicker(name(log_entry.user) + " built a road!");
     insertRoad(log_entry.user, decompress(log_entry.vertex1),
                decompress(log_entry.vertex2));
 
@@ -62,11 +62,7 @@ function handle_road_built(log_entry) {
 }
 
 function handle_resources_gained(log_entry) {
-    var message = "Player " + log_entry.user;
-    if(log_entry.user == userID)
-    {
-        message = "You";
-    }
+    var message = name(log_entry.user); 
 
     function format_single(card) {
         return card[0] + " " + cardNames[card[1]];
@@ -75,13 +71,18 @@ function handle_resources_gained(log_entry) {
     message += " got";
 
     var cards = log_entry.cards;
-    for(var i = 0; i < cards.length - 1; i++) {
+
+    if(cards.length > 0) {
+        message += " " + format_single(cards[0]);
+    }
+
+    for(var i = 1; i < cards.length - 1; i++) {
         message += ", " + format_single(cards[i]);
     }
 
-    if(cards.length > 0) {
-        if(cards.length > 2) message += ", and";
-        else if(cards.length > 1) message += " and"
+    if(cards.length > 1) {
+        if(cards.length >= 3) message += ", and";
+        else message += " and"
 
         message += " " + format_single(cards[cards.length - 1]);
     }
@@ -90,7 +91,6 @@ function handle_resources_gained(log_entry) {
 }
 
 function handle_req_setup(log_entry) {
-    sendToTicker("It's your turn!");
     promptSettlement(true);
     // this calls promptRoad(true) inside.
     // needs to be changed at some point
@@ -102,7 +102,7 @@ function handle_hexes_placed(log_entry) {
 }
 
 function handle_settlement_built(log_entry) {
-    sendToTicker("Player " + log_entry.user + " built a settlement!");
+    sendToTicker(name(log_entry.user) + " built a settlement!");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
     drawSettlement(gameboard.users[log_entry.user].color,
@@ -110,13 +110,12 @@ function handle_settlement_built(log_entry) {
 }
 
 function handle_settlement_upgraded(log_entry) {
-    sendToTicker("Player " + log_entry.user + " upgraded a settlement!");
+    sendToTicker(name(log_entry.user) + " upgraded a settlement!");
 
 }
 
 function handle_req_turn(log_entry) {
     sendToTicker("It's your turn!");
-
 }
 
 

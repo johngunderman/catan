@@ -138,30 +138,24 @@ function getValidSettlementPlaces() {
 }
 
 function getValidSettlementPlaces() {
-
-    var vertices = [];
-    var res = [];
+    var excluded = {};
 
     for (var vertex in gameboard.settlements) {
-        vertices.push(vertex);
+        vertex = parseInt(vertex);
+        excluded[vertex] = true;
 
-        var av = adjacent(vertex);
-        for(var v in av) {
-            vertices.push(av[v]);
-        }
-
+        //TODO: the decompress + recompress is somewhat ugly.
+        adjacent(decompress(vertex)).forEach(function(v) {
+            excluded[compress(v)] = true;
+        });
     }
 
-    res =  VERTICES.filter(function(vertex) {
-        return vertices.indexOf(vertex) <= -1;
+    return VERTICES.filter(function(vertex) {
+        return !(vertex in excluded)
     });
-
-
-    return res;
 }
 
 function getValidRoadPlaces() {
-
     var valid = [];
     for (var x = 0; x < 6; x++) {
         for (var y = 0; y < 6; y++) {

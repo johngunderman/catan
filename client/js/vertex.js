@@ -44,7 +44,7 @@ function decompress(p) {
     }
 
     y--; //We actually scan past the one we want, go back one
-    p += rows[y][0] - indices[y];
+    p += (rows[y][0] - indices[y]);
     return [Math.floor(p / 2), y, p % 2]
 }
 
