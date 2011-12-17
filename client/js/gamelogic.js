@@ -17,11 +17,6 @@ function insertSettlement(user, uvertex) {
                 "user" : user
             };
     }
-    else
-    {
-        console.log(gameboard.settlements[vertex]);
-        console.log("something reaaaaally weird happened");
-    }
 }
 
 function insertCity(user, vertex) {
