@@ -41,9 +41,8 @@ function handle_resources_gained(log_entry) {
 
 function handle_req_setup(log_entry) {
     promptSettlement(true);
-
-//    promptRoad(true);
-
+    // this calls promptRoad(true) inside.
+    // needs to be changed at some point
 }
 
 function handle_hexes_placed(log_entry) {
@@ -123,7 +122,7 @@ function handleResponseJson(json) {
 
 function joinGame() {
     makeAjaxRequest(HOSTNAME + "/join_game", "?game=" + gameID,
-                    function(json) {startGameLog();});
+                    function(json) {updateClient();});
 
 }
 
@@ -144,19 +143,13 @@ function startGameRequest() {
 
         window.location = HOSTNAME + "/#" + gameID;
 
-        startGameLog();
+        updateClient();
     }
 
     makeAjaxRequest(HOSTNAME + "/create_game", "",
                    create_game_callback);
 }
 
-
-function startGameLog() {
-    makeAjaxRequest(HOSTNAME + "/get_log", "?game=" + gameID
-                    + "&sequence=" + sequenceNum,
-                    handleResponseJson);
-}
 
 function makeSetupRequest(vertex, roadto) {
     makeAjaxRequest(HOSTNAME + "/setup",
