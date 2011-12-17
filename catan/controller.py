@@ -276,7 +276,7 @@ def setup(player, settlement_vertex, road_to):
                 group_by(Hex.Type). \
                 all()
 
-            player.add_cards(cards)
+            player.add_cards([(j, i) for (i, j) in cards])
 
             if game.CurrentIndex == 0:
                 #setup is over, welcome to the real world, Neo
