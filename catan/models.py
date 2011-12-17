@@ -11,11 +11,11 @@ import random
 class Terrain:
     (FOREST, PASTURE, FIELDS, HILLS, MOUNTAINS, DESERT) = range(1,7)
 
-CardTypes = {
+CardTypes = [
     "Wood", "Sheep", "Wheat", "Brick", "Ore",
     "Knight", "Library", "Palace", "Chapel", "University"
     "Market", "RoadBuilding", "YearOfPlenty"
-}
+]
 
 class BuildTypes:
     ROAD        = 1
@@ -77,23 +77,24 @@ class Game(Base):
         - create_board should be len(19)
         - it should 2-ples
         """
-        def create_hexes():
+        def create_board():
             chits = (5, 10, 8, 2, 9, 3, 4, 6, 11, 6, 11, 3, 4, 5, 12, 8, 10, 9)
             preboard = zip(h.valid_hexes, chits)
 
             types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.FIELDS]*4 + [Terrain.HILLS]*3 + [Terrain.MOUNTAINS]*3
             random.shuffle(types) #Shuffle the hexes
 
-            hexes = [Hex(vertex, chit, type) for ((vertex, chit), type) in zip(preboard, types)]
-            hexes.append(Hex(Game.ROBBER_START_HEX, 7, Terrain.DESERT)) #the desert tile is fixed
+            board = [Hex(vertex, chit, type) for ((vertex, chit), type) in zip(preboard, types)]
+            board.append(Hex(Game.ROBBER_START_HEX, 7, Terrain.DESERT)) #the desert tile is fixed
 
-            return hexes
+            return board
 
-        self.hexes = create_hexes()
+        self.State = Game.States.SETUP_FORWARD
+
+        self.hexes = create_board()
         self.RobberHex = Game.ROBBER_START_HEX
         self.log(Log.hexes_placed(self.hexes))
 
-        self.State = Game.States.SETUP_FORWARD
         self.CurrentIndex = 0
         self.CurrentPlayerID = self.players[self.CurrentIndex].UserID
         self.TurnCount = 0
@@ -101,15 +102,17 @@ class Game(Base):
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)
+        import pdb; pdb.set_trace()
+        rolled = rolled if rolled != 7 else 8
         if rolled == 7:
-            Game.State = States.MOVE_ROBBER
+            Game.State = Game.States.MOVE_ROBBER
         else:
             def give_cards(rolled):
                 #gets hexes that have just yielded stuff
                 rolled_hexes = db_session.query(Hex.Vertex, Hex.Type). \
                     filter_by(GameID=self.GameID). \
                     filter(Hex.Chit == rolled). \
-                    filter(Hex.Vertex != Game.RobberVertex). \
+                    filter(Hex.Vertex != self.RobberHex). \
                     all()
 
                 """
@@ -122,16 +125,17 @@ class Game(Base):
                         receive cards of type *type*
                 """
                 types = {}
-                for (vertex, type) in rolled_hexes:
+                for (hex, type) in rolled_hexes:
                     if not type in types:
                         types[type] = {}
 
-                    adjacent = hexes.adjacent(vertex)
-                    for v in adjacent:
-                        if not v in types[type]:
-                            types[type][v] = 0
-                        types[type][v] += 0
+                    adjacent = map(v.compress, h.adjacent(v.decompress(hex)))
+                    for i in adjacent:
+                        if not i in types[type]:
+                            types[type][i] = 0
+                        types[type][i] += 1
 
+                print(types)
                 """
                 Creates a dict of the form:
                 (userid -> (type -> count))
@@ -143,36 +147,38 @@ class Game(Base):
 
                 """
                 users = {}
-                for (type, vertices) in types:
+                for t in types:
                     #get all settlements that are adjacent to hexes
                     #of type *type*
-                    settlements = Settlement.query(). \
+                    settlements = Settlement.query. \
                         filter_by(GameID=self.GameID). \
-                        filter(Settlement.Vertex.in_(vertices.keys())). \
+                        filter(Settlement.Vertex.in_(types[t].keys())). \
                         all()
+
+                    print(settlements)
 
                     for s in settlements:
                         if not s.UserID in users:
                             users[s.UserID] = {}
-                        if not type in users[s.UserID]:
-                            users[s.UserID][type] = 0
-                        users[s.UserID][type] += \
-                            (2 if s.Type == Settlement.Types.CITY else 1) * \
-                            vertices[s.Vertex]
+                        if not t in users[s.UserID]:
+                            users[s.UserID][t] = 0
+                        #give double for cities
+                        users[s.UserID][t] += \
+                            (2 if s.Type == Settlement.CITY else 1) * \
+                            types[t][s.Vertex]
 
-                for (id, types) in users:
-                    allocated = []
-                    GamePlayer.query. \
+                print(users)
+                for u in users:
+                    allocated = list(map(lambda type: (users[u][type], type), users[u].keys()))
+
+                    db_session.query(PlayerCards). \
+                        join(GamePlayer). \
                         filter_by(GameID=self.GameID). \
-                        filter_by(UserID=id).one(). \
-                        cards.giveCards(types)
+                        filter_by(UserID=u).one(). \
+                        giveCards(allocated)
 
-                    for (type, amount) in types:
-                        allocate.append((amount, type))
-
-                    self.log(Log.got_resources(id, allocated))
+                    self.log(Log.got_resources(u, allocated))
             give_cards(rolled)
-            self.log(Log.req_turn(self.UserID))
 
 
     def log(self, action):
@@ -223,10 +229,12 @@ class GamePlayer(Base):
     UserID = Column(Integer, ForeignKey("User.UserID"))
     Score = Column(SmallInteger, nullable=False, default=0)
 
+    cards = relationship("PlayerCards", uselist=False)
+
     def __init__(self,userid):
+        self.cards = PlayerCards()
         self.UserID = userid
 
-    #cards = relationship("PlayerCards", uselist=False)
     #roads = relationship("Road",primaryjoin="(Road.UserID == GamePlayer.UserID) & (Road.GameID == GamePlayer.GameID)")
     #settlements = relationship("Settlement")
 
@@ -272,23 +280,23 @@ class GamePlayer(Base):
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
     PlayerID = Column(Integer, ForeignKey("GamePlayer.PlayerID"), primary_key=True)
-    Brick = Column(SmallInteger)
-    Wood = Column(SmallInteger)
-    Wheat = Column(SmallInteger)
-    Sheep = Column(SmallInteger)
-    Ore = Column(SmallInteger)
-    Monopoly = Column(SmallInteger)
-    Library = Column(SmallInteger)
-    Knight = Column(SmallInteger)
-    Palace = Column(SmallInteger)
-    Chapel = Column(SmallInteger)
-    University = Column(SmallInteger)
-    Market = Column(SmallInteger)
-    RoadBuilding = Column(SmallInteger)
-    YearOfPlenty = Column(SmallInteger)
+    Brick = Column(SmallInteger, default=0, nullable=False)
+    Wood = Column(SmallInteger, default=0, nullable=False)
+    Wheat = Column(SmallInteger, default=0, nullable=False)
+    Sheep = Column(SmallInteger, default=0, nullable=False)
+    Ore = Column(SmallInteger, default=0, nullable=False)
+    Monopoly = Column(SmallInteger, default=0, nullable=False)
+    Library = Column(SmallInteger, default=0, nullable=False)
+    Knight = Column(SmallInteger, default=0, nullable=False)
+    Palace = Column(SmallInteger, default=0, nullable=False)
+    Chapel = Column(SmallInteger, default=0, nullable=False)
+    University = Column(SmallInteger, default=0, nullable=False)
+    Market = Column(SmallInteger, default=0, nullable=False)
+    RoadBuilding = Column(SmallInteger, default=0, nullable=False)
+    YearOfPlenty = Column(SmallInteger, default=0, nullable=False)
 
     def giveCards(self, cards):
-        for (type, amount) in cards:
+        for (amount, type) in cards:
             attr = CardTypes[type - 1] #ugly hack
             x = getattr(self, attr)
             setattr(self, attr, x + amount)
