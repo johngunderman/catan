@@ -74,11 +74,19 @@ function handle_joined(log_entry) {
 
 function handle_road_built(log_entry) {
     insertRoad(log_entry.user, log_entry.vertex1, log_entry.vertex2);
-    
+
     sendToTicker(name(log_entry.user) + " built a road!");
 }
 
 function handle_resources_gained(log_entry) {
+    var cards = log_entry.cards;
+
+    cards.forEach(
+        function(card) {
+            gameboard.cards[cardNames[card[1]]] += card[0];
+        }
+    );
+
     var message = name(log_entry.user);
 
     function format_single(card) {
@@ -87,7 +95,6 @@ function handle_resources_gained(log_entry) {
 
     message += " got";
 
-    var cards = log_entry.cards;
 
     if(cards.length > 0) {
         message += " " + format_single(cards[0]);
@@ -103,6 +110,10 @@ function handle_resources_gained(log_entry) {
 
         message += " " + format_single(cards[cards.length - 1]);
     }
+
+    console.log(gameboard.cards);
+
+    drawResourceCounters();
 
     sendToTicker(message);
 }

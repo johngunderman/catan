@@ -552,9 +552,20 @@ function dispChit(context, number, x,y) {
 }
 
 
-function drawResourceCounters(context, brick, lumber, wool, grain, ore) {
+function drawResourceCounters() {
+
+    var brick  = gameboard.cards.brick;
+    var lumber = gameboard.cards.lumber;
+    var wool   = gameboard.cards.wool;
+    var grain  = gameboard.cards.grain;
+    var ore    = gameboard.cards.ore;
+
+    var context = stage.getContext();
+
     context.font = RESOURCE_FONT;
     context.fillStyle = RESOURCE_FONT_COLOR;
+
+    context.clearRect(RESOURCE_XCOORD - 20, RESOURCE_YCOORD - 20, BOARD_SIZE, BOARD_SIZE);
 
     // brick
     context.textAlign = "right";
