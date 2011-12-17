@@ -60,6 +60,10 @@ RESOURCE_YCOORD = 500;
 SETTLEMENT = 1;
 CITY = 2;
 
+TICKER_XOFFSET = 10;
+TICKER_BASE = 20;
+TICKER_INC = 20;
+TICKER_LENGTH = 15;
 
 HOSTNAME = "";
 
@@ -68,6 +72,7 @@ rows = [[0,6], [0,8], [0,10], [1,11], [3,11], [5,11]];
 //a[y] is the number of vertices that occur before row y
 indices = [0, 7, 16, 27, 38, 47];
 
+tickerLog = [];
 
 // GLOBALS BELOW, CONSTANTS ABOVE
 // we shall code in the shade

@@ -15,6 +15,7 @@ function insertSettlement(user, vertex, isInitialBuild) {
                  "user" : userID};
             // record our action so we can push it up to the server
             console.log("Action: Settlement created");
+            sendToTicker("Action: Settlement created");
         }
         if (!isInitialBuild && user == userID) {
             removeSettlementResources();
