@@ -131,7 +131,6 @@ function getValidSettlementPlaces() {
     });
 
 
-    console.log(res);
     return res;
 }
 
@@ -155,7 +154,6 @@ function getValidSettlementPlaces() {
     });
 
 
-    console.log(res);
     return res;
 }
 
@@ -177,6 +175,5 @@ function getValidRoadPlaces() {
         }
     }
 
-    console.log(valid);
     return valid;
 }
