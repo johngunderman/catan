@@ -170,8 +170,8 @@ class Game(Base):
                         filter_by(UserID=u).one(). \
                         add_cards(allocated)
 
-            self.log(Log.rolled(self.CurrentPlayerID, rolled))
             give_cards(rolled)
+            return rolled
 
 
     def log(self, action):
@@ -405,7 +405,7 @@ class Log(Base):
 
     @staticmethod
     def req_turn(userid, rolled):
-        return { "action": "req_turn", "user": userid, "value": rolled }
+        return { "action": "req_turn", "user": userid, "roll": rolled }
 
     @staticmethod
     def joined(userid):

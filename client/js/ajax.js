@@ -121,7 +121,7 @@ function handle_settlement_upgraded(log_entry) {
 }
 
 function handle_req_turn(log_entry) {
-    sendToTicker("It's your turn!");
+    sendToTicker(name(log_entry.user) + " rolled a " + log_entry.roll);
 }
 
 
