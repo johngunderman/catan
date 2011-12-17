@@ -28,7 +28,14 @@ function promptSettlement(isInitial) {
 }
 
 function promptRoad(isInitial) {
-    var valid = getValidRoadPlaces();
+    var valid;
+
+    if (isInitial) {
+        valid = getValidRoadPlacesInitial();
+    }
+    else {
+        valid = getValidRoadPlaces();
+    }
 
     for (var v in valid) {
         drawRoadDetector(stage, valid[v][0], valid[v][1], isInitial);
