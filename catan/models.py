@@ -182,9 +182,6 @@ class Game(Base):
         self.__log.append(l)
         self.NextSequence += 1
 
-        #This may be a massive hack
-        db_session.commit()
-
         if self.GameID in log_waiters:
             for i in list(log_waiters[self.GameID]):
                 i()
