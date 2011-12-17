@@ -1,7 +1,9 @@
+"use strict";
 
 window.onload = function() {
 
-    userID = $.cookie("user");
+    //TODO: Move this somewhere else, maybe?
+    window.userID = $.cookie("user");
     console.debug(userID);
 
     waitOnImage(handleGameJoin)
@@ -28,7 +30,7 @@ function waitOnImage(func) {
 
 function initBoard(hexes) {
 
-    stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
+    window.stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
 
     dispWaterFrame(img, stage.getContext());
     dispBoard(img, stage.getContext(), hexes);
@@ -57,7 +59,7 @@ function handleGameJoin() {
     var game = window.location.hash.substr(1);
 
     if (game) {
-        gameID = game;
+        window.gameID = game;
         joinGame();
     }
     else {

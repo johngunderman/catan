@@ -1,4 +1,3 @@
-
 IMAGE_SOURCE = 'images/tiles.png';
 TILE_HEIGHT = 306;
 TILE_WIDTH  = 354;
@@ -35,6 +34,13 @@ FIELDS    = 3;
 HILLS     = 4;
 MOUNTAINS = 5;
 DESERT    = 6;
+
+var cardNames = {}
+cardNames[FOREST] = "wood";
+cardNames[PASTURE] = "sheep";
+cardNames[FIELDS] = "wheat";
+cardNames[HILLS] = "brick";
+cardNames[MOUNTAINS] = "ore";
 
 WEST      = 0;
 NORTHWEST = 1;

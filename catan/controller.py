@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from database import db_session
 from models import *
 from string import replace
@@ -86,10 +87,9 @@ def players_turn(player):
         player.game.State == Game.States.NORMAL_PLAY and \
         player.game.CurrentPlayerID == player.UserID
 
-def build_settlement(player, vertex):
-    game = player.game
+def build_settlement(player, p):
     #TODO: make sure decompress checks validity
-    p = v.decompress(vertex)
+    vertex = v.decompress(p)
 
     if (
         players_turn(player) and
@@ -98,15 +98,13 @@ def build_settlement(player, vertex):
         Settlement.distance_rule(player.GameID, vertex) and
 
         #and the player has a road to the vertex
-        player.roads_q().count() > 0 and
+        player.roads_q().count() > 0 and #FIXME
 
         #and the player has the requisite resources
         player.hasResources(BuildTypes.TOWN)
     ) :
-        s = Settlement(vertex, Settlement.TOWN)
-        player.settlements.append(s)
         player.takeResources(BuildTypes.TOWN)
-        game.log(Log.settlement_built(userid, vertex))
+        player.add_settlement(p)
 
         db_session.commit()
 
@@ -120,8 +118,6 @@ def upgrade_settlement(player, vertex):
         #we are in the normal play state
         game.State == Game.States.NORMAL_PLAY and
 
-        #
-
         #the player already has a settlement here
         existing_settlement is not None and
 
@@ -131,6 +127,7 @@ def upgrade_settlement(player, vertex):
 
         existing_settlement.Type = Settlement.CITY
         player.takeResources(BuildTypes.CITY)
+        player.Score += 1
         player.game.log(Log.settlement_upgraded(player.UserID, vertex))
 
         db_session.commit()
@@ -271,13 +268,15 @@ def setup(player, settlement_vertex, road_to):
 
         elif game.State == Game.States.SETUP_BACKWARD:
             #TODO: A naming schema for compressed/uncompressed vertices (Hungarian Notation FTW!)
+
             adjacent = map(v.compress, v.adjacent_hexes(settlement_v))
-            cards = db_session.query(Hex.Type). \
+            cards = db_session.query(Hex.Type, func.count()). \
                 filter_by(GameID=game.GameID). \
                 filter(Hex.Vertex.in_(adjacent)). \
+                group_by(Hex.Type). \
                 all()
 
-            game.log(Log.got_resources(player.UserID, cards))
+            player.add_cards(cards)
 
             if game.CurrentIndex == 0:
                 #setup is over, welcome to the real world, Neo
@@ -314,5 +313,5 @@ def log_state_change(game):
     if game.State == Game.States.SETUP_FORWARD or game.State == Game.States.SETUP_BACKWARD:
         game.log(Log.req_setup(game.CurrentPlayerID))
     elif game.State == Game.States.NORMAL_PLAY:
-        game.begin_turn()
-        game.log(Log.req_turn(game.CurrentPlayerID))
+        rolled = game.begin_turn()
+        game.log(Log.req_turn(game.CurrentPlayerID, rolled))

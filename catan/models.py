@@ -102,8 +102,6 @@ class Game(Base):
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)
-        import pdb; pdb.set_trace()
-        rolled = rolled if rolled != 7 else 8
         if rolled == 7:
             Game.State = Game.States.MOVE_ROBBER
         else:
@@ -135,7 +133,6 @@ class Game(Base):
                             types[type][i] = 0
                         types[type][i] += 1
 
-                print(types)
                 """
                 Creates a dict of the form:
                 (userid -> (type -> count))
@@ -155,8 +152,6 @@ class Game(Base):
                         filter(Settlement.Vertex.in_(types[t].keys())). \
                         all()
 
-                    print(settlements)
-
                     for s in settlements:
                         if not s.UserID in users:
                             users[s.UserID] = {}
@@ -167,17 +162,15 @@ class Game(Base):
                             (2 if s.Type == Settlement.CITY else 1) * \
                             types[t][s.Vertex]
 
-                print(users)
                 for u in users:
                     allocated = list(map(lambda type: (users[u][type], type), users[u].keys()))
 
-                    db_session.query(PlayerCards). \
-                        join(GamePlayer). \
+                    GamePlayer.query. \
                         filter_by(GameID=self.GameID). \
                         filter_by(UserID=u).one(). \
-                        giveCards(allocated)
+                        add_cards(allocated)
 
-                    self.log(Log.got_resources(u, allocated))
+            self.log(Log.rolled(self.CurrentPlayerID, rolled))
             give_cards(rolled)
 
 
@@ -229,7 +222,7 @@ class GamePlayer(Base):
     UserID = Column(Integer, ForeignKey("User.UserID"))
     Score = Column(SmallInteger, nullable=False, default=0)
 
-    cards = relationship("PlayerCards", uselist=False)
+    cards = relationship("PlayerCards", uselist=False, backref="player")
 
     def __init__(self,userid):
         self.cards = PlayerCards()
@@ -254,9 +247,6 @@ class GamePlayer(Base):
         for (amnt, type) in __reqs[buildType]:
             self.cards[__cardTypes[type]] -= amnt
 
-    def changeScore(self,by):
-        self.Score += by
-
     def roads_q(self):
         return Road.query. \
             filter_by(GameID=player.GameID). \
@@ -270,12 +260,20 @@ class GamePlayer(Base):
     def add_settlement(self, vertex):
         s = Settlement(self.UserID, vertex)
         self.game.settlements.append(s)
+        self.Score += 1
         self.game.log(Log.settlement_built(self, s))
 
     def add_road(self, vertex1, vertex2):
         r = Road(self.UserID, vertex1, vertex2)
         self.game.roads.append(r)
         self.game.log(Log.road_built(self, r))
+
+    def add_cards(self, cards):
+        for (amount, type) in cards:
+            attr = CardTypes[type - 1] #ugly hack
+            x = getattr(self.cards, attr)
+            setattr(self.cards, attr, x + amount)
+        self.game.log(Log.got_resources(self.UserID, cards))
 
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
@@ -295,12 +293,7 @@ class PlayerCards(Base):
     RoadBuilding = Column(SmallInteger, default=0, nullable=False)
     YearOfPlenty = Column(SmallInteger, default=0, nullable=False)
 
-    def giveCards(self, cards):
-        for (amount, type) in cards:
-            attr = CardTypes[type - 1] #ugly hack
-            x = getattr(self, attr)
-            setattr(self, attr, x + amount)
-
+    
 class Hex(Base):
     __tablename__ = "Hex"
 
@@ -349,12 +342,11 @@ class Settlement(Base):
     GameID = Column(Integer, ForeignKey("Game.GameID"), primary_key=True)
     Vertex = Column(SmallInteger, primary_key=True)
     UserID = Column(Integer, ForeignKey("User.UserID"),nullable=False)
-    Type = Column(SmallInteger,nullable=False)
+    Type = Column(SmallInteger, default=TOWN, nullable=False)
 
     def __init__(self, userid, vertex):
         self.UserID = userid
         self.Vertex = vertex
-        self.Type = Settlement.TOWN
 
     """
     Returns True iff the a settlement can be placed on the given vertex
@@ -412,8 +404,8 @@ class Log(Base):
         return { "action" : "settlement_upgraded", "user" : player.UserID, "vertex": vertex, "score": player.Score }
 
     @staticmethod
-    def req_turn(userid):
-        return { "action": "req_turn", "user": userid }
+    def req_turn(userid, rolled):
+        return { "action": "req_turn", "user": userid, "value": rolled }
 
     @staticmethod
     def joined(userid):

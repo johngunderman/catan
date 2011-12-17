@@ -1,3 +1,5 @@
+"use strict";
+
 // hexes are encoded as [vertex, chit, type]
 function dispBoard(img, context, hexes) {
 
@@ -310,7 +312,7 @@ function initTicker() {
     // Init ticker
     var canvas = document.getElementById('ticker');
 
-    tickerContext = canvas.getContext('2d');
+    window.tickerContext = canvas.getContext('2d');
     tickerContext.clearRect(0, 0, canvas.width, canvas.height);
 
     tickerContext.fillStyle = "rgb(49,79,79)";
