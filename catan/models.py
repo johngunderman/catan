@@ -186,7 +186,7 @@ class Game(Base):
         db_session.commit()
 
         if self.GameID in log_waiters:
-            for i in log_waiters[self.GameID]:
+            for i in list(log_waiters[self.GameID]):
                 i()
 
 
