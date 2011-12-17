@@ -81,6 +81,7 @@ userID = 1;
 sequenceNum = 0;
 
 // actions to commit at the end of the user's turn
+// {action : foo, vertex : bar}
 actionsMade = [];
 
 

@@ -29,7 +29,7 @@ function promptRoad(isInitial) {
 
     for (var v in valid) {
         drawRoadDetector(stage, valid[v][0],
-                         valid[v][1]);
+                         valid[v][1], isInitial);
     }
 
 

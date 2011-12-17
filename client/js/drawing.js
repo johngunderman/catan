@@ -17,36 +17,18 @@ function drawCoords(context) {
     // draw us some coordinates:
     for (var x = -1; x < 7; x++) {
         for (var y = -1; y < 7; y++) {
-            //dispAtVertex(x + "," + y + ",0", context, x, y, 0);
+            dispAtVertex(x + "," + y + ",0", context, x, y, 0);
             dispAtVertex(x + "," + y + ",1", context, x, y, 1);
         }
     }
 }
 
 
-// called when initializing the board
-// here we draw all the valid road detectors
-// see drawRoadDetector() for more info
-function drawAllRoadDetectors(stage) {
-    for (var x = 0; x < 6; x++) {
-        for (var y = 0; y < 6; y++) {
-	    var v1 = [x,y,WEST];
-            if(isvalid(v1)) {
-                var adj = adjacent(v1);
-                for (var z = 0; z < adj.length; z++) {
-                    var v2 = adj[z];
-                    drawRoadDetector(stage, v1, v2);
-                }
-            }
-        }
-    }
-}
-
 // On the given stage, draw a road detector from the vertice
 // described with (x1,y1,d1) to the vertice (x2,y2,d2).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a road at the given line when clicked.
-function drawRoadDetector(stage, v1, v2) {
+function drawRoadDetector(stage, v1, v2, isInitial) {
 
     var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
     var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
@@ -97,16 +79,52 @@ function drawRoadDetector(stage, v1, v2) {
     });
 
     line.addEventListener("mousedown", function(){
-        document.body.style.cursor = "default";
-        context.beginPath();
-        context.lineWidth = 6;
-        context.strokeStyle = "red";
-        context.fillStyle = "rgba(0,0,0,0)";
-        context.moveTo(coords1[0], coords1[1]);
-        context.lineTo(coords2[0], coords2[1]);
-        context.closePath();
-        context.fill();
-        context.stroke();
+
+        if (hasRoadResources() || isInitial) {
+            document.body.style.cursor = "default";
+            context.beginPath();
+            context.lineWidth = 6;
+            context.strokeStyle = "red";
+            context.fillStyle = "rgba(0,0,0,0)";
+            context.moveTo(coords1[0], coords1[1]);
+            context.lineTo(coords2[0], coords2[1]);
+            context.closePath();
+            context.fill();
+            context.stroke();
+
+            insertRoad(userID, v1, v2, isInitial);
+
+        }
+
+        if (isInitial) {
+
+            console.log(actionsMade);
+
+            var roadto  = -1;
+
+            if (actionsMade[1].vertex1 == actionsMade[0].vertex) {
+                roadto = actionsMade[1].vertex2;
+            }
+            else {
+                roadto = actionsMade[1].vertex1;
+            }
+
+            // console.log(HOSTNAME + "/setup"
+            //             + "?user=" + userID
+            //             + "&sequence=" + sequenceNum
+            //             + "&settlement="+  actionsMade[0].vertex
+            //             + "&roadto=" + roadto);
+
+            makeAjaxRequest(HOSTNAME + "/setup",
+                            "?user=" + userID
+                            + "&sequence=" + sequenceNum
+                            + "&settlement=" + actionsMade[0].vertex
+                            + "&roadto=" + roadto
+                           );
+            // clear 'em out!
+            actionsMade = [];
+        }
+
 
         stage.removeAll();
     });
@@ -189,7 +207,7 @@ function drawSettlement(user, vertex) {
 
     stage.removeAll();
 
-    actionsMade.push(coords);
+    console.log("coords: " + compress(vertex));
 }
 
 // x,y determines a hex, d determines the vertex of the hex
