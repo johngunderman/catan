@@ -117,7 +117,11 @@ function drawRoadDetector(stage, v1, v2, isInitial) {
 }
 
 
-function drawRoad(color, v1, v2) {
+function drawRoad(road) {
+    var v1 = decompress(road.vertex1);
+    var v2 = decompress(road.vertex2);
+    var color = gameboard.users[road.user].color;
+
     var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
     var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
     var context = stage.getContext();

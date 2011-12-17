@@ -37,24 +37,20 @@ function insertCity(user, vertex) {
     }
 }
 
-// no cost if initial build
-function insertRoad(user, vertex1, vertex2, isInitialBuild) {
-    // make sure there isn't a road there yet
-    if (isvalid(vertex1)
-        && isvalid(vertex2)
-        && !gameboard.roads[vertex1 + "." + vertex2]
-        && !gameboard.roads[vertex2 + "." + vertex1]) {
-
-        if (hasRoadResources() || isInitialBuild || user != userID) {
-            gameboard.roads[vertex1 + "." + vertex2] = user;
-
-            console.log("Action: road created");
-        }
-
-        if (user == userID && hasRoadResources()) {
-            removeCityResources();
-        }
+function insertRoad(user, vertex1, vertex2) {
+    if(!gameboard.roads[user]) {
+        gameboard.roads[user] = [];
     }
+
+    var road = {
+        user : user,
+        vertex1: vertex1,
+        vertex2: vertex2
+    }
+    
+    gameboard.roads[user].push(road);
+
+    drawRoad(road);
 }
 
 
@@ -124,22 +120,46 @@ function getValidSettlementPlaces() {
 }
 
 function getValidRoadPlaces() {
-    var valid = [];
-    for (var x = 0; x < 6; x++) {
-        for (var y = 0; y < 6; y++) {
-	    var v1 = [x,y,WEST];
-            if(isvalid(v1)) {
-                var adj = adjacent(v1);
-                for (var z = 0; z < adj.length; z++) {
-                    var v2 = adj[z];
-                    if (gameboard.settlements[compress(v1)]
-                        || gameboard.settlements[compress(v2)]) {
-                        valid.push([v1,v2]);
-                    }
+    var valid = {}
+
+    function getAdjacentRoads(road) {
+        function getRoadsFromVertex(start) { //Start is compressed
+            
+            var start_v = decompress(start);
+            adjacent(start_v).forEach(function(end_v) {
+                var end = compress(end_v);
+                
+                var from = end > start ? start : end;
+                var to = end > start ? end: start;
+
+                valid[[from, to]] = true;
+            });
+        }
+
+        [road.vertex1, road.vertex2].forEach(getRoadsFromVertex);
+    }
+
+    gameboard.roads[userID].forEach(getAdjacentRoads);
+
+    //remove those which are already held by other players
+    for(var i in gameboard.roads) {
+        if(i != userID) {
+            var roads = gameboard.roads[i];
+            roads.forEach(function(road) {
+                console.log(road);
+                var index = [road.vertex1, road.vertex2];
+                if(index in valid) {
+                    delete valid[index];
                 }
-            }
+            });
         }
     }
 
-    return valid;
+    var ret = [];
+    
+    for(var i in valid) {
+        ret.push(i);
+    }
+   
+    return ret;
 }
