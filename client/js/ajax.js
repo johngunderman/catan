@@ -121,6 +121,12 @@ function handleResponseJson(json) {
 
 }
 
+function joinGame() {
+    makeAjaxRequest(HOSTNAME + "/join_game", "?game=" + gameID,
+                    function(json) {startGameLog();});
+
+}
+
 
 function updateClient() {
     makeAjaxRequest(HOSTNAME + "/get_log",

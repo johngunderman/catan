@@ -48,7 +48,7 @@ function handleGameJoin() {
 
     if (game) {
         gameID = game;
-        startGameLog();
+        joinGame();
     }
     else {
         startGameRequest();
