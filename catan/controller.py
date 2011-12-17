@@ -10,30 +10,72 @@ def get_log(game, sequence):
     log = [i.Action for i in Log.query.filter(Log.GameID == game.GameID).filter(Log.Sequence >= sequence).all()]
     return (game.NextSequence, "[" + ",".join(log) + "]")
 
+def create_user():
+    u = User()
+
+    db_session.add(u)
+    db_session.commit()
+    return u.UserID
+
 def create_game(userid):
+    #TODO: Move this to catan.py
     game = Game()
-    game.players.append(GamePlayer(userid))
+    user = User.query.get(userid)
+
+    user.join_game(game)
 
     db_session.add(game);
     db_session.commit()
     return game
 
+def join_game(gameid, userid):
+    #TODO: Move this to catan.py
+    game = Game.query.get(gameid)
+    user = User.query.get(userid)
+
+    if (
+        #the game hasn't started yet
+        game.State == Game.States.NOTSTARTED and
+
+        #the user isn't already in the game
+        GamePlayer.query. \
+            filter_by(GameID=game.GameID). \
+            filter_by(UserID=user.UserID). \
+            count() == 0 and
+
+        #there aren't already four players
+        len(game.players) < 4
+    ):
+        player = user.join_game(game)
+
+        #the game automatically starts when four players have joined
+        if len(game.players) == 4:
+            game.start()
+            log_state_change(game)
+
+        db_session.commit()
+        return player
+    else:
+        return None
+
 def start_game(player):
     game = player.game
-    if(game.State == Game.States.NOTSTARTED):
-        game.hexes = Game.create_hexes()
-        game.RobberHex = Game.ROBBER_START_HEX
-        game.log(Log.hexes_placed(game.hexes))
+    if(
+        #the game hasn't started yet
+        game.State == Game.States.NOTSTARTED and
 
-        game.State = Game.States.SETUP_FORWARD
-        game.CurrentIndex = 0
-        game.CurrentPlayerID = game.players[game.CurrentIndex].UserID
+        #there are at least three players
+        len(game.players) >= 3
+    ):
+        game.start()
+        #TODO: consider creating a turn_ended to replace log_state_change
         log_state_change(game)
 
         db_session.commit()
         return "success"
     else:
         return "failure"
+
 
 def build_settlement(player, vertex):
     game = player.game
@@ -42,9 +84,7 @@ def build_settlement(player, vertex):
 
     if (
         #there are no settlements within the distance rule
-        Settlement.query. \
-            filter_by(GameID=player.GameID).
-            in_(v.adjacent(vertex)).count() == 0 and
+        Settlement.distance_rule(player, vertex) and
 
         #and the player has a road to the vertex
         player.roads_q().count() > 0 and
@@ -72,7 +112,9 @@ def upgrade_settlement(player, vertex):
         #the player has the necessary resources
         player.hasCardsFor(BuildTypes.CITY)
     ) :
+
         existing_settlement.Type = Settlement.CITY
+        player.takeResources(BuildTypes.CITY)
         player.game.log(Log.settlement_upgraded(player.UserID, vertex))
 
         db_session.commit()
@@ -98,15 +140,17 @@ def build_road(player, vertex1, vertex2):
             filter_by(Vertex1=vertex1). \
             filter_by(Vertex2=vertex2). \
             count() == 0
-        and 
-            
-        #either the player has a road at one of the vertices already
+        and
+
+        #the player has a road at one of the vertices already
         player.roads_q(). \
             filter(or_(
                 in_(Road.Vertex1, vertices),
                 in_(Road.Vertex2, vertices)
             )).count() != 0
     ) :
+
+        player.takeResources(BuildTypes.ROAD)
         r = Road(vertex1, vertex2, userid)
         g.roads.append(r)
         g.log({ "action" : "road_built", "args" : [userid, vertex1, vertex2]})
@@ -114,8 +158,8 @@ def build_road(player, vertex1, vertex2):
         # TODO: check if we now have longest road.
         # It is a longest path problem.  Check the rules before implementing
 
-        db_session.commit() 
-                                
+        db_session.commit()
+
         return "success"
 
     else:
@@ -141,7 +185,7 @@ def move_robber(player, tile):
         game.State == States.MOVE_ROBBER and
 
         #this player is supposed to be moving the robber
-        player.UserID == game.CurrentPlayerID and 
+        player.UserID == game.CurrentPlayerID and
 
         #the robber isn't being moved nowhere
         game.RobberVertex != tile and
@@ -151,7 +195,7 @@ def move_robber(player, tile):
     ) :
         game.RobberTile = tile
         game.State = States.STEAL_CARDS
-        
+
         p = vertices.decompress(tile)
         adj = tiles.adjacent(p)
 
@@ -166,7 +210,7 @@ def move_robber(player, tile):
         return vulnerable_players
     else:
         return "failure"
-    
+
 
 """
 The setup RPC is called during the setup phase, to set up
@@ -186,11 +230,11 @@ def setup(player, settlement_vertex, road_to):
 
         #it's the player's turn
         player.UserID == game.CurrentPlayerID and
-        
+
         #the settlement vertex is valid
         v.isvalid(settlement_v) and
 
-        #the new settlement conforms to the distance rule 
+        #the new settlement conforms to the distance rule
         Settlement.distance_rule(player, settlement_v) and
 
         #the road vertex is adjacent to the settlement (and valid)
@@ -214,12 +258,12 @@ def setup(player, settlement_vertex, road_to):
 
         elif game.State == Game.States.SETUP_BACKWARD:
             #TODO: A naming schema for compressed/uncompressed vertices (Hungarian Notation FTW!)
-            adjacent_points = map(v.compress, v.adjacent_hexes(settlement_v))
+            adjacent = map(v.compress, v.adjacent_hexes(settlement_v))
             cards = db_session.query(Hex.Type). \
                 filter_by(GameID=game.GameID). \
-                filter(Hex.Vertex.in_(adjacent_points)). \
+                filter(Hex.Vertex.in_(adjacent)). \
                 all()
-            
+
             game.log(Log.got_resources(player.UserID, cards))
 
             if game.CurrentIndex == 0:
@@ -236,8 +280,29 @@ def setup(player, settlement_vertex, road_to):
     else:
         return "failure"
 
+def end_turn(player):
+    game = player.game
+    if (
+        game.State == Game.States.NORMAL_PLAY and
+        game.CurrentPlayerID == player.UserID
+    ):
+        game.CurrentIndex += game.CurrentIndex
+
+        if game.CurrentIndex == len(game.players):
+            game.CurrentIndex = 0
+            game.TurnCount += 1
+
+        game.CurrentPlayerID = game.players[game.CurrentIndex].UserID
+        log_state_change(player.game)
+        db_session.commit()
+
+        return "success"
+    else:
+        return "failure"
+
 def log_state_change(game):
     if game.State == Game.States.SETUP_FORWARD or game.State == Game.States.SETUP_BACKWARD:
         game.log(Log.req_setup(game.CurrentPlayerID))
     elif game.State == Game.States.NORMAL_PLAY:
+        game.begin_turn(game)
         game.log(Log.req_turn(game.CurrentPlayerID))
