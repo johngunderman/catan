@@ -260,9 +260,11 @@ def setup(player, settlement_vertex, road_to):
     ):
         s = Settlement(player.UserID, settlement_vertex)
         game.settlements.append(s)
+        game.log(Log.settlement_built(player, s)
 
         r = Road(player.UserID, settlement_vertex, road_to)
         game.roads.append(r)
+        game.log(Log.road_built(player, r))
 
         if game.State == Game.States.SETUP_FORWARD:
             if game.CurrentIndex + 1 == len(game.players):
