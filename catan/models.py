@@ -8,6 +8,8 @@ import hexes as h
 
 import random
 
+VICTORY_SCORE = 10
+
 class Terrain:
     (FOREST, PASTURE, FIELDS, HILLS, MOUNTAINS, DESERT) = range(1,7)
 
@@ -102,6 +104,7 @@ class Game(Base):
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)
+        game.log(Log.req_turn(game.CurrentPlayerID, rolled))
         if rolled == 7:
             Game.State = Game.States.MOVE_ROBBER
         else:
@@ -170,7 +173,6 @@ class Game(Base):
                         filter_by(UserID=u).one(). \
                         add_cards(allocated)
 
-            self.log(Log.rolled(self.CurrentPlayerID, rolled))
             give_cards(rolled)
 
 
@@ -262,6 +264,7 @@ class GamePlayer(Base):
         self.game.settlements.append(s)
         self.Score += 1
         self.game.log(Log.settlement_built(self, s))
+        player.checkVictory()
 
     def add_road(self, vertex1, vertex2):
         r = Road(self.UserID, vertex1, vertex2)
@@ -274,6 +277,10 @@ class GamePlayer(Base):
             x = getattr(self.cards, attr)
             setattr(self.cards, attr, x + amount)
         self.game.log(Log.got_resources(self.UserID, cards))
+
+    def checkVictory(self):
+        if(self.Score >= VICTORY_SCORE):
+            self.game.log(Log.game_over(self.UserID))
 
 class PlayerCards(Base):
     __tablename__ = "PlayerCards"
@@ -405,8 +412,12 @@ class Log(Base):
 
     @staticmethod
     def req_turn(userid, rolled):
-        return { "action": "req_turn", "user": userid, "value": rolled }
+        return { "action": "req_turn", "user": userid, "roll": rolled }
 
     @staticmethod
     def joined(userid):
         return { "action": "joined", "user": userid }
+
+    @staticmethod
+    def game_over(userid):
+        return { "action": "game_over", "winner": userid }

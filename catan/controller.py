@@ -129,6 +129,7 @@ def upgrade_settlement(player, vertex):
         player.takeResources(BuildTypes.CITY)
         player.Score += 1
         player.game.log(Log.settlement_upgraded(player.UserID, vertex))
+        player.checkVictory()
 
         db_session.commit()
 
@@ -276,7 +277,7 @@ def setup(player, settlement_vertex, road_to):
                 group_by(Hex.Type). \
                 all()
 
-            player.add_cards(cards)
+            player.add_cards([(j, i) for (i, j) in cards])
 
             if game.CurrentIndex == 0:
                 #setup is over, welcome to the real world, Neo
@@ -313,5 +314,4 @@ def log_state_change(game):
     if game.State == Game.States.SETUP_FORWARD or game.State == Game.States.SETUP_BACKWARD:
         game.log(Log.req_setup(game.CurrentPlayerID))
     elif game.State == Game.States.NORMAL_PLAY:
-        rolled = game.begin_turn()
-        game.log(Log.req_turn(game.CurrentPlayerID, rolled))
+        game.begin_turn()

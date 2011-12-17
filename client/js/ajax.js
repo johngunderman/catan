@@ -28,14 +28,10 @@ function promptSettlement(isInitial) {
 }
 
 function promptRoad(isInitial) {
-
     var valid = getValidRoadPlaces();
 
-    console.log("valid roads " + valid);
-
     for (var v in valid) {
-        drawRoadDetector(stage, valid[v][0],
-                         valid[v][1], isInitial);
+        drawRoadDetector(stage, valid[v][0], valid[v][1], isInitial);
     }
 }
 
@@ -70,13 +66,9 @@ function handle_joined(log_entry) {
 }
 
 function handle_road_built(log_entry) {
+    insertRoad(log_entry.user, log_entry.vertex1, log_entry.vertex2);
+    
     sendToTicker(name(log_entry.user) + " built a road!");
-
-    insertRoad(log_entry.user, decompress(log_entry.vertex1),
-               decompress(log_entry.vertex2));
-
-    drawRoad(gameboard.users[log_entry.user].color, decompress(log_entry.vertex1),
-               decompress(log_entry.vertex2));
 }
 
 function handle_resources_gained(log_entry) {
@@ -136,7 +128,7 @@ function handle_settlement_upgraded(log_entry) {
 }
 
 function handle_req_turn(log_entry) {
-    sendToTicker("It's your turn!");
+    sendToTicker(name(log_entry.user) + " rolled a " + log_entry.roll);
 }
 
 
