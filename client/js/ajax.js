@@ -1,7 +1,9 @@
+"use strict";
+
 // All our handlers for action events
 // req events are handled seperately, as we only care about them if they
 // are on the top of the log. See handleResponseJson().
-handlers = {
+var handlers = {
     "joined"              : handle_joined,
     "resources_gained"    : handle_resources_gained,
     "hexes_placed"        : handle_hexes_placed,
@@ -10,7 +12,7 @@ handlers = {
     "road_built"          : handle_road_built
 }
 
-req_handlers = {
+var req_handlers = {
     "req_turn"            : handle_req_turn,
     "req_setup"           : handle_req_setup
 }
@@ -58,8 +60,31 @@ function handle_road_built(log_entry) {
 }
 
 function handle_resources_gained(log_entry) {
-    sendToTicker("You gained resources!");
+    var message = "Player " + log_entry.user;
+    if(log_entry.user == userID)
+    {
+        message = "You";
+    }
 
+    function format_single(card) {
+        return card[0] + " " + cardNames[card[1]];
+    }
+
+    message += " got";
+
+    var cards = log_entry.cards;
+    for(var i = 0; i < cards.length - 1; i++) {
+        message += ", " + format_single(cards[i]);
+    }
+
+    if(cards.length > 0) {
+        if(cards.length > 2) message += ", and";
+        else if(cards.length > 1) message += " and"
+
+        message += " " + format_single(cards[cards.length - 1]);
+    }
+
+    sendToTicker(message);
 }
 
 function handle_req_setup(log_entry) {
@@ -119,7 +144,7 @@ function handleResponseJson(json) {
     var myJson = JSON.parse(json);
 
 
-    img = new Image();
+    window.img = new Image();
     img.onload = function() {
 
 
@@ -180,7 +205,7 @@ function updateClient() {
 function startGameRequest() {
 
     var create_game_callback = function(json) {
-        gameID = parseInt(json);
+        window.gameID = parseInt(json);
         console.log("created new game with gameID: " + gameID);
         sendToTicker("New game created!");
         sendToTicker("Waiting for players...");
