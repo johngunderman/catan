@@ -18,43 +18,56 @@ var req_handlers = {
 }
 
 
-function promptSettlement(isInitial) {
+function promptSettlement() {
+    var dfd = $.Deferred();
 
     var valid = getValidSettlementPlaces();
 
     for (var x in valid) {
-        drawSettlementDetector(stage, decompress(valid[x]), true);
+        drawSettlementDetector(stage, valid[x], gameboard.users[userID].color).
+            then(settlementChosen)
     }
+
+    function settlementChosen(p) {
+        stage.removeAll();
+        dfd.resolve(p)
+    }
+
+    return dfd.promise();
 }
 
-function promptRoad(isInitial) {
+//if p is passed, allow only roads from position p
+function promptRoad(p) {
+    var dfd = $.Deferred();
+
     var valid;
 
-    if (isInitial) {
-        valid = getValidRoadPlacesInitial();
+    if (p) {
+        valid = getRoadsFromVertex(p);
     }
     else {
         valid = getValidRoadPlaces();
     }
 
-    for (var v in valid) {
-        drawRoadDetector(stage, valid[v].from, valid[v].to, isInitial);
+    for (var i in valid) {
+        drawRoadDetector(stage, valid[i]).then(roadChosen);
     }
+
+    function roadChosen(p) {
+        stage.removeAll();
+        dfd.resolve(p);
+    }
+
+    return dfd.promise();
 }
 
 
 function promptUpgradeSettlement() {
-    if (!hasCityResources()) {
-        sendToTicker("You don't have enough resources!");
-        return;
-    }
-
     var valid = getValidCityPlaces();
 
     for (var v in valid) {
         drawCityDetector(starge, valid[v]);
     }
-
 }
 
 function name(user) {
@@ -119,9 +132,33 @@ function handle_resources_gained(log_entry) {
 }
 
 function handle_req_setup(log_entry) {
-    promptSettlement(true);
-    // this calls promptRoad(true) inside.
-    // needs to be changed at some point
+    var settlement;
+
+    promptSettlement().done(gotSettlement)
+
+    function gotSettlement(p) {
+        settlement = p;
+        drawSettlement(p, gameboard.users[userID].color);
+        promptRoad(p).done(gotRoad);
+    }
+
+    function gotRoad(r) {
+        r.user = userID;
+        drawRoad(r);
+
+        //The roadto is the one that doesn't equal the settlement
+        var roadto = r.vertex1 != settlement ? r.vertex1 : r.vertex2
+        makeSetupRequest(settlement, roadto);
+    }
+
+    function makeSetupRequest(settlement, roadto) {
+        makeAjaxRequest("/setup",
+                    "?game=" + gameID
+                    + "&settlement=" + settlement
+                    + "&roadto=" + roadto,
+                    function(json) {}
+                   );
+    }
 }
 
 function handle_hexes_placed(log_entry) {
@@ -136,8 +173,7 @@ function handle_settlement_built(log_entry) {
     sendToTicker(name(log_entry.user) + " built a settlement!");
     // TODO: register the settlement build in our global gamestate model
     insertSettlement(log_entry.user, decompress(log_entry.vertex));
-    drawSettlement(gameboard.users[log_entry.user].color,
-            decompress(log_entry.vertex));
+    drawSettlement(log_entry.vertex, gameboard.users[log_entry.user].color);
 }
 
 function handle_settlement_upgraded(log_entry) {
@@ -200,6 +236,7 @@ function handleResponseJson(json) {
             if (req_handlers[top.action]) {
 
                 updatePlayerDisplay(top.user);
+                window.currentUserID = top.user;
 
                 if (top.user == userID) {
                     req_handlers[top.action](top);
@@ -257,13 +294,4 @@ function startGameRequest() {
 }
 
 
-function makeSetupRequest(vertex, roadto) {
-    makeAjaxRequest(HOSTNAME + "/setup",
-                    "?game=" + gameID
-                    + "&settlement=" + vertex
-                    + "&roadto=" + roadto,
-                    function(json) {}
-                   );
-    // clear 'em out!
-    actionsMade = [];
-}
+

@@ -30,22 +30,17 @@ function drawCoords(context) {
 // described with (x1,y1,d1) to the vertice (x2,y2,d2).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a road at the given line when clicked.
-function drawRoadDetector(stage, vertex1, vertex2, isInitial) {
-
-    var v1 = decompress(vertex1);
-    var v2 = decompress(vertex2);
-
-    var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
-    var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
+function drawRoadDetector(stage, road) {
+    var coords1 = getVertexCoords(road.vertex1);
+    var coords2 = getVertexCoords(road.vertex2);
     var context = stage.getContext();
 
-    var line = new Kinetic.Shape(function(){
+    var shape = new Kinetic.Shape(function(){
         var context = this.getContext();
         context.beginPath();
         context.lineWidth = 1;
-        context.strokeStyle = "red";
-        context.fillStyle = "rgba(0,0,0,0)";
-	var width = 2
+        context.strokeStyle = DETECTOR_COLOR;
+        var width = 2
 
         // hacky-hack to fix the size of the road detectors
         // I know it's terribad.
@@ -69,23 +64,23 @@ function drawRoadDetector(stage, vertex1, vertex2, isInitial) {
 
         }
 
-
-
         context.closePath();
-	context.fill();
         context.stroke();
     });
 
-    line.addEventListener("mouseover", function(){
+    var dfd = $.Deferred();
+
+    shape.addEventListener("mouseover", function(){
         document.body.style.cursor = "pointer";
     });
-    line.addEventListener("mouseout", function(){
+    shape.addEventListener("mouseout", function(){
         document.body.style.cursor = "default";
     });
 
-    line.addEventListener("mousedown", function(){
+    shape.addEventListener("mousedown", function(){
+        dfd.resolve(road); 
 
-        if (hasRoadResources() || isInitial) {
+        /*if (hasRoadResources() || isInitial) {
 
             console.log(userID);
 
@@ -110,29 +105,26 @@ function drawRoadDetector(stage, vertex1, vertex2, isInitial) {
             }
 
             makeSetupRequest(actionsMade[0].vertex, roadto);
-        }
+        }*/
 
 
-        stage.removeAll();
     });
 
-    stage.add(line);
+    stage.add(shape);
+
+    return dfd.promise();
 }
 
 
 function drawRoad(road) {
-    var v1 = decompress(road.vertex1);
-    var v2 = decompress(road.vertex2);
-    var color = gameboard.users[road.user].color;
-
-    var coords1 = getVertexCoords(v1[0], v1[1], v1[2]);
-    var coords2 = getVertexCoords(v2[0], v2[1], v2[2]);
+    var coords1 = getVertexCoords(road.vertex1);
+    var coords2 = getVertexCoords(road.vertex2);
     var context = stage.getContext();
 
     document.body.style.cursor = "default";
     context.beginPath();
     context.lineWidth = 6;
-    context.strokeStyle = color;
+    context.strokeStyle = gameboard.users[road.user].color;
     context.moveTo(coords1[0], coords1[1]);
     context.lineTo(coords2[0], coords2[1]);
     context.closePath();
@@ -190,10 +182,9 @@ function drawCityDetector(stage, vertex, isInitial) {
     stage.add(city);
 }
 
-// user id determnies the color
-function drawSettlement(color, vertex) {
-
-    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+//TODO: just pass in a settlement object
+function drawSettlement(p, color) {
+    var coords = getVertexCoords(p);
     var context = stage.getContext();
 
     var width = 10;
@@ -208,102 +199,52 @@ function drawSettlement(color, vertex) {
     context.closePath();
     context.fill();
 
-    stage.removeAll();
-
 }
 
-// On the given stage, draw a city detector on the vertice
+// On the given stage, draw a city detector on the vertex
 // described with (x1,y1,d1).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a city at the given vertex when clicked.
-function drawSettlementDetector(stage, vertex, isInitial) {
-
-    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+function drawSettlementDetector(stage, p) {
+    var coords = getVertexCoords(p);
     var context = stage.getContext();
 
-    var city = new Kinetic.Shape(function(){
+    var shape = new Kinetic.Shape(function(){
         var context = this.getContext();
         context.beginPath();
         context.lineWidth = 1;
-        context.strokeStyle = "red"
+        context.strokeStyle = DETECTOR_COLOR;
         context.fillStyle = "rgba(0,0,0,0)";
-	var width = 5
+	
+        var width = 5
 
         context.moveTo(coords[0] - width, coords[1] - width);
         context.lineTo(coords[0] - width, coords[1] + width);
         context.lineTo(coords[0] + width, coords[1] + width);
         context.lineTo(coords[0] + width, coords[1] - width);
         context.closePath();
-	context.fill();
         context.stroke();
     });
 
-    city.addEventListener("mouseover", function(){
+    var dfd = $.Deferred();
+
+    shape.addEventListener("mouseover", function(){
         document.body.style.cursor = "pointer";
     });
-    city.addEventListener("mouseout", function(){
+    shape.addEventListener("mouseout", function(){
         document.body.style.cursor = "default";
     });
-
-    city.addEventListener("mousedown", function(){
-
-        if (isInitial || hasSettlementResources()) {
-            insertSettlement(userID, vertex, isInitial);
-
-            // record this action in our list of overall actions
-            actionsMade.push({"item" : "settlement", "vertex" : compress(vertex)});
-            drawSettlement(gameboard.users[userID].color, vertex);
-        } else {
-            console.log("Not enough resources");
-        }
-
-
-        if (isInitial) {
-            promptRoad(isInitial);
-        }
+    shape.addEventListener("mousedown", function(){
+        dfd.resolve(p);
     });
 
-    stage.add(city);
+    stage.add(shape);
+
+    return dfd.promise();
 }
 
 
-// user id determines the color
-function drawSettlement(color, vertex) {
 
-    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
-    var context = stage.getContext();
-
-    var width = 6;
-    document.body.style.cursor = "default";
-    context.beginPath();
-    context.fillStyle = color;
-    context.moveTo(coords[0] - width, coords[1] - width);
-    context.lineTo(coords[0] - width, coords[1] + width);
-    context.lineTo(coords[0] + width, coords[1] + width);
-    context.lineTo(coords[0] + width, coords[1] - width);
-
-    context.closePath();
-    context.fill();
-
-    stage.removeAll();
-
-}
-
-// x,y determines a hex, d determines the vertex of the hex
-// Two values for d: WEST or NORTHWEST
-function dispAtVertex(text, context, x, y, d) {
-    var xcoord = 0;
-    var ycoord = 0;
-
-    var coords = getVertexCoords(x,y,d);
-    xcoord = coords[0];
-    ycoord = coords[1];
-
-
-    context.fillStyle    = 'rgb(0,0,0)';
-    context.font         = '12px sans-serif';
-    context.fillText(text, xcoord, ycoord);
-}
 
 
 // gives the pixel coordinates of the upper left hand corner
@@ -323,7 +264,12 @@ function getPixelCoords(x,y) {
     return [xcoord, ycoord];
 }
 
-function getVertexCoords(x,y,d) {
+function getVertexCoords(p) {
+    var v = decompress(p);
+    var x = v[0];
+    var y = v[1];
+    var d = v[2];
+
     var xcoord;
     var ycoord;
 
@@ -343,7 +289,6 @@ function getVertexCoords(x,y,d) {
 
 
 function dispWaterFrame(img, context) {
-
     drawHexAt(img, context, OCEAN, -1,-1);
     drawHexAt(img, context, OCEAN, -1,0);
     drawHexAt(img, context, OCEAN, -1,1);
@@ -386,41 +331,6 @@ function drawHexAt(img, context, hexNum, x, y) {
                       TILE_WIDTH, TILE_HEIGHT,
                       xcoord, ycoord,
                       SCALE_WIDTH, SCALE_HEIGHT);
-}
-
-function initTicker() {
-    // Init ticker
-    var canvas = document.getElementById('ticker');
-
-    window.tickerContext = canvas.getContext('2d');
-    tickerContext.clearRect(0, 0, canvas.width, canvas.height);
-
-    tickerContext.fillStyle = "rgb(49,79,79)";
-    tickerContext.font    = 'bold 12px sans-serif';
-}
-
-function sendToTicker(message) {
-    tickerLog.push(message);
-
-    var canvas = document.getElementById('ticker');
-    tickerContext.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (tickerLog.length > TICKER_LENGTH) {
-        TICKER_BASE =  TICKER_BASE -  TICKER_INC;
-    }
-
-    for(var x = 0; x < tickerLog.length; x++) {
-
-        if (x == tickerLog.length - 1) {
-            tickerContext.fillStyle = "red";
-        }
-
-        tickerContext.fillText(tickerLog[x],
-                               TICKER_XOFFSET, TICKER_BASE + x * TICKER_INC);
-
-        tickerContext.fillStyle = "rgb(49,79,79)";
-    }
-
 }
 
 function initWhitespace(user) {

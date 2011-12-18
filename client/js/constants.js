@@ -35,6 +35,8 @@ HILLS     = 4;
 MOUNTAINS = 5;
 DESERT    = 6;
 
+DETECTOR_COLOR = "red";
+
 var cardNames = {}
 cardNames[FOREST] = "wood";
 cardNames[PASTURE] = "sheep";

@@ -7,7 +7,6 @@ window.onload = function() {
     console.debug(userID);
 
     waitOnImage(handleGameJoin)
-            initTicker();
             initWhitespace();
             initPlayerDisplay();
 }
@@ -15,6 +14,10 @@ window.onload = function() {
 function user(i) {
     document.cookie = "user=" + i;
     window.location.reload();
+}
+
+function next() {
+    user(currentUserID);
 }
 
 
@@ -47,6 +50,16 @@ function doneButtonClicked() {
     // here we should tell the server that we're done.
     alert("Your turn is now over!");
 }
+
+function tickerAction(user, message) {
+
+}
+
+function sendToTicker(message) {
+    $("#ticker").append("<li> " + message + "</li>");
+}
+
+
 
 
 function handleGameJoin() {

@@ -119,60 +119,30 @@ function getValidSettlementPlaces() {
     });
 }
 
+function getRoadsFromVertex(start) {
+    var start_v = decompress(start);
 
-// called when we are handling req_setup
-function getValidRoadPlacesInitial() {
-    var valid = {}
+    var ret = {};
+    adjacent(start_v).forEach(function(end_v) {
+        var end = compress(end_v);
 
-    function getRoadsFromVertex(start) { //Start is compressed
+        //Reorder if necessary
+        var vertex1 = end > start ? start : end;
+        var vertex2 = end > start ? end: start;
 
-        var start_v = decompress(start);
-        console.log(start_v);
-        adjacent(start_v).forEach(function(end_v) {
-            var end = compress(end_v);
+        //This code may require parseInt
+        ret[[vertex1, vertex2]] =  { "vertex1" : vertex1, "vertex2" : vertex2 };
+    });
 
-            var from = end > start ? start : end;
-            var to = end > start ? end: start;
-
-            valid[[from, to]] = { "from" : parseInt(from),
-                                  "to" : parseInt(to) };
-        });
-    }
-
-    for (var s in  gameboard.settlements) {
-        console.log("heroo: " + s);
-
-        if (gameboard.settlements[s].user == userID) {
-            getRoadsFromVertex(s);
-        }
-    }
-
-
-    console.log( valid);
-
-    return valid;
+    return ret;
 }
 
-
 function getValidRoadPlaces() {
+    var valid = {}
 
-    // called most of the time
-    function getAdjacentRoads(road) {
-        function getRoadsFromVertex(start) { //Start is compressed
-
-            var start_v = decompress(start);
-            adjacent(start_v).forEach(function(end_v) {
-                var end = compress(end_v);
-
-                var from = end > start ? start : end;
-                var to = end > start ? end: start;
-
-                valid[[from, to]] =  { "from" : parseInt(from),
-                                       "to" : parseInt(to) };
-            });
-        }
-
-        [road.vertex1, road.vertex2].forEach(getRoadsFromVertex);
+    function getAdjacentRoads(road) {    
+        $.extend(valid, getRoadsFromVertex(road.vertex1));
+        $.extend(valid, getRoadsFromVertex(road.vertex2));
     }
 
     gameboard.roads[userID].forEach(getAdjacentRoads);
@@ -182,7 +152,6 @@ function getValidRoadPlaces() {
         if(i != userID) {
             var roads = gameboard.roads[i];
             roads.forEach(function(road) {
-                console.log(road);
                 var index = [road.vertex1, road.vertex2];
                 if(index in valid) {
                     delete valid[index];
@@ -191,6 +160,7 @@ function getValidRoadPlaces() {
         }
     }
 
+    //There may be a utility function to do the below
     var ret = [];
 
     for(var i in valid) {
