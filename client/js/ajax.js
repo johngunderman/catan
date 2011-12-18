@@ -9,24 +9,25 @@ var handlers = {
     "hexes_placed"        : handle_hexes_placed,
     "settlement_built"    : handle_settlement_built,
     "settlement_upgraded" : handle_settlement_upgraded,
-    "road_built"          : handle_road_built
+    "road_built"          : handle_road_built,
+    "req_turn"            : handle_req_turn
 }
 
 var req_handlers = {
-    "req_turn"            : handle_req_turn,
-    "req_setup"           : handle_req_setup
+    "req_turn"            : do_turn,
+    "req_setup"           : do_setup
+
 }
 
-
-function promptSettlement() {
+//TODO: Chance this to promptVertex
+function promptSettlement(acceptable) {
     var dfd = $.Deferred();
-
-    var valid = getValidSettlementPlaces();
-
-    for (var x in valid) {
-        drawSettlementDetector(stage, valid[x], gameboard.users[userID].color).
+    
+    acceptable.forEach(function(i) {
+        drawSettlementDetector(stage, i).
             then(settlementChosen)
-    }
+
+    });
 
     function settlementChosen(p) {
         stage.removeAll();
@@ -34,6 +35,16 @@ function promptSettlement() {
     }
 
     return dfd.promise();
+}
+
+function promptNewSettlement() {
+    var o = getValidSettlementPlaces();
+    var a = [];
+    for(i in o) {
+        a.push(o[i]);
+    }
+
+    return promptSettlement(a);
 }
 
 //if p is passed, allow only roads from position p
@@ -61,53 +72,51 @@ function promptRoad(p) {
     return dfd.promise();
 }
 
-
 function promptUpgradeSettlement() {
-    var valid = getValidCityPlaces();
+    var valid = getValidSettlementUpgrades();
 
     for (var v in valid) {
         drawCityDetector(starge, valid[v]);
     }
 }
 
-function name(user) {
-    return user == userID ? "You" : ("Player " + user);
+function end_turn() {
+    $.ajax("/end_turn?game=" + gameID).done(console.log);
 }
 
 function handle_joined(log_entry) {
     var user = {};
-    user.id = log_entry.user
+    user.id = log_entry.user;
 
     gameboard.scores[user.id] = 0;
     user.color = usercolors.pop();
     gameboard.users[log_entry.user] = user;
 
-    sendToTicker(name(user.id) + " joined!");
+    tickerName(user.id, "joined!");
 }
 
 function handle_road_built(log_entry) {
     insertRoad(log_entry.user, log_entry.vertex1, log_entry.vertex2);
 
-    sendToTicker(name(log_entry.user) + " built a road!");
+    tickerName(log_entry.user, "built a road!");
 }
 
 function handle_resources_gained(log_entry) {
     var cards = log_entry.cards;
 
+    //Add to cards owned.
     cards.forEach(
         function(card) {
             gameboard.cards[cardNames[card[1]]] += card[0];
         }
     );
 
-    var message = name(log_entry.user);
-
+    //Put a message in the ticker
     function format_single(card) {
         return card[0] + " " + cardNames[card[1]];
     }
 
-    message += " got";
-
+    var message = "got";
 
     if(cards.length > 0) {
         message += " " + format_single(cards[0]);
@@ -124,17 +133,14 @@ function handle_resources_gained(log_entry) {
         message += " " + format_single(cards[cards.length - 1]);
     }
 
-    console.log(gameboard.cards);
-
+    tickerName(log_entry.user, message);
     drawResourceCounters();
-
-    sendToTicker(message);
 }
 
-function handle_req_setup(log_entry) {
+function do_setup(log_entry) {
     var settlement;
 
-    promptSettlement().done(gotSettlement)
+    promptNewSettlement().done(gotSettlement)
 
     function gotSettlement(p) {
         settlement = p;
@@ -178,14 +184,85 @@ function handle_settlement_built(log_entry) {
 
 function handle_settlement_upgraded(log_entry) {
     sendToTicker(name(log_entry.user) + " upgraded a settlement!");
-
 }
 
 function handle_req_turn(log_entry) {
-    sendToTicker(name(log_entry.user) + " rolled a " + log_entry.roll);
+    tickerName(log_entry.user, "rolled a " + log_entry.roll);
 }
 
+function handle_req_setup(log_entry) {
+}
 
+function do_turn(log_entry) {
+    function move_robber() {
+        var robber_dfd = $.Deferred();
+   
+        if(log_entry.roll === 7) {
+            var moveto;
+            var choose_location = promptRobber();
+            var choose_steal_from = choose_location.pipe(function(chosen) {
+                moveto = chosen;
+               
+                var valid = hex_adjacent(chosen).filter(function(h) {
+                    return h in gameboard.settlements;
+                });
+
+                var dfd = $.Deferred();
+
+                if(valid.length > 1) {
+                    promptSettlement(valid).done(dfd.resolve);
+                } else if(valid.length === 1) {
+                    dfd.resolve(valid[0])
+                } else {
+                    dfd.resolve(null);
+                }
+
+                return dfd.promise();
+            })
+            
+            choose_steal_from.pipe(function(stealfrom) {
+                var data = { moveto: moveto };
+                if(stealfrom) {
+                    data.stealfrom = stealfrom;
+                }
+                
+                $.post("/move_robber", data);
+                robber_dfd.resolve();
+            });
+        } else {
+            robber_dfd.resolve();
+        }
+
+        return robber_dfd.promise();
+    }
+
+    function do_build() {
+        if(hasRoadResources()) {
+            console.log("We can build a road!");
+            promptRoad();
+        }
+    }
+
+    move_robber().done(do_build);
+}
+
+function promptRobber() {
+    var dfd = $.Deferred();
+
+    VALID_HEXES.forEach(function(h) {
+        if(h !== gameboard.robber) {
+            drawChitDetector(stage, h).done(gotRobber);
+        }
+    });
+
+    function gotRobber(h) {
+        //TODO: Come up with a more-fine grained approach.
+        stage.removeAll();
+        dfd.resolve(h);
+    }
+
+    return dfd.promise();
+}
 
 // The result of the ajax request will json which is then passed to
 // the given callback func.
@@ -224,22 +301,24 @@ function handleResponseJson(json) {
             // take care of everything else
             var log = myJson.log;
 
+            var last_req = null;
             for(var x = 0; x < myJson.log.length; x++) {
-                if (handlers[log[x].action]) {
-                    handlers[log[x].action](log[x]);
+                var log_entry = log[x];
+                if (handlers[log_entry.action]) {
+                    handlers[log_entry.action](log_entry);
+                }
+
+                if(req_handlers[log_entry.action]) {
+                    last_req = log_entry;
                 }
             }
 
-            var top = myJson.log[myJson.log.length - 1];
+            if(last_req) {
+                updatePlayerDisplay(last_req.user);
+                window.currentUserID = last_req.user;
 
-            // handle req_handlers if need be
-            if (req_handlers[top.action]) {
-
-                updatePlayerDisplay(top.user);
-                window.currentUserID = top.user;
-
-                if (top.user == userID) {
-                    req_handlers[top.action](top);
+                if(userID === last_req.user) {
+                    req_handlers[last_req.action](last_req);
                 }
             }
 
@@ -257,14 +336,11 @@ function handleResponseJson(json) {
     }
 
     img.src = IMAGE_SOURCE;
-
-
 }
 
 function joinGame() {
     makeAjaxRequest(HOSTNAME + "/join_game", "?game=" + gameID,
                     function(json) {updateClient();});
-
 }
 
 

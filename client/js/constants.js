@@ -47,9 +47,11 @@ cardNames[MOUNTAINS] = "ore";
 WEST      = 0;
 NORTHWEST = 1;
 
-
+VALID_HEXES = [1,3,5,8,10,12,14,17,19,21,23,25,29,31,33,35,40,42,44]
 MAX_VERTEX = 53;
 VERTICES = []
+
+HEX_ADJACENCY = [[0, 0, -1], [0, 0, 0], [0, 1, 0], [1, 1, -1], [1, 1, 0], [1, 0, -1]]
 
 for(var x = 0;x <= MAX_VERTEX; x++) {
     VERTICES.push(x);
@@ -91,7 +93,7 @@ tickerLog = [];
 // we shall code in the shade
 // 'til we run out of rum.
 
-usercolors = ["#F90", "#F00", "#000", "#008" ];
+usercolors = ["#F90", "#F0F", "#000", "#008" ];
 
 // shows where we are in the sequence of actions for this game.
 sequenceNum = 0;

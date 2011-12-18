@@ -58,7 +58,6 @@ class Game(Base):
     RobberHex = Column(SmallInteger)
     CurrentIndex = Column(SmallInteger)
     CurrentPlayerID = Column(Integer, ForeignKey("User.UserID"))
-    #TurnCount = Column(Integer)
     NextSequence = Column(Integer, nullable=False)
 
     players = relationship("GamePlayer", backref="game")
@@ -80,7 +79,7 @@ class Game(Base):
         """
         def create_board():
             chits = (5, 10, 8, 2, 9, 3, 4, 6, 11, 6, 11, 3, 4, 5, 12, 8, 10, 9)
-            preboard = zip(h.valid_hexes, chits)
+            preboard = zip(h.preboard_hexes, chits)
 
             types = [Terrain.FOREST]*4 + [Terrain.PASTURE]*4 + [Terrain.FIELDS]*4 + [Terrain.HILLS]*3 + [Terrain.MOUNTAINS]*3
             random.shuffle(types) #Shuffle the hexes
@@ -98,8 +97,6 @@ class Game(Base):
 
         self.CurrentIndex = 0
         self.CurrentPlayerID = self.players[self.CurrentIndex].UserID
-        self.TurnCount = 0
-
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)

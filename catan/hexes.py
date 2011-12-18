@@ -1,7 +1,8 @@
 import operator
 import vertices as v
 
-valid_hexes = [1,3,5,8,10,12,14,17,21,23,25,29,31,33,35,40,42,44]
+preboard_hexes = [1,3,5,8,10,12,14,17,21,23,25,29,31,33,35,40,42,44]
+valid_hexes = preboard_hexes + [19]
 __adjacency = [(0, 0, -1), (0, 0, 0), (0, 1, 0), (1, 1, -1), (1, 1, 0), (1, 0, -1)]
 
 """

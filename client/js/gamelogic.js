@@ -3,13 +3,10 @@
 // entries in `settlements` read as follows:
 // with key of vertex, value is type of
 // { settlement: CITY | SETTLEMENT, user:userID }
-
 function insertSettlement(user, uvertex) {
     // make sure we're valid and a settlement doesn't exist
     // at that vertex yet.
     var vertex = compress(uvertex);
-    console.log("vertex: " + vertex);
-    console.log(gameboard.settlements[vertex]);
     if (isvalid(uvertex) && !gameboard.settlements[vertex]) {
         gameboard.settlements[vertex] =
             {
@@ -17,6 +14,21 @@ function insertSettlement(user, uvertex) {
                 "user" : user
             };
     }
+}
+
+function hex_adjacent(p) {
+    var coords = decompress(p);
+
+    var adjacent = [];
+    HEX_ADJACENCY.forEach(function(x) {
+        var h = [];
+        for(var i = 0; i < 3; i++) {
+            h.push(coords[i] + x[i]);
+        }
+        adjacent.push(compress(h));
+    });
+
+    return adjacent;
 }
 
 function insertCity(user, vertex) {

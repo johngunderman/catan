@@ -1,17 +1,25 @@
 "use strict";
 
+function addClickableEL(o) {
+    o.addEventListener("mouseover", function(){
+        document.body.style.cursor = "pointer";
+    });
+    o.addEventListener("mouseout", function(){
+        document.body.style.cursor = "default";
+    });
+
+}
+
 // hexes are encoded as [vertex, chit, type]
 function dispBoard(img, context, hexes) {
-
     for (var x = 0; x < hexes.length; x++) {
         var xyd = decompress(hexes[x][0]);
 
         drawHexAt(img, context, hexes[x][2], xyd[0], xyd[1]);
-        dispChit(context, hexes[x][1], xyd[0],xyd[1]);
+        dispChit(context, hexes[x][1], hexes[x][0]);
     }
 
     drawResourceCounters(context, 1,2,5,4,3);
-
 }
 
 
@@ -25,9 +33,8 @@ function drawCoords(context) {
     }
 }
 
-
 // On the given stage, draw a road detector from the vertice
-// described with (x1,y1,d1) to the vertice (x2,y2,d2).
+// described with (x1,y1,d1) to the vertex (x2,y2,d2).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a road at the given line when clicked.
 function drawRoadDetector(stage, road) {
@@ -40,74 +47,35 @@ function drawRoadDetector(stage, road) {
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = DETECTOR_COLOR;
-        var width = 2
+        var WIDTH = .05;
+        var BUFFER = .10;
 
-        // hacky-hack to fix the size of the road detectors
-        // I know it's terribad.
-        if (coords1[1] > coords2[1]) {
-            context.moveTo(coords1[0] - width, coords1[1] - width);
-            context.lineTo(coords1[0] + width, coords1[1] + width);
-            context.lineTo(coords2[0] + width, coords2[1] + width);
-            context.lineTo(coords2[0] - width, coords2[1] - width);
-        }
-        else if (coords1[1] < coords2[1]) {
-            context.moveTo(coords1[0] - width, coords1[1] + width);
-            context.lineTo(coords1[0] + width, coords1[1] - width);
-            context.lineTo(coords2[0] + width, coords2[1] - width);
-            context.lineTo(coords2[0] - width, coords2[1] + width);
-        }
-        else {
-            context.moveTo(coords1[0] - width, coords1[1] - width);
-            context.lineTo(coords1[0] + width, coords1[1] + width);
-            context.lineTo(coords2[0] + width, coords2[1] + width);
-            context.lineTo(coords2[0] - width, coords2[1] - width);
+        var xlen = coords2[0] - coords1[0];
+        var ylen = coords2[1] - coords1[1];
 
-        }
+        var xwidth = WIDTH * ylen;
+        var ywidth = WIDTH * -xlen;
 
+        var xstart = coords1[0] + BUFFER * xlen;
+        var ystart = coords1[1] + BUFFER * ylen;
+        
+        xlen *= (1 - 2 * BUFFER);
+        ylen *= (1 - 2 * BUFFER);
+
+        context.moveTo(xstart - xwidth, ystart - ywidth);
+        context.lineTo(xstart + xlen - xwidth, ystart + ylen - ywidth);
+        context.lineTo(xstart + xlen + xwidth, ystart + ylen + ywidth);
+        context.lineTo(xstart + xwidth, ystart + ywidth);
         context.closePath();
+
         context.stroke();
     });
 
+    addClickableEL(shape);
+    
     var dfd = $.Deferred();
-
-    shape.addEventListener("mouseover", function(){
-        document.body.style.cursor = "pointer";
-    });
-    shape.addEventListener("mouseout", function(){
-        document.body.style.cursor = "default";
-    });
-
     shape.addEventListener("mousedown", function(){
         dfd.resolve(road); 
-
-        /*if (hasRoadResources() || isInitial) {
-
-            console.log(userID);
-
-            insertRoad(userID, vertex1, vertex2);
-            // log this into our actions to send to the server
-            actionsMade.push({"action" : "road",
-                              "vertex1" : compress(v1),
-                              "vertex2" : compress(v2)});
-
-
-        }
-
-        if (isInitial) {
-
-            var roadto  = -1;
-
-            if (actionsMade[1].vertex1 == actionsMade[0].vertex) {
-                roadto = actionsMade[1].vertex2;
-            }
-            else {
-                roadto = actionsMade[1].vertex1;
-            }
-
-            makeSetupRequest(actionsMade[0].vertex, roadto);
-        }*/
-
-
     });
 
     stage.add(shape);
@@ -158,12 +126,7 @@ function drawCityDetector(stage, vertex, isInitial) {
         context.stroke();
     });
 
-    city.addEventListener("mouseover", function(){
-        document.body.style.cursor = "pointer";
-    });
-    city.addEventListener("mouseout", function(){
-        document.body.style.cursor = "default";
-    });
+    addClickableEL(city);
 
     city.addEventListener("mousedown", function(){
 
@@ -228,12 +191,8 @@ function drawSettlementDetector(stage, p) {
 
     var dfd = $.Deferred();
 
-    shape.addEventListener("mouseover", function(){
-        document.body.style.cursor = "pointer";
-    });
-    shape.addEventListener("mouseout", function(){
-        document.body.style.cursor = "default";
-    });
+    addClickableEL(shape);
+    
     shape.addEventListener("mousedown", function(){
         dfd.resolve(p);
     });
@@ -358,8 +317,6 @@ function updatePlayerDisplay(user) {
 
     initWhitespace(user);
 
-    console.log(gameboard.users);
-
     var canvas = document.getElementById('players');
 
     var context = canvas.getContext('2d');
@@ -400,21 +357,52 @@ function updatePlayerDisplay(user) {
 
 }
 
-function initPlayerDisplay() {
-    // init playersDisplay
+function drawChitDetector(stage, hex) {
+    var xy = getChitCoords(hex);
+    var context = stage.getContext();
 
+    var shape = new Kinetic.Shape(function() {
+        var context = this.getContext();
+        context.beginPath();
+        context.lineWidth = 2;
+        context.strokeStyle = DETECTOR_COLOR
+        
+        context.arc(xy[0], xy[1], 1.5 * CHIT_RADIUS, 0, 2 * Math.PI, false);
+        context.closePath();
+
+        context.stroke();
+    });
+
+    addClickableEL(shape);
+
+    var dfd = $.Deferred();
+    shape.addEventListener("mousedown", function() {
+        dfd.resolve(hex); 
+    });
+   
+    stage.add(shape);
+
+    return dfd.promise();
 }
 
-function dispChit(context, number, x,y) {
-    var xcoord = 0;
-    var ycoord = 0;
-    var xy = getPixelCoords(x,y);
+function getChitCoords(hex) {
+    var v = decompress(hex);
+    var xy = getPixelCoords(v[0], v[1]);
 
-    xcoord = xy[0];
-    ycoord = xy[1];
+    var xcoord = xy[0];
+    var ycoord = xy[1];
 
     xcoord += SCALE_HEIGHT / 2 + TEXT_XOFFSET;
     ycoord += SCALE_WIDTH / 2 + TEXT_YOFFSET;
+
+    return [xcoord, ycoord]
+}
+
+function dispChit(context, number, hex) {
+    var xy = getChitCoords(hex);
+
+    var xcoord = xy[0];
+    var ycoord = xy[1];
 
     context.beginPath();
     context.arc(xcoord, ycoord, CHIT_RADIUS, 0, 2 * Math.PI, false);

@@ -1,9 +1,7 @@
 "use strict";
 
 window.onload = function() {
-
-    //TODO: Move this somewhere else, maybe?
-    window.userID = $.cookie("user");
+    window.userID = parseInt($.cookie("user"));
     console.debug(userID);
 
     waitOnImage(handleGameJoin)
@@ -32,12 +30,17 @@ function waitOnImage(func) {
 }
 
 function initBoard(hexes) {
-
     window.stage = new Kinetic.Stage("board", BOARD_SIZE, BOARD_SIZE);
 
     dispWaterFrame(img, stage.getContext());
     dispBoard(img, stage.getContext(), hexes);
 
+    for(var i = 0; i < hexes.length; i++) {
+        //Store the robber position
+        if(hexes[i][2] == DESERT) {
+            gameboard.robber = hexes[i][0];
+        }
+    }
 }
 
 
@@ -48,11 +51,15 @@ function upgradeSettlements() {
 
 function doneButtonClicked() {
     // here we should tell the server that we're done.
-    alert("Your turn is now over!");
+    end_turn();
 }
 
-function tickerAction(user, message) {
+function name(user) {
+    return user == userID ? "You" : ("Player " + user);
+}
 
+function tickerName(user, message) {
+    sendToTicker(name(user) + " " + message);
 }
 
 function sendToTicker(message) {

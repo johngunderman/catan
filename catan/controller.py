@@ -274,6 +274,7 @@ def setup(player, settlement_vertex, road_to):
             cards = db_session.query(Hex.Type, func.count()). \
                 filter_by(GameID=game.GameID). \
                 filter(Hex.Vertex.in_(adjacent)). \
+                filter(Hex.Type != Terrain.DESERT). \
                 group_by(Hex.Type). \
                 all()
 
@@ -300,7 +301,6 @@ def end_turn(player):
 
         if game.CurrentIndex == len(game.players):
             game.CurrentIndex = 0
-            game.TurnCount += 1
 
         game.CurrentPlayerID = game.players[game.CurrentIndex].UserID
         log_state_change(player.game)
