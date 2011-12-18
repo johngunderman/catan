@@ -103,9 +103,9 @@ class Game(Base):
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)
-        game.log(Log.req_turn(game.CurrentPlayerID, rolled))
+        self.log(Log.req_turn(self.CurrentPlayerID, rolled))
         if rolled == 7:
-            Game.State = Game.States.MOVE_ROBBER
+            self.State = Game.States.MOVE_ROBBER
         else:
             def give_cards(rolled):
                 #gets hexes that have just yielded stuff
