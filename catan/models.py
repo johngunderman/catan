@@ -267,6 +267,11 @@ class GamePlayer(Base):
                 filter_by(GameID=self.GameID). \
                 filter_by(UserID=self.UserID)
 
+    def roads_q(self):
+        return Road.query. \
+                filter_by(GameID=self.GameID). \
+                filter_by(UserID=self.UserID)
+
     def add_settlement(self, vertex):
         s = Settlement(self.UserID, vertex)
         self.game.settlements.append(s)

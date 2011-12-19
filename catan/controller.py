@@ -105,7 +105,7 @@ def build_settlement(player, p):
     ) :
         player.takeResourcesFor(BuildTypes.TOWN)
         #Actually, I think it would be better to just have add_settlement written here inline
-        player.add_settlement(p)
+        s = player.add_settlement(p)
         player.Score += 1
         player.game.log(Log.settlement_built(player, s))
         player.checkVictory()

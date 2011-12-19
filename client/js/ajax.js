@@ -44,7 +44,7 @@ var req_handlers = {
 
 function promptVertex(accept) {
     var dfd = $.Deferred();
-    
+
     accept.forEach(function(i) {
         drawSettlementDetector(stage, i). then(settlementChosen);
     });
@@ -273,7 +273,7 @@ function do_turn(log_entry) {
             promptNewSettlement().then(send_update_new_settlement);
         }
     }
-   
+
     $("#done").show(1000);
     do_build();
 }

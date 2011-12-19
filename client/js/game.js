@@ -60,7 +60,8 @@ function tickerName(user, message) {
 }
 
 function sendToTicker(message) {
-    $("#ticker").append("<li> " + message + "</li>");
+    var textbox = $("#ticker");
+    textbox.append("<li> " + message + "</li>");
 }
 
 function initResources() {
