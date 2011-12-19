@@ -40,7 +40,7 @@ function promptSettlement(acceptable) {
 function promptNewSettlement() {
     var o = getValidSettlementPlaces();
     var a = [];
-    for(i in o) {
+    for(var i in o) {
         a.push(o[i]);
     }
 
