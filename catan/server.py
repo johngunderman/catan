@@ -8,9 +8,11 @@ from frontend import app
 from database import init_db
 from loghandler import LogHandler
 
+from werkzeug.debug import DebuggedApplication
+
 init_db()
 
-wsgi_app = WSGIContainer(app)
+wsgi_app = WSGIContainer(DebuggedApplication(app, evalex=True))
 application = Application([
     (r"/get_log", LogHandler),
     (r".*", FallbackHandler, dict(fallback=wsgi_app))

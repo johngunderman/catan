@@ -10,13 +10,19 @@ var handlers = {
     "settlement_built"    : handle_settlement_built,
     "settlement_upgraded" : handle_settlement_upgraded,
     "road_built"          : handle_road_built,
-    "req_turn"            : handle_req_turn
+    "rolled": function(log_entry) {
+        tickerName(log_entry.user, "rolled a " + log_entry.rolled);
+    },
+    "req_robber" : function(log_entry) {
+        tickerName(log_entry.user, "must move the robber");
+    },
+    "robber_moved"        : handle_robber_moved
 }
 
 var req_handlers = {
-    "req_turn"            : do_turn,
-    "req_setup"           : do_setup
-
+    "req_turn" : do_turn,
+    "req_setup" : do_setup,
+    "req_robber" : do_robber
 }
 
 //TODO: Chance this to promptVertex
@@ -51,7 +57,7 @@ function promptRoad(p) {
 
     var valid;
 
-    if (p) {
+    if (p !== undefined) {
         valid = getRoadsFromVertex(p);
     }
     else {
@@ -184,68 +190,52 @@ function handle_settlement_upgraded(log_entry) {
     sendToTicker(name(log_entry.user) + " upgraded a settlement!");
 }
 
-function handle_req_turn(log_entry) {
-    tickerName(log_entry.user, "rolled a " + log_entry.roll);
+function handle_robber_moved(log_entry) {
+    tickerName(log_entry.user, "moved the robber");
+    gameboard.robber = log_entry.to
 }
 
-function handle_req_setup(log_entry) {
+function do_robber(log_entry) {
+    var choose_location = promptRobber();
+    var choose_steal_from = choose_location.pipe(function(moveto) {
+        var valid = hex_adjacent(moveto).filter(function(h) {
+            return h in gameboard.settlements && gameboard.settlements[h].user !== userID;
+        });
+
+        var dfd = $.Deferred();
+
+        if(valid.length > 1) {
+            promptSettlement(valid).done(function(stealfrom) { 
+                dfd.resolve(moveto, stealfrom);
+            });
+        } else if(valid.length === 1) {
+            dfd.resolve(moveto, valid[0])
+        } else {
+            dfd.resolve(moveto);
+        }
+
+        return dfd.promise();
+    })
+
+    choose_steal_from.pipe(function(moveto, stealfrom) {
+        var data = { game: gameID, moveto: moveto };
+        if(stealfrom !== undefined) {
+            data.stealfrom = gameboard.settlements[stealfrom].user;
+        }
+        
+        $.get("/move_robber", data);
+    });
 }
 
 function do_turn(log_entry) {
-    function move_robber() {
-        var robber_dfd = $.Deferred();
-
-        if(log_entry.roll === 7) {
-            var moveto;
-            var choose_location = promptRobber();
-            var choose_steal_from = choose_location.pipe(function(chosen) {
-                moveto = chosen;
-
-                var valid = hex_adjacent(chosen).filter(function(h) {
-                    return h in gameboard.settlements;
-                });
-
-                var dfd = $.Deferred();
-
-                if(valid.length > 1) {
-                    promptSettlement(valid).done(dfd.resolve);
-                } else if(valid.length === 1) {
-                    dfd.resolve(valid[0])
-                } else {
-                    dfd.resolve(null);
-                }
-
-                return dfd.promise();
-            })
-
-            choose_steal_from.pipe(function(stealfrom) {
-                var data = { game: gameID, moveto: moveto };
-                if(stealfrom) {
-                    data.stealfrom = stealfrom;
-                }
-                
-                $.get("/move_robber", data);
-                robber_dfd.resolve();
-            });
-        } else {
-            robber_dfd.resolve();
-        }
-
-        return robber_dfd.promise();
+    if(hasRoadResources()) {
+        console.log("We can build a road!");
+        promptRoad();
     }
-
-    function do_build() {
-        if(hasRoadResources()) {
-            console.log("We can build a road!");
-            promptRoad();
-        }
-        if(hasSettlementResources()) {
-            console.log("We can build a Settlement!");
-            promptNewSettlement();
-        }
+    if(hasSettlementResources()) {
+        console.log("We can build a Settlement!");
+        promptNewSettlement();
     }
-
-    move_robber().done(do_build);
 }
 
 function promptRobber() {

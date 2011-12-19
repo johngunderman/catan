@@ -62,7 +62,7 @@ joins an existing game created by create_game.
 @app.route("/join_game")
 def join_game():
     userid = int(request.cookies.get("user"))
-    gameid = request.args["game"]
+    gameid = request.args.get("game")
     game = Game.query.get(gameid)
     user = User.query.get(userid)
 
@@ -95,6 +95,19 @@ def build_settlement():
     player = get_player_prereqs()
 
     result = controller.build_settlement(player, request.args["vertex"])
+
+    flush_log(player.GameID)
+    return JsonResponse(result)
+
+@app.route("/move_robber")
+def move_robber():
+    player = get_player_prereqs()
+    moveto = int(request.args.get("moveto"))
+    stealfrom = request.args.get("stealfrom")
+    if stealfrom is not None:
+        stealfrom = int(stealfrom)
+
+    result = controller.move_robber(player, moveto, stealfrom)
 
     flush_log(player.GameID)
     return JsonResponse(result)

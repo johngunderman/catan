@@ -32,6 +32,10 @@ class LogHandler(RequestHandler):
             return
 
         (nextsequence, log) = controller.get_log(self.game, self.sequence)
+
+        if not nextsequence >= self.sequence:
+            return
+
         flagged = json.dumps({ "log": "REPLACE_TOKEN", "sequence" : nextsequence })
 
         self.write(flagged.replace('"REPLACE_TOKEN"', log, 1))

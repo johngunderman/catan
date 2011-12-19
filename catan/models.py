@@ -100,10 +100,12 @@ class Game(Base):
 
     def begin_turn(self):
         rolled = random.randint(1,6) + random.randint(1,6)
-        self.log(Log.req_turn(self.CurrentPlayerID, rolled))
+        self.log(Log.rolled(self.CurrentPlayerID, rolled))
         if rolled == 7:
+            self.log(Log.req_robber(self.CurrentPlayerID))
             self.State = Game.States.MOVE_ROBBER
         else:
+            self.log(Log.req_turn(self.CurrentPlayerID))
             def give_cards(rolled):
                 #gets hexes that have just yielded stuff
                 rolled_hexes = db_session.query(Hex.Vertex, Hex.Type). \
@@ -120,6 +122,8 @@ class Game(Base):
                     vertex is a vertex number adjacent to the hex
                     count is the number of times that vertex would
                         receive cards of type *type*
+
+                It may be better to do sort | uniq here
                 """
                 types = {}
                 for (hex, type) in rolled_hexes:
@@ -407,8 +411,8 @@ class Log(Base):
         return { "action" : "settlement_upgraded", "user" : player.UserID, "vertex": vertex, "score": player.Score }
 
     @staticmethod
-    def req_turn(userid, rolled):
-        return { "action": "req_turn", "user": userid, "roll": rolled }
+    def req_turn(userid):
+        return { "action": "req_turn", "user": userid}
 
     @staticmethod
     def joined(userid):
@@ -417,3 +421,15 @@ class Log(Base):
     @staticmethod
     def game_over(userid):
         return { "action": "game_over", "winner": userid }
+
+    @staticmethod
+    def req_robber(userid):
+        return { "action": "req_robber", "user": userid }
+
+    @staticmethod
+    def robber_moved(userid, to):
+        return { "action": "robber_moved", "user": userid, "to": to }
+
+    @staticmethod
+    def rolled(userid, rolled):
+        return { "action": "rolled", "user": userid, "rolled": rolled }

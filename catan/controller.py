@@ -4,7 +4,7 @@ from models import *
 from string import replace
 
 import vertices as v
-import hexes
+import hexes as h
 import json
 
 def get_log(game, sequence):
@@ -192,39 +192,45 @@ def build_road(player, vertex1, vertex2):
         return add_log("failure", id, sequence)
 """
 
-def move_robber(player, tile):
+def move_robber(player, to, stealfrom):
     game = player.game
-    if (
+    if not (
         #We're supposed to be moving the robber
-        game.State == States.MOVE_ROBBER and
+        game.State == Game.States.MOVE_ROBBER and
 
         #this player is supposed to be moving the robber
         player.UserID == game.CurrentPlayerID and
 
         #the robber isn't being moved nowhere
-        game.RobberVertex != tile and
+        game.RobberHex != to and
 
         #the place where the robber is being moved is valid
-        tile in valid_hexes
+        to in h.valid_hexes
     ) :
-        game.RobberTile = tile
-        game.State = States.STEAL_CARDS
+        return "failure"
+ 
+    v1 = v.decompress(to)
+    adjacent_vertices = map(v.compress, h.adjacent(v1))
 
-        p = vertices.decompress(tile)
-        adj = tiles.adjacent(p)
+    vulnerable_players = db_session.query(Settlement.UserID). \
+        filter_by(GameID=game.GameID). \
+        filter(Settlement.Vertex.in_(adjacent_vertices)). \
+        filter(Settlement.UserID != player.UserID). \
+        all()
 
-        vulnerable_players = \
-            Settlement.query. \
-            filter_by(GameID=player.GameID). \
-            filter(Settlement.Vertex.in_(adj)). \
-            group_by(Settlement.UserID). \
-            having(Settlement.UserID != player.UserID)
+    if (len(vulnerable_players) == 0 and stealfrom is None) or (stealfrom,) in vulnerable_players:
+        game.RobberHex = to
+        game.State = Game.States.NORMAL_PLAY
 
-        game.State = States.STEAL_CARDS
-        return vulnerable_players
+        if stealfrom is not None:
+            pass #TODO
+
+        game.log(Log.robber_moved(player.UserID, to))
+        game.log(Log.req_turn(player.UserID))
+        db_session.commit()
+        return "success"
     else:
         return "failure"
-
 
 """
 The setup RPC is called during the setup phase, to set up
