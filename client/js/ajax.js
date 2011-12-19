@@ -25,8 +25,7 @@ var req_handlers = {
     "req_robber" : do_robber
 }
 
-//TODO: Chance this to promptVertex
-function promptSettlement(accept) {
+function promptVertex(accept) {
     var dfd = $.Deferred();
     
     accept.forEach(function(i) {
@@ -41,14 +40,31 @@ function promptSettlement(accept) {
     return dfd.promise();
 }
 
-function promptNewSettlement() {
-    var o = getValidSettlementPlaces();
-    var a = [];
-    for(var i in o) {
-        a.push(o[i]);
-    }
+function promptSetupSettlement() {
+    var accept = getValidDistanceRule();
+    return promptVertex(accept);
+}
 
-    return promptSettlement(a);
+function promptNewSettlement() {
+    var accept = [];
+    var distanceRule = getBadDistanceRule();
+    var settlements = gameboard.settlements;
+    gameboard.roads[userID].forEach(function(r) {
+        if(
+            r.user == userID &&
+            !(r.vertex2 in distanceRule)
+        ) {
+            accept.push(r.vertex2);
+        }
+        if(
+            r.user == userID &&
+            !(r.vertex1 in distanceRule)
+        ) {
+            accept.push(r.vertex1);
+        }
+    });
+
+    return promptVertex(accept);
 }
 
 //if p is passed, allow only roads from position p
@@ -144,7 +160,7 @@ function handle_resources_gained(log_entry) {
 function do_setup(log_entry) {
     var settlement;
 
-    promptNewSettlement().done(gotSettlement)
+    promptSetupSettlement().done(gotSettlement)
 
     function gotSettlement(p) {
         settlement = p;
@@ -182,7 +198,7 @@ function handle_settlement_built(log_entry) {
 
     sendToTicker(name(log_entry.user) + " built a settlement!");
     // TODO: register the settlement build in our global gamestate model
-    insertSettlement(log_entry.user, decompress(log_entry.vertex));
+    insertSettlement(log_entry.user, log_entry.vertex);
     drawSettlement(log_entry.vertex, gameboard.users[log_entry.user].color);
 }
 
@@ -229,35 +245,26 @@ function do_robber(log_entry) {
 
 function do_turn(log_entry) {
     function send_update_new_settlement(p) {
-        insertSettlement(userID, decompress(p));
+        insertSettlement(userID, p);
         //drawSettlement(p);
         $.get(HOSTNAME + "/build_settlement", {"vertex" : p, "game" : gameID});
 
-        // keep giving the option to build, if we can.
-        if (hasRoadResources() || hasSettlementResources()) {
-            do_build();
-        }
+        do_build();
     }
 
     function send_update_new_road(p) {
         insertRoad(userID, p.vertex1, p.vertex2);
         $.get(HOSTNAME + "/build_road", {"vertex1" : p.vertex1, "vertex2" : p.vertex2, "game" : gameID});
+        do_build();
     }
 
     function do_build() {
-        var built = false;
-
         if(hasRoadResources()) {
-            console.log("We can build a road!");
             promptRoad().then(send_update_new_road);
-            built = true;
         }
         if(hasSettlementResources()) {
-            console.log("We can build a Settlement!");
             promptNewSettlement().then(send_update_new_settlement);
-            built = true;
         }
-        return built;
     }
    
     do_build();

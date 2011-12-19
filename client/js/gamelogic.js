@@ -3,18 +3,14 @@
 // entries in `settlements` read as follows:
 // with key of vertex, value is type of
 // { settlement: CITY | SETTLEMENT, user:userID }
-function insertSettlement(user, uvertex) {
-    // make sure we're valid and a settlement doesn't exist
-    // at that vertex yet.
-    var vertex = compress(uvertex);
-    if (isvalid(uvertex) && !gameboard.settlements[vertex]) {
-        gameboard.settlements[vertex] =
-            {
-                "settlement" : SETTLEMENT,
-                "user" : user
-            };
-    }
-    drawSettlement(vertex);
+function insertSettlement(user, p, type) {
+    gameboard.settlements[p] =
+    {
+        "settlement" : type,
+        "user" : user
+    };
+
+    drawSettlement(p, gameboard.users[userID].color);
 }
 
 function hex_adjacent(p) {
@@ -30,24 +26,6 @@ function hex_adjacent(p) {
     });
 
     return adjacent;
-}
-
-function insertCity(user, vertex) {
-    // make sure we're valid and a settlement does exist
-    // at that vertex yet.
-    if (isvalid(vertex) && gameboard.settlements[vertex]
-        && gameboard.settlements[vertex].settlement == SETTLEMENT
-        && gameboard.settlements[vertex].user == user) {
-        if (hasCityResources()) {
-            // gameboard.settlements[vertex] =
-            //     {"settlement" : CITY,
-            //      "user" : userID};
-
-            if (user == userID) {
-                removeCityResources();
-            }
-        }
-    }
 }
 
 function insertRoad(user, vertex1, vertex2) {
@@ -66,7 +44,6 @@ function insertRoad(user, vertex1, vertex2) {
     drawRoad(road);
 }
 
-
 function hasCityResources() {
     if (gameboard.cards.ore > 3 && gameboard.cards.grain > 2) {
         return true;
@@ -81,20 +58,6 @@ function hasRoadResources() {
     else return false;
 }
 
-function removeRoadResources() {
-    if (hasRoadResources()) {
-        gameboard.cards.brick--;
-        gameboard.cards.lumber--;
-    }
-}
-
-function removeCityResources() {
-    if (hasCityResources()) {
-        gameboard.cards.ore -= 3;
-        gameboard.cards.grain -= 2;
-    }
-}
-
 function hasSettlementResources() {
     if (gameboard.cards.brick
         && gameboard.cards.lumber
@@ -105,16 +68,24 @@ function hasSettlementResources() {
     else return false;
 }
 
-function removeSettlementResources() {
-    if (hasSettlementResources()) {
-        gameboard.cards.brick--;
-        gameboard.cards.lumber--;
-        gameboard.cards.wool--;
-        gameboard.cards.grain--;
-    }
+function removeRoadResources() {
+    gameboard.cards.brick--;
+    gameboard.cards.lumber--;
 }
 
-function getValidSettlementPlaces() {
+function removeCityResources() {
+    gameboard.cards.ore -= 3;
+    gameboard.cards.grain -= 2;
+}
+
+function removeSettlementResources() {
+    gameboard.cards.brick--;
+    gameboard.cards.lumber--;
+    gameboard.cards.wool--;
+    gameboard.cards.grain--;
+}
+
+function getBadDistanceRule() {
     var excluded = {};
 
     for (var vertex in gameboard.settlements) {
@@ -126,6 +97,13 @@ function getValidSettlementPlaces() {
             excluded[compress(v)] = true;
         });
     }
+
+    return excluded;
+}
+
+
+function getValidDistanceRule() {
+    var excluded = getBadDistanceRule(); 
 
     return VERTICES.filter(function(vertex) {
         return !(vertex in excluded)
