@@ -93,16 +93,39 @@ def setup():
 @app.route("/build_settlement")
 def build_settlement():
     player = get_player_prereqs()
+    vertex = int(request.args["vertex"])
 
-    result = controller.build_settlement(player, request.args["vertex"])
+    result = controller.build_settlement(player, vertex)
 
     flush_log(player.GameID)
     return JsonResponse(result)
 
+@app.route("/upgrade_settlement")
+def upgrade_settlement():
+    player = get_player_prereqs()
+    vertex = int(request.args["vertex"])
+
+    result = controller.upgrade_settlement(player, vertex);
+
+    flush_log(player.GameID)
+    return JsonResponse(result)
+
+@app.route("/build_road")
+def build_road():
+    player = get_player_prereqs()
+    vertex1 = int(request.args["vertex1"])
+    vertex2 = int(request.args["vertex2"])
+
+    result = controller.build_road(player, vertex1, vertex2);
+
+    flush_log(player.GameID)
+    return JsonResponse(result)
+
+
 @app.route("/move_robber")
 def move_robber():
     player = get_player_prereqs()
-    moveto = int(request.args.get("moveto"))
+    moveto = int(request.args["moveto"])
     stealfrom = request.args.get("stealfrom")
     if stealfrom is not None:
         stealfrom = int(stealfrom)

@@ -38,9 +38,9 @@ DESERT    = 6;
 DETECTOR_COLOR = "red";
 
 var cardNames = {}
-cardNames[FOREST] = "wood";
-cardNames[PASTURE] = "sheep";
-cardNames[FIELDS] = "wheat";
+cardNames[FOREST] = "lumber";
+cardNames[PASTURE] = "wool";
+cardNames[FIELDS] = "grain";
 cardNames[HILLS] = "brick";
 cardNames[MOUNTAINS] = "ore";
 

@@ -240,19 +240,27 @@ class GamePlayer(Base):
         BuildTypes.DEVCARD : [(1, "Sheep"), (1, "Ore"), (1, "Wheat")]
     }
 
+    def hasResourcesFor(self, buildType):
+        def above(amnt, type):
+            x = getattr(self.cards, type)
+            return x >= amnt
 
-    def hasCardsFor(self, buildType):
-        return all(lambda (amnt, type) : self.cards[type] >= amnt, __reqs[buildType])
+        return all([above(amnt, type) for (amnt, type) in self.__reqs[buildType]])
 
-    #an eventual unification of "resources" and "cards" would be nice
-    def takeCardsFor(self, buildType):
-        for (amnt, type) in __reqs[buildType]:
-            self.cards[__cardTypes[type]] -= amnt
+    def takeResourcesFor(self, buildType):
+        for (amnt, type) in self.__reqs[buildType]:
+            x = getattr(self.cards, type)
+            setattr(self.cards, type, x - amnt)
 
-    def roads_q(self):
+    def road_meets_q(self, vertex1, vertex2):
+        vertices = (vertex1, vertex2)
         return Road.query. \
-            filter_by(GameID=player.GameID). \
-            filter_by(UserID=player.UserID)
+            filter_by(GameID=self.GameID). \
+            filter_by(UserID=self.UserID). \
+            filter(
+                Road.Vertex1.in_(vertices) |
+                Road.Vertex2.in_(vertices)
+            )
 
     def settlements_q(self):
         return Settlement.query. \
@@ -262,14 +270,12 @@ class GamePlayer(Base):
     def add_settlement(self, vertex):
         s = Settlement(self.UserID, vertex)
         self.game.settlements.append(s)
-        self.Score += 1
-        self.game.log(Log.settlement_built(self, s))
-        self.checkVictory()
-
+        return s
+        
     def add_road(self, vertex1, vertex2):
         r = Road(self.UserID, vertex1, vertex2)
         self.game.roads.append(r)
-        self.game.log(Log.road_built(self, r))
+        return r
 
     def add_cards(self, cards):
         for (amount, type) in cards:
@@ -329,16 +335,12 @@ class Road(Base):
         self.Vertex1 = vertex1
         self.Vertex2 = vertex2
 
-    """
-    Returns a query for the roads that are at a given (compressed) vertex
-    """
-    def at_q(player, p):
-        return \
-            Road.query. \
+    @staticmethod
+    def overlaps_q(player, vertex1, vertex2):
+        return Road.query. \
             filter_by(GameID=player.GameID). \
-            filter_by(UserID=player.UserID). \
-            filter(or_(p == Road.Vertex1, p == Road.Vertex2))
-
+            filter_by(Vertex1=vertex1). \
+            filter_by(Vertex2=vertex2)
 
 class Settlement(Base):
     __tablename__ = "Settlement"
@@ -399,6 +401,10 @@ class Log(Base):
             [[i.Vertex, i.Chit, i.Type] for i in hexes ]}
 
     @staticmethod
+    def setup(player, settlement, roadto):
+        return { "action" : "setup", "user" : player.UserID, "settlement": settlement, "vertex2": roadto }
+
+    @staticmethod
     def road_built(player, road):
         return { "action" : "road_built", "user" : player.UserID, "vertex1": road.Vertex1, "vertex2": road.Vertex2 }
 
@@ -433,3 +439,7 @@ class Log(Base):
     @staticmethod
     def rolled(userid, rolled):
         return { "action": "rolled", "user": userid, "rolled": rolled }
+
+    @staticmethod
+    def setup(player, settlement_vertex, road_to):
+        return { "action": "setup", "user": player.UserID, "settlement": settlement_vertex, "road_to": road_to }

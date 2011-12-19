@@ -100,13 +100,12 @@ function drawRoad(road) {
 }
 
 
-// On the given stage, draw a city detector on the vertice
+// On the given stage, draw a city detector on the vertex
 // described with (x1,y1,d1).
 // Note that these are game piece vertices, not pixel locations.
 // the detector will draw a city at the given vertex when clicked.
 function drawCityDetector(stage, vertex, isInitial) {
-
-    var coords = getVertexCoords(vertex[0], vertex[1], vertex[2]);
+    var coords = getVertexCoords(vertex);
     var context = stage.getContext();
 
     var city = new Kinetic.Shape(function(){
@@ -129,17 +128,6 @@ function drawCityDetector(stage, vertex, isInitial) {
     addClickableEL(city);
 
     city.addEventListener("mousedown", function(){
-
-        if (hasResources()) {
-            insertCity(userID, vertex);
-
-            // record this action in our list of overall actions
-            actionsMade.push({"item" : "city", "vertex" : compress(vertex)});
-            drawCity(gameboard.users[userID].color, vertex);
-        } else {
-            sendToTicker("Not enough resources!");
-        }
-
     });
 
     stage.add(city);

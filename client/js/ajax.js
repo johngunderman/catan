@@ -7,16 +7,33 @@ var handlers = {
     "joined"              : handle_joined,
     "resources_gained"    : handle_resources_gained,
     "hexes_placed"        : handle_hexes_placed,
-    "settlement_built"    : handle_settlement_built,
+    
+    "settlement_built"    : function(log_entry) {
+        tickerName(log_entry.user, "built a settlement!");
+        insertSettlement(log_entry.user, log_entry.vertex, true);
+    },
+
     "settlement_upgraded" : handle_settlement_upgraded,
-    "road_built"          : handle_road_built,
+
+    "road_built" : function(log_entry) {
+        tickerName(log_entry.user, "built a road!");
+        insertRoad(log_entry.user, log_entry.vertex1, log_entry.vertex2, true);
+    },
+
     "rolled": function(log_entry) {
         tickerName(log_entry.user, "rolled a " + log_entry.rolled);
     },
+    
     "req_robber" : function(log_entry) {
         tickerName(log_entry.user, "must move the robber");
     },
-    "robber_moved"        : handle_robber_moved
+   
+    "robber_moved" : handle_robber_moved,
+    
+    "setup" : function(log_entry) {
+        insertSettlement(log_entry.user, log_entry.settlement);
+        insertRoad(log_entry.user, log_entry.settlement, log_entry.road_to);
+    }
 }
 
 var req_handlers = {
@@ -49,7 +66,8 @@ function promptNewSettlement() {
     var accept = [];
     var distanceRule = getBadDistanceRule();
     var settlements = gameboard.settlements;
-    gameboard.roads[userID].forEach(function(r) {
+    for(var i in gameboard.roads[userID]) {
+        var r = gameboard.roads[userID][i];
         if(
             r.user == userID &&
             !(r.vertex2 in distanceRule)
@@ -62,7 +80,7 @@ function promptNewSettlement() {
         ) {
             accept.push(r.vertex1);
         }
-    });
+    }
 
     return promptVertex(accept);
 }
@@ -101,7 +119,7 @@ function promptUpgradeSettlement() {
 }
 
 function end_turn() {
-    $.ajax("/end_turn?game=" + gameID).done(console.log);
+    $.ajax("/end_turn?game=" + gameID);
 }
 
 function handle_joined(log_entry) {
@@ -115,21 +133,19 @@ function handle_joined(log_entry) {
     tickerName(user.id, "joined!");
 }
 
-function handle_road_built(log_entry) {
-    insertRoad(log_entry.user, log_entry.vertex1, log_entry.vertex2);
 
-    tickerName(log_entry.user, "built a road!");
-}
 
 function handle_resources_gained(log_entry) {
     var cards = log_entry.cards;
 
-    //Add to cards owned.
-    cards.forEach(
-        function(card) {
-            gameboard.cards[cardNames[card[1]]] += card[0];
-        }
-    );
+    if(log_entry.user == userID) {
+        //Add to cards owned.
+        cards.forEach(
+            function(card) {
+                gameboard.cards[cardNames[card[1]]] += card[0];
+            }
+        );
+    }
 
     //Put a message in the ticker
     function format_single(card) {
@@ -192,16 +208,6 @@ function handle_hexes_placed(log_entry) {
     initBoard(log_entry.args);
 }
 
-function handle_settlement_built(log_entry) {
-    // update score:
-    gameboard.scores[log_entry.user] = log_entry.score;
-
-    sendToTicker(name(log_entry.user) + " built a settlement!");
-    // TODO: register the settlement build in our global gamestate model
-    insertSettlement(log_entry.user, log_entry.vertex);
-    drawSettlement(log_entry.vertex, gameboard.users[log_entry.user].color);
-}
-
 function handle_settlement_upgraded(log_entry) {
     sendToTicker(name(log_entry.user) + " upgraded a settlement!");
 }
@@ -221,7 +227,7 @@ function do_robber(log_entry) {
         var dfd = $.Deferred();
 
         if(valid.length > 1) {
-            promptSettlement(valid).done(function(stealfrom) { 
+            promptVertex(valid).done(function(stealfrom) { 
                 dfd.resolve(moveto, stealfrom);
             });
         } else if(valid.length === 1) {
@@ -245,20 +251,21 @@ function do_robber(log_entry) {
 
 function do_turn(log_entry) {
     function send_update_new_settlement(p) {
-        insertSettlement(userID, p);
-        //drawSettlement(p);
+        insertSettlement(userID, p, true);
         $.get(HOSTNAME + "/build_settlement", {"vertex" : p, "game" : gameID});
 
         do_build();
     }
 
     function send_update_new_road(p) {
-        insertRoad(userID, p.vertex1, p.vertex2);
+        insertRoad(userID, p.vertex1, p.vertex2, true);
         $.get(HOSTNAME + "/build_road", {"vertex1" : p.vertex1, "vertex2" : p.vertex2, "game" : gameID});
+
         do_build();
     }
 
     function do_build() {
+        stage.removeAll();
         if(hasRoadResources()) {
             promptRoad().then(send_update_new_road);
         }
@@ -296,14 +303,10 @@ function makeAjaxRequest(url, params, callbackFunc) {
 
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-
-            console.log("Server Response: " + xmlhttp.responseText);
-
             callbackFunc(xmlhttp.responseText);
         }
     }
 
-    console.log("Client Request: " + url + params);
     xmlhttp.open("GET", url + params, true);
     xmlhttp.send();
 }
@@ -340,6 +343,7 @@ function handleResponseJson(json) {
             if(last_req) {
                 updatePlayerDisplay(last_req.user);
                 window.currentUserID = last_req.user;
+                stage.removeAll();
 
                 if(userID === last_req.user) {
                     req_handlers[last_req.action](last_req);
@@ -365,7 +369,6 @@ function joinGame() {
     makeAjaxRequest(HOSTNAME + "/join_game", "?game=" + gameID,
                     function(json) {updateClient();});
 }
-
 
 function updateClient() {
     makeAjaxRequest(HOSTNAME + "/get_log",

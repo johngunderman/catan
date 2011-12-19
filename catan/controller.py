@@ -101,10 +101,15 @@ def build_settlement(player, p):
         player.roads_q().count() > 0 and #FIXME
 
         #and the player has the requisite resources
-        player.hasResources(BuildTypes.TOWN)
+        player.hasResourcesFor(BuildTypes.TOWN)
     ) :
-        player.takeResources(BuildTypes.TOWN)
+        player.takeResourcesFor(BuildTypes.TOWN)
+        #Actually, I think it would be better to just have add_settlement written here inline
         player.add_settlement(p)
+        player.Score += 1
+        player.game.log(Log.settlement_built(player, s))
+        player.checkVictory()
+
 
         db_session.commit()
 
@@ -122,11 +127,10 @@ def upgrade_settlement(player, vertex):
         existing_settlement is not None and
 
         #the player has the necessary resources
-        player.hasCardsFor(BuildTypes.CITY)
+        player.hasResourcesFor(BuildTypes.CITY)
     ) :
-
         existing_settlement.Type = Settlement.CITY
-        player.takeResources(BuildTypes.CITY)
+        player.takeResourcesFor(BuildTypes.CITY)
         player.Score += 1
         player.game.log(Log.settlement_upgraded(player.UserID, vertex))
         player.checkVictory()
@@ -140,34 +144,26 @@ def upgrade_settlement(player, vertex):
 def build_road(player, vertex1, vertex2):
     if vertex2 < vertex1:
         (vertex1, vertex2) = (vertex2, vertex1)
-    p1 = v.decompress(vertex1)
-    p2 = v.decompress(vertex2)
-    vertices = (vertex1, vertex2)
+    
     if (
         #the player has the resources
-        player.hasResources(BuildTypes.ROAD) and
+        player.hasResourcesFor(BuildTypes.ROAD) and
+
         #both vertices are valid
-        v.isvalid(p1) and v.isvalid(p2) and
+        v.isvalid(v.decompress(vertex1)) and
+        v.isvalid(v.decompress(vertex2)) and
+
         #no other roads overlap
-        Road.query. \
-            filter_by(GameID=player.GameID). \
-            filter_by(Vertex1=vertex1). \
-            filter_by(Vertex2=vertex2). \
-            count() == 0
-        and
+        Road.overlaps_q(player, vertex1, vertex2).count() == 0 and
 
         #the player has a road at one of the vertices already
-        player.roads_q(). \
-            filter(or_(
-                in_(Road.Vertex1, vertices),
-                in_(Road.Vertex2, vertices)
-            )).count() != 0
+        player.road_meets_q(vertex1, vertex2).count() != 0
     ) :
 
-        player.takeResources(BuildTypes.ROAD)
-        r = Road(vertex1, vertex2, userid)
-        g.roads.append(r)
-        g.log({ "action" : "road_built", "args" : [userid, vertex1, vertex2]})
+        player.takeResourcesFor(BuildTypes.ROAD)
+        r = Road(player.UserID, vertex1, vertex2)
+        player.game.roads.append(r)
+        player.game.log(Log.road_built(player, r))
 
         # TODO: check if we now have longest road.
         # It is a longest path problem.  Check the rules before implementing
@@ -175,22 +171,8 @@ def build_road(player, vertex1, vertex2):
         db_session.commit()
 
         return "success"
-
     else:
         return "failure"
-
-"""def development_card(player):
-    if player.hasResources(BuildTypes.DEVCARD):
-        card = player.game.cards.drawDevCard();
-
-        player.getCard(card)
-
-        g.log({ "action" : "devcard_bought", "args" : [userid, card]}) #private
-
-        return add_log("success", id, sequence)
-    else:
-        return add_log("failure", id, sequence)
-"""
 
 def move_robber(player, to, stealfrom):
     game = player.game
@@ -262,9 +244,13 @@ def setup(player, settlement_vertex, road_to):
         #we don't have to check for existing roads,
         #because there can't be any, by the distance rule
     ):
-        player.add_settlement(settlement_vertex)
+        s = player.add_settlement(settlement_vertex)
+        
+        r = player.add_road(settlement_vertex, road_to)
 
-        player.add_road(settlement_vertex, road_to)
+        player.Score += 2
+
+        game.log(Log.setup(player, settlement_vertex, road_to))
 
         if game.State == Game.States.SETUP_FORWARD:
             if game.CurrentIndex + 1 == len(game.players):

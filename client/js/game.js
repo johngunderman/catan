@@ -2,11 +2,8 @@
 
 window.onload = function() {
     window.userID = parseInt($.cookie("user"));
-    console.debug(userID);
 
-    waitOnImage(handleGameJoin)
-            initWhitespace();
-            initPlayerDisplay();
+    waitOnImage(handleGameJoin);
 }
 
 function user(i) {
