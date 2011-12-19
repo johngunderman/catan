@@ -20,13 +20,11 @@ var req_handlers = {
 }
 
 //TODO: Chance this to promptVertex
-function promptSettlement(acceptable) {
+function promptSettlement(accept) {
     var dfd = $.Deferred();
-
-    acceptable.forEach(function(i) {
-        drawSettlementDetector(stage, i).
-            then(settlementChosen);
-
+    
+    accept.forEach(function(i) {
+        drawSettlementDetector(stage, i). then(settlementChosen);
     });
 
     function settlementChosen(p) {
@@ -221,12 +219,12 @@ function do_turn(log_entry) {
             })
 
             choose_steal_from.pipe(function(stealfrom) {
-                var data = { moveto: moveto };
+                var data = { game: gameID, moveto: moveto };
                 if(stealfrom) {
                     data.stealfrom = stealfrom;
                 }
-
-                $.post("/move_robber", data);
+                
+                $.get("/move_robber", data);
                 robber_dfd.resolve();
             });
         } else {
