@@ -236,15 +236,37 @@ function do_turn(log_entry) {
         return robber_dfd.promise();
     }
 
+
+    function send_update_new_settlement(p) {
+        insertSettlement(userID, decompress(p));
+        //drawSettlement(p);
+        $.get(HOSTNAME + "/build_settlement", {"vertex" : p, "game" : gameID});
+
+        // keep giving the option to build, if we can.
+        if (hasRoadResources() || hasSettlementResources()) {
+            do_build();
+        }
+    }
+
+    function send_update_new_road(p) {
+        insertRoad(userID, p.vertex1, p.vertex2);
+        $.get(HOSTNAME + "/build_road", {"vertex1" : p.vertex1, "vertex2" : p.vertex2, "game" : gameID});
+    }
+
     function do_build() {
+        var built = false;
+
         if(hasRoadResources()) {
             console.log("We can build a road!");
-            promptRoad();
+            promptRoad().then(send_update_new_road);
+            built = true;
         }
         if(hasSettlementResources()) {
             console.log("We can build a Settlement!");
-            promptNewSettlement();
+            promptNewSettlement().then(send_update_new_settlement);
+            built = true;
         }
+        return built;
     }
 
     move_robber().done(do_build);
