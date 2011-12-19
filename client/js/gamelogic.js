@@ -14,6 +14,7 @@ function insertSettlement(user, uvertex) {
                 "user" : user
             };
     }
+    drawSettlement(vertex);
 }
 
 function hex_adjacent(p) {
@@ -161,7 +162,6 @@ function getValidRoadPlaces() {
 
     //remove those which are already held by other players
     for(var i in gameboard.roads) {
-        if(i != userID) {
             var roads = gameboard.roads[i];
             roads.forEach(function(road) {
                 var index = [road.vertex1, road.vertex2];
@@ -169,14 +169,13 @@ function getValidRoadPlaces() {
                     delete valid[index];
                 }
             });
-        }
     }
 
     //There may be a utility function to do the below
     var ret = [];
 
     for(var i in valid) {
-        ret.push(i);
+        ret.push(valid[i]);
     }
 
     return ret;
