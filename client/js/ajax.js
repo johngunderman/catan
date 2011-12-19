@@ -145,6 +145,7 @@ function handle_resources_gained(log_entry) {
                 gameboard.cards[cardNames[card[1]]] += card[0];
             }
         );
+        updateResources();
     }
 
     //Put a message in the ticker
@@ -170,7 +171,6 @@ function handle_resources_gained(log_entry) {
     }
 
     tickerName(log_entry.user, message);
-    drawResourceCounters();
 }
 
 function do_setup(log_entry) {
@@ -274,6 +274,7 @@ function do_turn(log_entry) {
         }
     }
    
+    $("#done").show(1000);
     do_build();
 }
 

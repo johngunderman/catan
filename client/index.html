@@ -5,19 +5,16 @@
 <script src="lib/jquery.cookie.js"></script>
 <link rel="stylesheet" type="text/css" href="style/style.css" />
 
-<h1>Settlers of Catan</h1>
 
 <div id="left-side">
+    <div id="button-div" style="height: 150px; width: 150px;">
+      <a id="done" style="display: none;" href="javascript:doneButtonClicked();"> Done! </a>
+    </div>
     <h2>Ticker</h2>
     <div style="height: 400px; overflow-y: auto">
         <ul id="ticker"></ul>
     </div>
-    <div id="resources">
-        <h2>My Resources</h2>
-    </div>
 </div>
-
-<div id="board"></div>
 
 <div id="right-side">
     <div>
@@ -25,16 +22,13 @@
           This text is displayed if your browser does not support HTML5 Canvas.
         </canvas>
     </div>
-    <div>
-        <canvas id="whitespace" width="250" height="130">
-          This text is displayed if your browser does not support HTML5 Canvas.
-        </canvas>
-    </div>
-    <div id="button-div">
-      <button type="button" id="city-button" onclick="upgradeSettlements();">Upgrade Settlements</button>
-      <button type="button" id="confirm-button" onclick="doneButtonClicked();"> Done! </button>
+        <div id="resources">
+        <h2>My Resources</h2>
     </div>
 </div>
+
+<h1>The Settlers of Catan</h1>
+<div id="board"></div>
 
 <script type="text/javascript" src="js/constants.js"></script>
 <script type="text/javascript" src="js/vertex.js"></script>

@@ -1,18 +1,24 @@
+body {
+    font-family: sans-serif;
+    background-color: #99F
+}
+
 h1 {
     text-align: center;
     font: bold 40px sans-serif;
 }
 
 #right-side {
-    position: absolute;
-    top: 10%;
-    right: 0;
+    float: right;
+    align: center;
+}
+
+#right-side > * {
+    margin-top: 20px;
 }
 
 #left-side {
-    position: absolute;
-    top: 10%;
-    left: 0;
+    float: left;
     padding-left: 50px;
 }
 
@@ -23,17 +29,18 @@ h1 {
     height: 600px;
 }
 
-#city-button {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-}
-
 #button-div {
     position: relative;
     width: 70%;
     margin-left: auto;
     margin-right: auto;
+}
+
+#players {
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+    background-color: #FFF;
 }
 
 #confirm-button {
@@ -49,4 +56,19 @@ h1 {
     font-size: 10pt;
 }
 
-
+#done {
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    font-size: larger;
+    font-style: bold;
+    color: white;
+    vertical-align: middle;
+    text-align: center;
+    display: block;
+    background-color: green;
+    height: 150px;
+    width: 150px;
+    line-height: 150px;
+    display: block;
+}

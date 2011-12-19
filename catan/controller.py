@@ -248,7 +248,7 @@ def setup(player, settlement_vertex, road_to):
         
         r = player.add_road(settlement_vertex, road_to)
 
-        player.Score += 2
+        player.Score += 1
 
         game.log(Log.setup(player, settlement_vertex, road_to))
 

@@ -19,7 +19,7 @@ function dispBoard(img, context, hexes) {
         dispChit(context, hexes[x][1], hexes[x][0]);
     }
 
-    drawResourceCounters(context, 1,2,5,4,3);
+    updateResources();
 }
 
 
@@ -280,31 +280,7 @@ function drawHexAt(img, context, hexNum, x, y) {
                       SCALE_WIDTH, SCALE_HEIGHT);
 }
 
-function initWhitespace(user) {
-    var example = document.getElementById('whitespace');
-    var context = example.getContext('2d');
-
-    if (user == userID) {
-        // init whitespace
-
-        context.fillStyle = "rgb(34,139,34)";
-        context.beginPath();
-        context.arc(40, 43, 10, 0, Math.PI*2, true);
-        context.closePath();
-        context.fill();
-        context.font    = 'bold 20px sans-serif';
-        context.fillText  ("It's your turn!", 70, 50);
-        //context.fillText  ("1:37", 180, 105);
-    } else {
-        context.clearRect(0,0,250,130);
-    }
-}
-
-
 function updatePlayerDisplay(user) {
-
-    initWhitespace(user);
-
     var canvas = document.getElementById('players');
 
     var context = canvas.getContext('2d');
@@ -435,60 +411,4 @@ function dispChit(context, number, hex) {
 
     if (number != 7)
         context.fillText("" + number, xcoord + offset, ycoord);
-}
-
-
-function drawResourceCounters() {
-
-    var brick  = gameboard.cards.brick;
-    var lumber = gameboard.cards.lumber;
-    var wool   = gameboard.cards.wool;
-    var grain  = gameboard.cards.grain;
-    var ore    = gameboard.cards.ore;
-
-    var context = stage.getContext();
-
-    context.font = RESOURCE_FONT;
-    context.fillStyle = RESOURCE_FONT_COLOR;
-
-    context.clearRect(RESOURCE_XCOORD - 20, RESOURCE_YCOORD - 20, BOARD_SIZE, BOARD_SIZE);
-
-    // brick
-    context.textAlign = "right";
-    context.fillText("" + brick, RESOURCE_XCOORD, RESOURCE_YCOORD);
-
-    context.textAlign = "left";
-    context.fillText("Brick", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET, RESOURCE_YCOORD);
-
-    // lumber
-    context.textAlign = "right";
-    context.fillText("" + lumber, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING);
-
-    context.textAlign = "left";
-    context.fillText("Lumber", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
-                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING );
-
-    // wool
-    context.textAlign = "right";
-    context.fillText("" + wool, RESOURCE_XCOORD, RESOURCE_YCOORD  + RESOURCE_VERTICAL_SPACING * 2);
-
-    context.textAlign = "left";
-    context.fillText("Wool", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
-                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 2);
-
-    // grain
-    context.textAlign = "right";
-    context.fillText("" + grain, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 3);
-
-    context.textAlign = "left";
-    context.fillText("Grain", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
-                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 3);
-
-    // ore
-    context.textAlign = "right";
-    context.fillText("" + ore, RESOURCE_XCOORD, RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 4);
-
-    context.textAlign = "left";
-    context.fillText("Ore", RESOURCE_XCOORD + RESOURCE_TEXT_OFFSET,
-                     RESOURCE_YCOORD + RESOURCE_VERTICAL_SPACING * 4);
 }

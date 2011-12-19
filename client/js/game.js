@@ -47,7 +47,7 @@ function upgradeSettlements() {
 }
 
 function doneButtonClicked() {
-    // here we should tell the server that we're done.
+    $("#done").hide(1000)
     end_turn();
 }
 
@@ -63,8 +63,19 @@ function sendToTicker(message) {
     $("#ticker").append("<li> " + message + "</li>");
 }
 
+function initResources() {
+    var cards = $("#resources");
+    
+    for(var i in gameboard.cards) {
+        cards.append("<span id='" + i + "'>" + gameboard.cards[i] + "</span> " + i + "<br />");
+    }
+}
 
-
+function updateResources() {
+    for(var i in gameboard.cards) {
+        $("#resources #" + i).text(gameboard.cards[i]);
+    }
+}
 
 function handleGameJoin() {
 
@@ -73,6 +84,7 @@ function handleGameJoin() {
     if (game) {
         window.gameID = game;
         joinGame();
+        initResources();
     }
     else {
         startGameRequest();

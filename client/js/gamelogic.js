@@ -79,11 +79,13 @@ function hasSettlementResources() {
 function takeRoadResources() {
     gameboard.cards.brick--;
     gameboard.cards.lumber--;
+    updateResources();
 }
 
 function takeCityResources() {
     gameboard.cards.ore -= 3;
     gameboard.cards.grain -= 2;
+    updateResources();
 }
 
 function takeSettlementResources() {
@@ -91,6 +93,7 @@ function takeSettlementResources() {
     gameboard.cards.lumber--;
     gameboard.cards.wool--;
     gameboard.cards.grain--;
+    updateResources();
 }
 
 function getBadDistanceRule() {
