@@ -22,10 +22,10 @@ var req_handlers = {
 //TODO: Chance this to promptVertex
 function promptSettlement(acceptable) {
     var dfd = $.Deferred();
-    
+
     acceptable.forEach(function(i) {
         drawSettlementDetector(stage, i).
-            then(settlementChosen)
+            then(settlementChosen);
 
     });
 
@@ -196,13 +196,13 @@ function handle_req_setup(log_entry) {
 function do_turn(log_entry) {
     function move_robber() {
         var robber_dfd = $.Deferred();
-   
+
         if(log_entry.roll === 7) {
             var moveto;
             var choose_location = promptRobber();
             var choose_steal_from = choose_location.pipe(function(chosen) {
                 moveto = chosen;
-               
+
                 var valid = hex_adjacent(chosen).filter(function(h) {
                     return h in gameboard.settlements;
                 });
@@ -219,13 +219,13 @@ function do_turn(log_entry) {
 
                 return dfd.promise();
             })
-            
+
             choose_steal_from.pipe(function(stealfrom) {
                 var data = { moveto: moveto };
                 if(stealfrom) {
                     data.stealfrom = stealfrom;
                 }
-                
+
                 $.post("/move_robber", data);
                 robber_dfd.resolve();
             });
@@ -240,6 +240,10 @@ function do_turn(log_entry) {
         if(hasRoadResources()) {
             console.log("We can build a road!");
             promptRoad();
+        }
+        if(hasSettlementResources()) {
+            console.log("We can build a Settlement!");
+            promptNewSettlement();
         }
     }
 
@@ -330,7 +334,6 @@ function handleResponseJson(json) {
 
             setTimeout("updateClient()",3000);
             // stuff is really messed up, so go ahead and reload the page
-            //window.location.reload();
         }
 
     }
@@ -368,6 +371,3 @@ function startGameRequest() {
     makeAjaxRequest(HOSTNAME + "/create_game", "",
                    create_game_callback);
 }
-
-
-
