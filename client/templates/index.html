@@ -24,6 +24,11 @@
   {% if request.cookies.get("user") %}
   <a id = "float-right-link" href="/create_game" class="btn primary">New Game</a>
   {% else %}
+  <div class="alert-message error">
+    <p>
+      <center><strong>Oh No!</strong> You'll need to log in before you can play any games.</center>
+    </p>
+  </div>
   <a id = "float-right-link" href="/login" class="btn primary">Log In</a>
   {% endif %}
   <table id="games-table" class="zebra-striped">
