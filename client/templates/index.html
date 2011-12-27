@@ -21,7 +21,11 @@
 </div>
 
 <div id="table-div">
-  <a id = "new-game-link" href="/create_game" class="btn primary">New Game</a>
+  {% if request.cookies.get("user") %}
+  <a id = "float-right-link" href="/create_game" class="btn primary">New Game</a>
+  {% else %}
+  <a id = "float-right-link" href="/login" class="btn primary">Log In</a>
+  {% endif %}
   <table id="games-table" class="zebra-striped">
     <thead>
       <tr id="games-table-header">
@@ -34,7 +38,9 @@
       <tr>
         <td>3</td>
         <td>1</td>
-        <td><a id="join-link" class="btn success" href="">Join</a></td>
+        <td>
+          <a id="join-link" class="btn success" href="">Join</a>
+        </td>
       </tr>
       <tr>
         <td>1</td>
