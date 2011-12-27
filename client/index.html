@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <script src="lib/jquery-1.7.1.min.js"></script>
 <script src="lib/jquery.cookie.js"></script>
+<script src="lib/jquery.tablesorter.min.js"></script>
+
 <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="style/main.css" />
 <link rel="stylesheet" type="text/css" href="style/join.css" />
 
 
+<script>
+  $(document).ready(function()
+  {
+  $("#games-table").tablesorter({ sortList: [[1,0]] });
+  }
+  );
+</script>
+
 <div id="header">
   <h1>Welcome to Catan!</h1>
 </div>
-<table id="games-table">
-  <tr id="games-table-header">
-    <td>Available?</td>
-    <td>Game ID</td>
-    <td># Players</td>
-    <td></td>
-  <tr>
-  <tr>
-    <td>foo</td>
-    <td>bar</td>
-    <td>baz</td>
-    <td><a href="">join</a></td>
-  </tr>
-  <tr>
-    <td>foo</td>
-    <td>bar</td>
-    <td>baz</td>
-    <td><a href="">join</a></td>
-  </tr>
-  <tr>
-    <td>foo</td>
-    <td>bar</td>
-    <td>baz</td>
-    <td><a href="">join</a></td>
-  </tr>
-</table>
+
+<div class="container">
+  <a href="/create_game" class="btn primary">New Game</a>
+  <table id="games-table" class="zebra-striped">
+    <thead>
+      <tr id="games-table-header">
+        <th class="blue header">Game ID</th>
+        <th class="green header"># Players</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>3</td>
+        <td>1</td>
+        <td><a class="btn success" href="">Join</a></td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>2</td>
+        <td><a class="btn success" href="">Join</a></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>4</td>
+        <td><a class="btn success disabled" href="">Full</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
