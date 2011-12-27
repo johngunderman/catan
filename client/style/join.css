@@ -1,5 +1,5 @@
+
 #games-table {
-    width: 50%;
     margin: auto;
 }
 
@@ -7,6 +7,20 @@
     font: bold 20px sans-serif;
 }
 
-#games-table {
+#new-game-link {
+    float: right;
+    margin: 5px;
+}
 
+#join-link {
+    float: right;
+}
+
+#table-div {
+    width: 600px;
+    margin: auto;
+}
+
+#header {
+    margin: 20px;
 }
