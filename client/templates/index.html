@@ -2,6 +2,8 @@
 <script src="lib/jquery-1.7.1.min.js"></script>
 <script src="lib/jquery.cookie.js"></script>
 <script src="lib/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap-alerts.js"></script>
+<script type="text/javascript" src="js/gamebrowser.js"></script>
 
 <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="style/main.css" />
@@ -21,16 +23,14 @@
 </div>
 
 <div id="table-div">
-  {% if request.cookies.get("user") %}
-  <a id = "float-right-link" href="/create_game" class="btn primary">New Game</a>
-  {% else %}
-  <div class="alert-message error">
-    <p>
-      <center><strong>Oh No!</strong> You'll need to log in before you can play any games.</center>
-    </p>
+
+  <div id="login-message-div" class="alert-message error invis">
+    <a class="close" href="#">×</a>
+    <p><strong>Oh Noes!</strong> You need to log in before you can start playing.</p>
   </div>
-  <a id = "float-right-link" href="/login" class="btn primary">Log In</a>
-  {% endif %}
+
+  <a id="create-game-button" href="/create_game" class="btn primary right">New Game</a>
+  <a id="login-button" href="/login" class="btn primary right invis">Log In</a>
   <table id="games-table" class="zebra-striped">
     <thead>
       <tr id="games-table-header">

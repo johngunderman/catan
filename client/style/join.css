@@ -7,7 +7,7 @@
     font: bold 20px sans-serif;
 }
 
-#float-right-link {
+.right {
     float: right;
     margin: 5px;
 }
@@ -23,4 +23,8 @@
 
 #header {
     margin: 20px;
+}
+
+.invis {
+    display: none;
 }
