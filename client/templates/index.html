@@ -30,7 +30,7 @@
   </div>
 
   <a id="create-game-button" href="/create_game" class="btn primary right">New Game</a>
-  <a id="login-button" href="/login" class="btn primary right invis">Log In</a>
+  <a id="login-button" onclick="login()" class="btn primary right invis">Log In</a>
   <table id="games-table" class="zebra-striped">
     <thead>
       <tr id="games-table-header">
@@ -50,7 +50,9 @@
       <tr>
         <td>1</td>
         <td>2</td>
-        <td><a id="join-link" class="btn success" href="">Join</a></td>
+        <td>
+          <a id="join-link" class="btn success" href="">Join</a>
+        </td>
       </tr>
       <tr>
         <td>2</td>

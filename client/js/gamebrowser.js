@@ -10,7 +10,7 @@ window.onload = function() {
 }
 
 function nullActionButtons() {
-
+    $(".success").addClass("disabled");
 }
 
 function displayLoginPrompt() {
@@ -18,4 +18,8 @@ function displayLoginPrompt() {
     $(".alert-message").alert();
     $("#login-button").removeClass("invis");
     $("#create-game-button").addClass("invis");
+}
+
+function login() {
+    
 }
