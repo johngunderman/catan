@@ -21,5 +21,9 @@ function displayLoginPrompt() {
 }
 
 function login() {
-    
+    $.get('/login', function(data) {
+        if (data == "success") {
+            document.location.reload();
+        }
+    }, 'text');
 }
