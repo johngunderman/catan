@@ -150,7 +150,10 @@ def get_file(filename):
 
 @app.route("/")
 def get_index():
-    return render_template('index.html')
+    game = Game();
+    games = game.query.filter_by(State=Game.States.NOTSTARTED)
+    # passing in len is a huge hack, but it does the job.
+    return render_template('index.html',games=games, len=len)
     #return send_from_directory('../client', "index.html")
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@
     <p><strong>Oh Noes!</strong> You need to log in before you can start playing.</p>
   </div>
 
-  <a id="create-game-button" href="/create_game" class="btn primary right">New Game</a>
+  <a id="create-game-button" href="/game.html" class="btn primary right">New Game</a>
   <a id="login-button" onclick="login()" class="btn primary right invis">Log In</a>
   <table id="games-table" class="zebra-striped">
     <thead>
@@ -40,25 +40,16 @@
       </tr>
     </thead>
     <tbody>
+      {% for game in games %}
       <tr>
-        <td>3</td>
-        <td>1</td>
+        <td>{{game.GameID}}</td>
+        <td>{{len(game.players)}}</td>
         <td>
-          <a id="join-link" class="btn success" href="">Join</a>
+          <a id="join-link" class="btn success"
+             href="/game.html#{{game.GameID}}">Join</a>
         </td>
       </tr>
-      <tr>
-        <td>1</td>
-        <td>2</td>
-        <td>
-          <a id="join-link" class="btn success" href="">Join</a>
-        </td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>4</td>
-        <td><a id="join-link" class="btn success disabled" href="">Full</a></td>
-      </tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
