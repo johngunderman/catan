@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<script src="lib/jquery-1.7.1.min.js"></script>
+<script src="lib/jquery.cookie.js"></script>
+<script src="lib/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="lib/bootstrap-alerts.js"></script>
+<script type="text/javascript" src="js/gamebrowser.js"></script>
+
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="style/main.css" />
+<link rel="stylesheet" type="text/css" href="style/join.css" />
+
+
+<script>
+  $(document).ready(function()
+  {
+  $("#games-table").tablesorter({ sortList: [[1,0]] });
+  }
+  );
+</script>
+
+<div id="header">
+  <h1>Welcome to Catan!</h1>
+</div>
+
+<div id="table-div">
+
+  <div id="login-message-div" class="alert-message error invis fade in">
+    <a class="close" href="#">×</a>
+    <p><strong>Oh Noes!</strong> You need to log in before you can start playing.</p>
+  </div>
+
+  <a id="create-game-button" href="/game.html" class="btn primary right">New Game</a>
+  <a id="login-button" onclick="login()" class="btn primary right invis">Log In</a>
+  <table id="games-table" class="zebra-striped">
+    <thead>
+      <tr id="games-table-header">
+        <th class="blue header">Game ID</th>
+        <th class="green header"># Players</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for game in games %}
+      <tr>
+        <td>{{game.GameID}}</td>
+        <td>{{len(game.players)}}</td>
+        <td>
+          <a id="join-link" class="btn success"
+             href="/game.html#{{game.GameID}}">Join</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

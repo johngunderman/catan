@@ -387,7 +387,7 @@ function startGameRequest() {
         sendToTicker("New game created!");
         sendToTicker("Waiting for players...");
 
-        window.location = HOSTNAME + "/#" + gameID;
+        window.location = HOSTNAME + "/game.html#" + gameID;
 
         updateClient();
     }

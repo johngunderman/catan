@@ -1,5 +1,5 @@
-from flask import Flask, Response, make_response, request, send_from_directory, jsonify
-app = Flask(__name__)
+from flask import Flask, Response, make_response, request, send_from_directory, jsonify, render_template
+app = Flask(__name__, template_folder="../client/templates")
 app.debug = True
 #app.config.from_envvar("CATAN_SETTINGS")
 
@@ -150,7 +150,11 @@ def get_file(filename):
 
 @app.route("/")
 def get_index():
-    return send_from_directory('../client', "index.html")
+    game = Game();
+    games = game.query.filter_by(State=Game.States.NOTSTARTED)
+    # passing in len is a huge hack, but it does the job.
+    return render_template('index.html',games=games, len=len)
+    #return send_from_directory('../client', "index.html")
 
 if __name__ == "__main__":
     app.run()
